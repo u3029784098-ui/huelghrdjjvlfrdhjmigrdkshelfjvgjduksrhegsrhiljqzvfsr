@@ -1,0 +1,5 @@
+In more complex scenarios, a pair of nodes in a graph can be associated with multiple edges of different types. By viewing under different types of edges, the graph can form multiple layers, in which each layer represents one type of relation. Therefore, multiplex graph can also be referred to as multi-view graph (multi-dimensional graph). For example, in YouTube, there can be three different relations between two users: sharing, subscription, comment. Edge types are not assumed independent with each other, therefore simply splitting the graph into subgraphs with one type of edges might not be an optimal solution. mGCN (Ma et al., 2019) introduces general representations and dimension-specific representations for nodes in each layer of GNN. The dimension-specific representations are projected from general representations using
+
+Figure 5: An overview of methods with unsupervised loss.
+
+different projection matrices and then aggregated to form the next layer's general representations.

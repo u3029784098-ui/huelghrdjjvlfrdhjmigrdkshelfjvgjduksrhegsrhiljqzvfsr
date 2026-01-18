@@ -1,0 +1,3 @@
+Instead of sampling neighbors for each node, layer sampling retains a small set of nodes for aggregation in each layer to control the expansion factor. FastGCN (Chen et al., 2018) directly samples the receptive field for each layer. It uses importance sampling, where the important nodes are more likely to be sampled.
+
+In contrast to fixed sampling methods above, Huang et al. (2018) introduce a parameterized and trainable sampler to perform layer-wise sampling conditioned on the former layer. Furthermore, this adaptive sampler could optimize the sampling importance and reduce variance simultaneously. LADIES (Zouet al., 2019) intends to alleviate the sparsity issue in layer-wise sampling by generating samples from the union of neighbors of the nodes.

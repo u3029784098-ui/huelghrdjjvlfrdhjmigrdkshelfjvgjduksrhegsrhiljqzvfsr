@@ -1,0 +1,1 @@
+The second variant of graphs is heterogeneous graphs, where the nodes and edges are multi-typed or multi-modal. More specifically, in a heterogeneous graph \(\{V,E,\varphi,\psi\}\), each node \(\nu_{i}\) is associated with a type \(\varphi(\nu_{i})\) and each edge \(e_{i}\) with a type \(\psi(e_{i})\).

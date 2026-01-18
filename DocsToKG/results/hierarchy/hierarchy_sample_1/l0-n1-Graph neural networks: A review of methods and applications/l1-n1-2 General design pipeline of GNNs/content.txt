@@ -1,0 +1,7 @@
+In this paper, we introduce models of GNNs in a designer view. We first present the general design pipeline for designing a GNN model in this section. Then we give details of each step such as selecting computational modules, considering graph type and scale, and designing loss function in Section 3, 4, and 5, respectively. And finally, we use an example to illustrate the design process of GNN for a specific task in Section 6.
+
+Figure 1: Left: image in Euclidean space. Right: graph in non-Euclidean space.
+
+In later sections, we denote a graph as \(G=(V,E)\), where \(|V|=N\) is the number of nodes in the graph and \(|E|=N^{*}\) is the number of edges. \(\mathbf{A}\in\mathbb{R}^{N,N}\) is the adjacency matrix. For graph representation learning, we use \(\mathbf{h}_{v}\) and \(\mathbf{o}_{v}\) as the hidden state and output vector of node \(v\). The detailed descriptions of the notations could be found in Table 1.
+
+In this section, we present the general design pipeline of a GNN model for a specific task on a specific graph type. Generally, the pipeline contains four steps: (1) find graph structure, (2) specify graph type and scale, (3) design loss function and (4) build model using computational modules. We give general design principles and some background knowledge in this section. The design details of these steps are discussed in later sections.

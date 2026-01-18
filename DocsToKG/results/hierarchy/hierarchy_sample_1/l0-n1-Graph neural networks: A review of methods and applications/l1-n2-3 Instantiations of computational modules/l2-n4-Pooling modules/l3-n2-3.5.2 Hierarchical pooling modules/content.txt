@@ -1,0 +1,19 @@
+The methods mentioned before directly learn graph representations from nodes and they do not investigate the hierarchical property of the graph structure. Next we will talk about methods that follow a hierarchical pooling pattern and learn graph representations by layers.
+
+_Graph Coarsening._ Early methods are usually based on graph coarsening algorithms. Spectral clustering algorithms are firstly used but they are inefficient because of the eigendecomposition step. Gracus (Dhillon et al., 2007) provides a faster way to cluster nodes and it is applied as a pooling module. For example, ChebNet and MoNet use Graclus to merge node pairs and further add additional nodes to make sure the pooling procedure forms a balanced binary tree.
+
+_ECC_. Edge-Conditioned Convolution (ECC) (Simonovsky and Komodakis, 2017) designs its pooling module with recursively downsampling operation. The downsampling method is based on splitting the graph into two components by the sign of the largest eigenvector of the Laplacian.
+
+_DiffPool._ DiffPool (Ying et al., 2018) uses a learnable hierarchical clustering module by training an assignment matrix \(\mathbf{S}^{t}\) in each layer:
+
+\[\begin{array}{l}\mathbf{S}^{t}=\operatorname{softmax}(\operatorname{GNN}_{i,\text{real}}(\mathbf{A}^{t},\mathbf{H})),\\ \mathbf{A}^{t+1}=(\mathbf{S})^{T}\mathbf{A}\mathbf{S}^{t},\end{array} \tag{24}\]
+
+where \(\mathbf{H}^{t}\) is the node feature matrix and \(\mathbf{A}^{t}\) is coarsened adjacency matrix of layer \(t\). \(\mathbf{S}^{t}\) denotes the probabilities that a node in layer \(t\) can be assigned to a coarser node in layer \(t+1\).
+
+_gPool._ gPool (Gao and Ji, 2019) uses a project vector to learn projection scores for each node and select nodes with top-k scores. Compared to DiffPool, it uses a vector instead of a matrix at each layer, thus it reduces the storage complexity. But the projection procedure does not consider the graph structure.
+
+_EigenPooling._ EigenPooling (Ma et al., 2019) is designed to use the node features and local structure jointly. It uses the local graph Fourier transform to extract subgraph information and suffers from the inefficiency of graph eigendecomposition.
+
+_SAGPool._ SAGPool (Lee et al., 2019) is also proposed to use features and topology jointly to learn graph representations. It uses a self-attention based method with a reasonable time and space complexity.
+
+Figure 4: An overview of variants considering graph type and scale.

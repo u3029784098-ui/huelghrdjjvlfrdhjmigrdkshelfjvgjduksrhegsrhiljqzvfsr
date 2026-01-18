@@ -1,0 +1,13 @@
+For unsupervised graph representation learning, there has been a trend to extend auto-encoder (AE) to graph domains.
+
+Graph Auto-Encoder (GAE) (Kipf and Welling, 2016) first uses GCNs to encode nodes in the graph. Then it uses a simple decoder to reconstruct the adjacency matrix and compute the loss from the similarity between the original adjacency matrix and the reconstructed matrix:
+
+\[\mathbf{H}=\mathrm{GCN}(\mathbf{X},\mathbf{A}), \tag{28}\] \[\tilde{\mathbf{A}}=\rho(\mathbf{H}\mathbf{H}^{\prime}).\]
+
+Kipf and Welling (2016) also train the GAE model in a variational manner and the model is named as the variational graph auto-encoder (VGAE).
+
+Adversarially Regularized Graph Auto-encoder (ARGA) (Pan et al., 2018) employs generative adversarial networks (GANs) to regularize a GCN-based graph auto-encoder, which could learn more robust node representations.
+
+Instead of recovering the adjacency matrix, Wang et al. (2017), Park et al. (2019) try to reconstruct the feature matrix. MGAE (Wang et al., 2017) utilizes marginalized denoising auto-encoder to get robust node representation. To build a symmetric graph auto-encoder, GALA (Park et al., 2019) proposes Laplacian sharpening, the inverse operation of Laplacian smoothing, to decode hidden states. This mechanism alleviates the oversmoothing issue in GNN training.
+
+Different from above, AGE (Cui et al., 2020) states that the recovering losses are not compatible with downstream tasks. Therefore, they apply adaptive learning for the measurement of pairwise node similarity and achieve state-of-the-art performance on node clustering and link prediction.

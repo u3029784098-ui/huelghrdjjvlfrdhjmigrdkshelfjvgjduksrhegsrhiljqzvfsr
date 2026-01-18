@@ -1,0 +1,74 @@
+s as the input to RNN, it feeds the weights of the GCN into the RNN to capture the intrinsic dynamics of the graph interactions. Recently, a survey (Huang et al., 2020) classifies the dynamic networks into several categories based on the link duration, and groups the existing models into these categories according to their specialization. It also establishes a general framework for models of dynamic graphs and fits existing models into the general framework.
+
+### Other graph types
+
+For other variants of graphs, such as hypergraphs and signed graphs, there are also some models proposed to address the challenges.
+
+#### 4.4.1 Hypergraphs
+
+A hypergraph can be denoted by \(G=(V,E,W_{e})\), where an edge \(e\in E\) connects two or more vertices and is assigned a weight \(w\in W_{e}\). The adjacency matrix of a hypergraph can be represented in a \(|V|\times|E|\) matrix \(L\):
+
+\[L_{w}=\left\{\begin{aligned} 1,&\text{if}\quad v\in e \\ 0,&\text{if}\quad v\not\in e\end{aligned}\right\}. \tag{26}\]
+
+HGNN (Feng et al., 2019) proposes hypergraph convolution to process these high order interaction between nodes:
+
+\[\mathbf{H}=\mathbf{D}_{r}^{-}\mathbf{L}\mathbf{W}_{e}\mathbf{D}_{e}^{-} \mathbf{L}^{\prime}\mathbf{D}_{r}^{-}\mathbf{X}\mathbf{W}, \tag{27}\]
+
+where the \(\mathbf{D}_{r}\), \(\mathbf{W}_{e}\), \(\mathbf{D}_{e}\), \(\mathbf{X}\) are the node degree matrix, edge weight matrix, edge degree matrix and node feature matrix respectively. \(\mathbf{W}\) is the learnable parameters. This formula is derived by approximating the hypergraph Laplacian using truncated Chebyshev polynomials.
+
+#### 4.4.2 Signal graphs
+
+Signed graphs are the graphs with signed edges, i.e. an edge can be either positive or negative. Instead of simply treating the negative edges as the absent edges or another type of edges, SGCN (Derr et al., 2018) utilizes balance theory to capture the interactions between positive edges and negative edges. Intuitively, balance theory suggests that the friend (positive edge) of my friend is also my friend and the enemy (negative edge) of my enemy is my friend. Therefore it provides theoretical foundation for SGCN to model the interactions between positive edges and negative edges.
+
+### Large graphs
+
+As we mentioned in Section 3.4, sampling operators are usually used to process large-scale graphs. Besides sampling techniques, there are also other methods for the scaling problem. Leveraging approximate personalized PageRank, methods proposed by Klicpera et al. (2019) and Bojchevski et al. (2020) avoid calculating high-order propagation matrices. Rossi et al. (2020) propose a method to precompute graph convolutional filters of different sizes for efficient training and inference. PageRank-based models squeeze multiple GCN layers into one single propagation layer to mitigate the "neighbor explosion" issue, hence are highly scalable and efficient.
+
+## 5 Variants for different training settings
+
+In this section, we introduce variants for different training settings. For supervised and semi-supervised settings, labels are provided so that loss functions are easy to design for these labeled samples. For unsupervised settings, there are no labeled samples so that loss functions should depend on the information provided by the graph itself, such as input features or the graph topology. In this section, we mainly introduce variants for unsupervised training, which are usually based on the ideas of auto-encoders or contrastive learning. An overview of the methods we mention is shown in Fig. 5.
+
+### Graph auto-encoders
+
+For unsupervised graph representation learning, there has been a trend to extend auto-encoder (AE) to graph domains.
+
+Graph Auto-Encoder (GAE) (Kipf and Welling, 2016) first uses GCNs to encode nodes in the graph. Then it uses a simple decoder to reconstruct the adjacency matrix and compute the loss from the similarity between the original adjacency matrix and the reconstructed matrix:
+
+\[\mathbf{H}=\mathrm{GCN}(\mathbf{X},\mathbf{A}), \tag{28}\] \[\tilde{\mathbf{A}}=\rho(\mathbf{H}\mathbf{H}^{\prime}).\]
+
+Kipf and Welling (2016) also train the GAE model in a variational manner and the model is named as the variational graph auto-encoder (VGAE).
+
+Adversarially Regularized Graph Auto-encoder (ARGA) (Pan et al., 2018) employs generative adversarial networks (GANs) to regularize a GCN-based graph auto-encoder, which could learn more robust node representations.
+
+Instead of recovering the adjacency matrix, Wang et al. (2017), Park et al. (2019) try to reconstruct the feature matrix. MGAE (Wang et al., 2017) utilizes marginalized denoising auto-encoder to get robust node representation. To build a symmetric graph auto-encoder, GALA (Park et al., 2019) proposes Laplacian sharpening, the inverse operation of Laplacian smoothing, to decode hidden states. This mechanism alleviates the oversmoothing issue in GNN training.
+
+Different from above, AGE (Cui et al., 2020) states that the recovering losses are not compatible with downstream tasks. Therefore, they apply adaptive learning for the measurement of pairwise node similarity and achieve state-of-the-art performance on node clustering and link prediction.
+
+### Contrastive learning
+
+Besides graph auto-encoders, contrastive learning paves another way for unsupervised graph representation learning. Deep Graph Infomax (DGI) (Velickovic et al., 2019) maximizes mutual information between node representations and graph representations. Infograph (Sun et al., 2020) aims to learn graph representations by mutual information maximization between graph-level representations and the substructure-level representations of different scales including nodes, edges and triangles. Multi-view (Hassani and Khasahmadi, 2020) contrasts representations from first-order adjacency matrix and graph diffusion, achieves state-of-the-art performances on multiple graph learning tasks.
+
+## 6 A design example of GNN
+
+In this section, we give an existing GNN model to illustrated the design process. Taking the task of heterogeneous graph pretraining as an example, we use GPT-GNN (Hu et al., 2020) as the model to illustrate the design process.
+
+1. _Find graph structure._ The paper focuses on applications on the academic knowledge graph and the recommendation system. In the academic knowledge graph, the graph structure is explicit. In recommendation systems, users, items and reviews can be regarded as nodes and the interactions among them can be regarded as edges, so the graph structure is also easy to construct.
+2. _Specify graph type and scale._ The tasks focus on heterogeneous graphs, so that types of nodes and edges should be considered and incorporated in the final model. As the academic graph and the recommendation graph contain millions of nodes, so that the model should further consider the efficiency problem. In conclusion, the model should focus on large-scale heterogeneous graphs.
+3. _Design loss function._ As downstream tasks in (Hu et al., 2020) are all node-level tasks (e.g. Paper-Field prediction in the academic graph), so that the model should learn node representations in the pretraining step. In the pretraining step, no labeled data is available, so that a self-supervised graph generation task is designed to learn node embeddings. In the finetuning step, the model is finetuned based on the training data of each task, so that the supervised loss of each task is applied.
+4. _Build model using computational modules._ Finally the model is built with computational modules. For the propagation module, the authors use a convolution operator HGT (Hu et al., 2020) that we mentioned before. HGT incorporates the types of nodes and edges into the propagation step of the model and the skip connection is also added in the architecture. For the sampling module, a specially designed sampling method HG sampling (Hu et al., 2020) is applied, which is a heterogeneous version of LADIES (Zou et al., 2019). As the model focuses on learning node representations, the pooling module is not needed. The HGT layer are stacked multiple layers to learn better node embeddings.
+
+## 7 Analyses of GNNs
+
+### Theoretical aspect
+
+In this section, we summarize the papers about the theoretic foundations and explanations of graph neural networks from various perspectives.
+
+Figure 6: Application scenarios. (lcons made by Freeplk from Flaticon)
+
+#### 7.1.1 Graph signal processing
+
+From the spectral perspective of view, GCNs perform convolution operation on the input features in the spectral domain, which follows graph signal processing in theory.
+
+There exists several works analyzing GNNs from graph signal processing. Li et al. (2018c) first address the graph convolution in graph neural networks is actually Laplacian smoothing, which smooths the feature matrix so that nearby nodes have similar hidden representations. Laplacian smoothing reflects the homophily assumption that nearby nodes are supposed to be similar. The Laplacian matrix serves as a low-pass filter for the input features. SGC (Wu et al., 2019b) further removes the weight matrices and nonlinearities between layers, showing that the low-pass filter is the reason why GNNs work.
+
+Following the idea of low-pass filtering, Zhang et al. (2019c), Cui et al. (2020), NT and Maehara (19), Chen et al. (2020b) analyze different filters and provide new insights. To achieve low-pass filtering for all the eigenvalues, AGC (Zhang et al., 2019c) designs a graph filter \(I-\frac{1}{2}L\) according to the frequency response function. AGE (Cui et al., 2020) further demonstrates that filter with \(I-\frac{1}{\alpha\alpha}L\) could get better results, where \(\lambda_{\text{max}}\) is the maximum eigenvalue of the Laplacian matrix. Despite linear filters, GraphHeat (Xuetal et al., 2019a) leverages heat kernels for better low-pass properties. NT and Maehara (Net and Maehara, 2019) state that graph convolution is mainly a denoising process for input features, the model performances heavi

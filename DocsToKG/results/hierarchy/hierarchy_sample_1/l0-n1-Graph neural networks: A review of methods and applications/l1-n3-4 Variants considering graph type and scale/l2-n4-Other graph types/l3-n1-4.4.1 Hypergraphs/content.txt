@@ -1,0 +1,9 @@
+A hypergraph can be denoted by \(G=(V,E,W_{e})\), where an edge \(e\in E\) connects two or more vertices and is assigned a weight \(w\in W_{e}\). The adjacency matrix of a hypergraph can be represented in a \(|V|\times|E|\) matrix \(L\):
+
+\[L_{w}=\left\{\begin{aligned} 1,&\text{if}\quad v\in e \\ 0,&\text{if}\quad v\not\in e\end{aligned}\right\}. \tag{26}\]
+
+HGNN (Feng et al., 2019) proposes hypergraph convolution to process these high order interaction between nodes:
+
+\[\mathbf{H}=\mathbf{D}_{r}^{-}\mathbf{L}\mathbf{W}_{e}\mathbf{D}_{e}^{-} \mathbf{L}^{\prime}\mathbf{D}_{r}^{-}\mathbf{X}\mathbf{W}, \tag{27}\]
+
+where the \(\mathbf{D}_{r}\), \(\mathbf{W}_{e}\), \(\mathbf{D}_{e}\), \(\mathbf{X}\) are the node degree matrix, edge weight matrix, edge degree matrix and node feature matrix respectively. \(\mathbf{W}\) is the learnable parameters. This formula is derived by approximating the hypergraph Laplacian using truncated Chebyshev polynomials.

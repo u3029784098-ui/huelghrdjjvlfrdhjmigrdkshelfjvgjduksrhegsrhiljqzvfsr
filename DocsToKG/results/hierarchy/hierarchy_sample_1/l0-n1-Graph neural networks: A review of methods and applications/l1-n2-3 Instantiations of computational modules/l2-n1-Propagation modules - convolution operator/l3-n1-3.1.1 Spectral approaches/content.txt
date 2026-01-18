@@ -1,0 +1,57 @@
+Spectral approaches work with a spectral representation of the graphs. These methods are theoretically based on graph signal processing (Shuman et al., 2013) and define the convolution operator in the spectral domain.
+
+In spectral methods, a graph signal \(\mathbf{x}\) is firstly transformed to the spectral domain by the graph Fourier transform \(\mathcal{T}\), then the convolution operation is conducted. After the convolution, the resulted signal is transformed back using the inverse graph Fourier transform \(\mathcal{T}^{-1}\). These transforms are defined as:
+
+\[\mathcal{T}(\mathbf{x})=\mathbf{U}^{\top}\mathbf{x}, \tag{1}\] \[\mathcal{T}^{-1}(\mathbf{x})=\mathbf{U}\mathbf{x}.\]
+
+Here \(\mathbf{U}\) is the matrix of eigenvectors of the normalized graph Laplacian \(\mathbf{L}=\mathbf{I}_{\mathbf{N}}-\mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{ D}^{-\frac{1}{2}}\) (\(\mathbf{D}\) is the degree matrix and \(\mathbf{A}\) is the adjacency matrix of the graph). The normalized graph Laplacian is real symmetric positive semidefinite, so it can be factorized as \(\mathbf{L}=\mathbf{U}\mathbf{U}^{\top}\) (where \(\mathbf{A}\) is a diagonal matrix of the eigenvalues). Based on the convolution theorem (Mallat, 1999), the convolution operation is defined as:
+
+\[\mathbf{g}\star\mathbf{x} =\mathcal{T}^{-1}(\mathcal{T}(\mathbf{g})\odot\mathcal{T}( \mathbf{x})) \tag{2}\] \[=\mathbf{U}(\mathbf{U}^{\top}\mathbf{g}\odot\mathbf{U}^{\top} \mathbf{x}),\]
+
+where \(\mathbf{U}^{\top}\mathbf{g}\) is the filter in the spectral domain. If we simplify the filter by
+
+Figure 2: The general design pipeline for a GNN model.
+
+using a learnable diagonal matrix \(\mathbf{g}_{\mathbf{w}}\), then we have the basic function of the spectral methods:
+
+\[\mathbf{g}_{\mathbf{w}}\star\mathbf{x}=\mathbf{U}_{\mathbf{g}}\mathbf{U}^{ \dagger}\mathbf{x}. \tag{3}\]
+
+Next we introduce several typical spectral methods which design different filters \(\mathbf{g}_{\mathbf{w}}\).
+
+_Spectral Network._ Spectral network (Bruna et al., 2014) uses a learnable diagonal matrix as the filter, that is \(\mathbf{g}_{\mathbf{w}}=\text{diag}(\mathbf{w})\), where \(\mathbf{w}\in\mathbb{R}^{N}\) is the parameter. However, this operation is computationally inefficient and the filter is non-spatially localized. Henaff et al. (2015) attempt to make the spectral filters spatially localized by introducing a parameterization with smooth coefficients.
+
+_ChebNet._ Hammond et al. (2011) suggest that \(\mathbf{g}_{\mathbf{w}}\) can be approximated by a truncated expansion in terms of Chebyshev polynomials \(\mathbf{T}_{k}(x)\) up to \(\mathbb{K}^{\text{th}}\) order. Deferhard et al. (2016) propose the ChebNet based on this theory. Thus the operation can be written as:
+
+\[\mathbf{g}_{\mathbf{w}}\star\mathbf{x}\approx\sum_{k=0}^{\mathbf{c}}w_{k} \mathbf{T}_{k}\big{(}\hat{\mathbf{L}}\big{)}\mathbf{x}, \tag{4}\]
+
+where \(\hat{\mathbf{L}}=\frac{2}{4\text{mm}}\mathbf{L}-\mathbf{I}_{\mathbf{N}},\hat {\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{ \mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{     \mathbf{   }}}}}}}}}}}}}}\) denotes the largest eigenvalue of \(\mathbf{L}\). The range of the eigenvalues in \(\hat{\mathbf{L}}\) is [-1, 1]. \(\mathbf{w}\in\mathbb{R}^{K}\) is now a vector of Chebyshev coefficients. The Chebyshev polynomials are defined as \(\mathbf{T}_{k}(\mathbf{x})=2\mathbf{x}\mathbf{T}_{k-1}(\mathbf{x})-\mathbf{T} _{k-2}(\mathbf{x})\), with \(\mathbf{T}_{0}(\mathbf{x})=1\) and \(\mathbf{T}_{1}(\mathbf{x})=\mathbf{x}\). It can be observed that the operation is \(K\)-localized since it is a \(\mathbb{K}^{\text{th}}\)-order polynomial in the Laplacian. Deferhard et al. (2016) use this \(K\)-localized convolution to define a convolutional neural network which could remove the need to compute the eigenvectors of the Laplacian.
+
+_GCN._ Kipf and Welling (2017) simplify the convolution operation in Eq. (4) with \(K=1\) to alleviate the problem of overfitting. They further assume \(z_{\text{max}}\approx 2\) and simplify the equation to
+
+\[\mathbf{g}_{\mathbf{w}}\star\mathbf{x}\approx w_{0}\mathbf{x}+w_{1}(\mathbf{L }-\mathbf{I}_{\mathbf{w}})\mathbf{x}=w_{0}\mathbf{x}-w_{1}\mathbf{D}^{- \frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}}\mathbf{x} \tag{5}\]
+
+with two free parameters \(w_{0}\) and \(w_{1}\). With parameter constraint \(w=w_{0}=-w_{1}\), we can obtain the following expression:
+
+\[\mathbf{g}_{\mathbf{w}}\star\mathbf{x}\approx w\left(\mathbf{I}_{\mathbf{N}}+ \mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}}\right)\mathbf{x}. \tag{6}\]
+
+GCN further introduces a _renormalization trick_ to solve the exploding/vanishing gradient problem in Eq. (6): \(\mathbf{I}_{\mathbf{N}}+\mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{ 1}{2}}\rightarrow\mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}}\), with
+
+Figure 3: An overview of computational modules.
+
+\(\hat{\mathbf{A}}=\mathbf{A}+\mathbf{I}_{\mathbf{w}}\) and \(\tilde{\mathbf{D}}_{\mathbf{z}}=\sum\limits_{j}\hat{\mathbf{A}}_{y}\). Finally, the compact form of GCN is defined as:
+
+\[\mathbf{H}=\mathbf{D}^{-\frac{1}{2}}\hat{\mathbf{A}}\mathbf{D}^{-\frac{1}{2}} \hat{\mathbf{X}}\mathbf{W}, \tag{7}\]
+
+where \(\mathbf{X}\in\mathbb{R}^{R,r}\) is the input matrix, \(\mathbf{W}\in\mathbb{R}^{R,r^{\prime}}\) is the parameter and \(\mathbf{H}\in\mathbb{R}^{R,r^{\prime}}\) is the convolved matrix. \(F\) and \(F^{\prime}\) are the dimensions of the input and the output, respectively. Note that GCN can also be regarded as a spatial method that we will discuss later.
+
+_AGCN._ All of these models use the original graph structure to denote relations between nodes. However, there may have implicit relations between different nodes. The Adaptive Graph Convolution Network (AGCN) is proposed to learn the underlying relations (Li et al., 2018). AGCN learns a "residual" graph Laplacian and add it to the original Laplacian matrix. As a result, it is proven to be effective in several graph-structured datasets.
+
+_DGCN._ The dual graph convolutional network (DGCN) (Zhuang and Ma, 2018) is proposed to jointly consider the local consistency and global consistency on graphs. It uses two convolutional networks to capture the local and global consistency and adopts an unsupervised loss to ensemble them. The first convolutional network is the same as Eq. (7), and the second network replaces the adjacency matrix with positive pointwise mutual information (PPMI) matrix:
+
+\[\mathbf{H}=\rho\left(\mathbf{D}_{\rho}^{-1}\mathbf{A}_{\rho}\mathbf{D}_{ \rho}^{-1}\mathbf{H}\mathbf{W}\right), \tag{8}\]
+
+where \(\mathbf{A}_{\rho}\) is the PPMI matrix and \(\mathbf{D}_{\rho}\) is the diagonal degree matrix of \(\mathbf{A}_{\rho}\).
+
+_GWNN._ Graph wavelet neural network (GWNN) (Xu et al., 2019) uses the graph wavelet transform to replace the graph Fourier transform. It has several advantages: (1) graph wavelets can be fastly obtained without matrix decomposition; (2) graph wavelets are sparse and localized thus the results are better and more explainable. GWNN outperforms several spectral methods on the semi-supervised node classification task.
+
+_AGCN_ and _DGCN_ try to improve spectral methods from the perspective of augmenting graph Laplacian while _GWNN_ replaces the Fourier transform. In conclusion, spectral approaches are well theoretically based and there are also several theoretical analyses proposed recently (see Section 7.1.1). However, in almost all of the spectral approaches mentioned above, the learned filters depend on graph structure. That is to say, the filters cannot be applied to a graph with a different structure and those models can only be applied under the "transductive" setting of graph tasks.

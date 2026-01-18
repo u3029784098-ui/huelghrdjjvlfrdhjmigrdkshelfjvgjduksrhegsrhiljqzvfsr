@@ -1,0 +1,831 @@
+# Graph neural networks: A review of methods and applications
+
+Jie Zhou
+
+Corresponding author.
+
+Ganqu Cui
+
+Corresponding author.
+
+Shengding Hu
+
+Corresponding author.
+
+Zhengyan Zhang
+
+Corresponding author.
+
+Cheng Yang
+
+Corresponding author.
+
+Zhiyuan Liu
+
+Corresponding author.
+
+Lifeng Wang
+
+Corresponding author.
+
+Changcheng Li
+
+Corresponding author.
+
+Maosong Sun
+
+Corresponding author.
+
+###### Abstract
+
+Lots of learning tasks require dealing with graph data which contains rich relation information among elements. Modeling physics systems, learning molecular fingerprints, predicting protein interface, and classifying diseases demand a model to learn from graph inputs. In other domains such as learning from non-structural data like texts and images, reasoning on extracted structures (like the dependency trees of sentences and the scene graphs of images) is an important research topic which also needs graph reasoning models. Graph neural networks (GNNs) are neural models that capture the dependence of graphs via message passing between the nodes of graphs. In recent years, variants of GNNs such as graph convolutional network (GCN), graph attention network (GAT), graph recurrent network (GRN) have demonstrated ground-breaking performances on many deep learning tasks. In this survey, we propose a general design pipeline for GNN models and discuss the variants of each component, systematically categorize the applications, and propose four open problems for future research.
+
+GNN, Graph neural networks, GNN,is straightforward to generalize CNNs on graphs. As shown in Fig. 1, it is hard to define localized convolutional filters and pooling operators, which hinders the transformation of CNN from Euclidean domain to non-Euclidean domain. Extending deep neural models to non-Euclidean domains, which is generally referred to as geometric deep learning, has been an emerging research area (Bronstein et al., 2017). Under this umbrella term, deep learning on graphs receives enormous attention.
+
+The other motivation comes from _graph representation learning_(Cui et al., 2018; Hamilton et al., 2017; Zhang et al., 2018; Cai et al., 2018; Goyal and Ferrara, 2018), which learns to represent graph nodes, edges or subgraphs by low-dimensional vectors. In the field of graph analysis, traditional machine learning approaches usually rely on hand engineered features and are limited by its inflexibility and high cost. Following the idea of _representation learning_ and the success of word embedding (Mikolov et al., 2013), DeepWalk (Perozzi et al., 2014), regarded as the first graph embedding method based on representation learning, applies SkipGram model (Mikolov et al., 2013) on the generated random walks. Similar approaches such as node2vec (Grover and Leskovec, 2016), LINE (Tang et al., 2015) and TADW (Yang et al., 2015) also achieved breakthroughs. However, these methods suffer from two severe drawbacks (Hamilton et al., 2017). First, no parameters are shared between nodes in the encoder, which leads to computationally inefficiency, since it means the number of parameters grows linearly with the number of nodes. Second, the direct embedding methods lack the ability of generalization, which means they cannot deal with dynamic graphs or generalize to new graphs.
+
+Based on CNNs and graph embedding, variants of graph neural networks (GNNs) are proposed to collectively aggregate information from graph structure. Thus they can model input and/or output consisting of elements and their dependency.
+
+There exists several comprehensive reviews on graph neural networks. Bronstein et al. (2017) provide a thorough review of geometric deep learning, which presents its problems, difficulties, solutions, applications and future directions. Zhang et al. (2019) propose another comprehensive overview of graph convolutional networks. However, they mainly focus on convolution operators defined on graphs while we investigate other computation modules in GNNs such as skip connections and pooling operators.
+
+Papers by Zhang et al. (2018), Wu et al. (2019), Chami et al. (2020) are the most up-to-date survey papers on GNNs and they mainly focus on models of GNN. Wu et al. (2019) categorize GNNs into four groups: recurrent graph neural networks, convolutional graph neural networks, graph autoencoders, and spatial-temporal graph neural networks. Zhang et al. (2018) give a systematic overview of different graph deep learning methods and Chami et al. (2020) propose a Graph Encoder Decoder Model to unify network embedding and graph neural network models. Our paper provides a different taxonomy with them and we mainly focus on classic GNN models. Besides, we summarize variants of GNNs for different graph types and also provide a detailed summary of GNNs' applications in different domains.
+
+There have also been several surveys focusing on some specific graph learning fields. Sun et al. (2018) and Chen et al. (2020) give detailed overviews for adversarial learning methods on graphs, including graph data attack and defense. Lee et al. (2018) provide a review over graph attention models. The paper proposed by Yang et al. (2020) focuses on heterogeneous graph representation learning, where nodes or edges are of multiple types. Huang et al. (2020) review over existing GNN models for dynamic graphs. Peng et al. (2020) summarize graph embeddings methods for combinatorial optimization. We conclude GNNs for heterogeneous graphs, dynamic graphs and combinatorial optimization in Section 4.2, Section 4.3, and Section 8.1.6 respectively.
+
+In this paper, we provide a thorough review of different graph neural network models as well as a systematic taxonomy of the applications. To summarize, our contributions are:
+
+* We provide a detailed review over existing graph neural network models. We present a general design pipeline and discuss the variants of each module. We also introduce researches on theoretical and empirical analyses of GNN models.
+* We systematically categorize the applications and divide the applications into structural scenarios and non-structural scenarios. We present several major applications and their corresponding methods for each scenario.
+* We propose four open problems for future research. We provide a thorough analysis of each problem and propose future research directions.
+
+The rest of this survey is organized as follows. In Section 2, we present a general GNN design pipeline. Following the pipeline, we discuss each step in detail to review GNN model variants. The details are included in Section 3 to Section 6. In Section 7, we revisit research works over theoretical and empirical analyses of GNNs. In Section 8, we introduce several major applications of graph neural networks applied to structural scenarios, non-structural scenarios and other scenarios. In Section 9, we propose four open problems of graph neural networks as well as several future research directions. And finally, we conclude the survey in Section 10.
+
+## 2 General design pipeline of GNNs
+
+In this paper, we introduce models of GNNs in a designer view. We first present the general design pipeline for designing a GNN model in this section. Then we give details of each step such as selecting computational modules, considering graph type and scale, and designing loss function in Section 3, 4, and 5, respectively. And finally, we use an example to illustrate the design process of GNN for a specific task in Section 6.
+
+Figure 1: Left: image in Euclidean space. Right: graph in non-Euclidean space.
+
+In later sections, we denote a graph as \(G=(V,E)\), where \(|V|=N\) is the number of nodes in the graph and \(|E|=N^{*}\) is the number of edges. \(\mathbf{A}\in\mathbb{R}^{N,N}\) is the adjacency matrix. For graph representation learning, we use \(\mathbf{h}_{v}\) and \(\mathbf{o}_{v}\) as the hidden state and output vector of node \(v\). The detailed descriptions of the notations could be found in Table 1.
+
+In this section, we present the general design pipeline of a GNN model for a specific task on a specific graph type. Generally, the pipeline contains four steps: (1) find graph structure, (2) specify graph type and scale, (3) design loss function and (4) build model using computational modules. We give general design principles and some background knowledge in this section. The design details of these steps are discussed in later sections.
+
+### Find graph structure
+
+At first, we have to find out the graph structure in the application. There are usually two scenarios: structural scenarios and non-structural scenarios. In structural scenarios, the graph structure is explicit in the applications, such as applications on molecules, physical systems, knowledge graphs and so on. In non-structural scenarios, graphs are implicit so that we have to first build the graph from the task, such as building a fully-connected "word" graph for text or building a scene graph for an image. After we get the graph, the later design process attempts to find an optimal GNN model on this specific graph.
+
+### Specify graph type and scale
+
+After we get the graph in the application, we then have to find out the graph type and its scale.
+
+Graphs with complex types could provide more information on nodes and their connections. Graphs are usually categorized as:
+
+* **Directed/Undirected Graphs.** Edges in directed graphs are all directed from one node to another, which provide more information than undirected graphs. Each edge in undirected graphs can also be regarded as two directed edges.
+* **Homogeneous/Heterogeneous Graphs.** Nodes and edges in homogeneous graphs have same types, while nodes and edges have different types in heterogeneous graphs. Types for nodes and edges play important roles in heterogeneous graphs and should be further considered.
+* **Static/Dynamic Graphs.** When input features or the topology of the graph vary with time, the graph is regarded as a dynamic graph. The time information should be carefully considered in dynamic graphs.
+
+Note these categories are orthogonal, which means these types can be combined, e.g. one can deal with a dynamic directed heterogeneous graph. There are also several other graph types designed for different tasks such as hypergraphs and signed graphs. We will not enumerate all types here but the most important idea is to consider the additional information provided by these graphs. Once we specify the graph type, the additional information provided by these graph types should be further considered in the design process.
+
+As for the graph scale, there is no clear classification criterion for "small" and "large" graphs. The criterion is still changing with the development of computation devices (e.g. the speed and memory of GPUs). In this paper, when the adjacency matrix or the graph Laplacian of a graph (the space complexity is \(O(n^{2})\)) cannot be stored and processed by the device, then we regard the graph as a large-scale graph and then some sampling methods should be considered.
+
+### Design loss function
+
+In this step we should design the loss function based on our task type and the training setting.
+
+For graph learning tasks, there are usually three kinds of tasks:
+
+* **Node-level** tasks focus on nodes, which include node classification, node regression, node clustering, etc. Node classification tries to categorize nodes into several classes, and node regression predicts a continuous value for each node. Node clustering aims to partition the nodes into several disjoint groups, where similar nodes should be in the same group.
+* **Edge-level** tasks are edge classification and link prediction, which require the model to classify edge types or predict whether there is an edge existing between two given nodes.
+* **Graph-level** tasks include graph classification, graph regression, and graph matching, all of which need the model to learn graph representations.
+
+From the perspective of supervision, we can also categorize graph learning tasks into three different training settings:
+
+* **Supervised setting** provides labeled data for training.
+* **Semi-supervised setting** gives a small amount of labeled nodes and a large amount of unlabeled nodes for training. In the test phase, the **transductive setting** requires the model to predict the labels of the given unlabeled nodes, while the **inductive setting** provides new unlabeled nodes from the same distribution to infer. Most node and edge classification tasks are semi-supervised. Most recently, a mixed transductive-inductive scheme is undertaken by Wang and Leskovec (2020) and Rossi et al. (2018), carving a new path towards the mixed setting.
+* **Unsupervised setting** only offers unlabeled data for the model to find patterns. Node clustering is a typical unsupervised learning task.
+
+With the task type and the training setting, we can design a specific loss function for the task. For example, for a node-level semi-supervised classification task, the cross-entropy loss can be used for the labeled nodes in the training set.
+
+### Build model using computational modules
+
+Finally, we can start building the model using the computational modules. Some commonly used computational modules are:
+
+\begin{table}
+\begin{tabular}{l l} \hline \hline Notations & Descriptions \\ \hline \hline \(\mathbf{g}^{n}\) & \(m\)-dimensional Euclidean space \\ \(\alpha,\mathbf{n},\mathbf{A}\) & Scalar, vector and matrix \\ \(\mathbf{A}^{r}\) & Matrix transpose \\ \(\mathbf{l}_{v}\) & Identity matrix of dimension \(N\) \\ \(\mathbf{g}_{v}\) **x** & Convolution of \(\mathbf{g}_{v}\) and \(\mathbf{s}\) \\ \(N,N^{r}\) & Number of nodes in the graph \\ \(N^{r}\) & Number of edges in the graph \\ \(\cdot,r\) & Neighborhood set of node \\ \(\mathbf{s}^{r}\) & Vector \(a\) of node \(v\) at time step \(t\) \\ \(\mathbf{h}_{v}\) & Hidden state of node \(v\) \\ \(\mathbf{h}^{r}_{i}\) & Hidden state of node \(v\) at time step \(t\) \\ \(\mathbf{o}^{r}_{i}\) & Output of node \(v\) at time step \(t\) \\ \(\mathbf{e}_{vw}\) & Features of edge from node \(v\) to \(w\) \\ \(\mathbf{n}_{v}\) & Features of edge with label \(k\) \\ \(\mathbf{W}^{r}\),\(\mathbf{U}^{r}\) & Matrices for computing i, a \\ \(\mathbf{W}^{r}\),\(\mathbf{U}^{r}\) & Vectors for computing i, a \\ \(\rho\) & An alternative non-linear function \\ \(\sigma\) & The logistic sigmoid function \\ tanh & The hyperbolic tangent function \\ LealeyReLU & The LealeyReLU function \\ \(\odot\) & Element-wise multiplication operation \\ \(\parallel\) & Vector concatenation \\ \hline \hline \end{tabular}
+\end{table}
+Table 1: Notations used in this paper.
+
+* **Propagation Module.** The propagation module is used to propagate information between nodes so that the aggregated information could capture both feature and topological information. In propagation modules, the **convolution operator** and **recurrent operator** are usually used to aggregate information from neighbors while the **skip connection** operation is used to gather information from historical representations of nodes and mitigate the over-smoothing problem.
+* **Sampling Module.** When graphs are large, sampling modules are usually needed to conduct propagation on graphs. The sampling module is usually combined with the propagation module.
+* **Pooling Module.** When we need the representations of high-level subgraphs or graphs, pooling modules are needed to extract information from nodes.
+
+With these computation modules, a typical GNN model is usually built by combining them. A typical architecture of the GNN model is illustrated in the middle part of Fig. 2 where the convolutional operator, recurrent operator, sampling module and skip connection are used to propagate information in each layer and then the pooling module is added to extract high-level information. These layers are usually stacked to obtain better representations. Note this architecture can generalize most GNN models while there are also exceptions, for example, NDCN (Zang and Wang, 2020) combines ordinary differential equation systems (ODEs) and GNNs. It can be regarded as a continuous-time GNN model which integrates GNN layers over continuous time without propagating through a discrete number of layers.
+
+An illustration of the general design pipeline is shown in Fig. 2. In later sections, we first give the existing instantiations of computational modules in Section 3, then introduce existing variants which consider different graph types and scale in Section 4. Then we survey on variants designed for different training settings in Section 5. These sections correspond to details of step (4), step (2), and step (3) in the pipeline. And finally, we give a concrete design example in Section 6.
+
+## 3 Instantiations of computational modules
+
+In this section we introduce existing instantiations of three computational modules: propagation modules, sampling modules and pooling modules. We introduce three sub-components of propagation modules: convolution operator, recurrent operator and skip connection in Section 3.1, 3.2, and 3.3 respectively. Then we introduce sampling modules and pooling modules in Section 3.4 and 3.5. An overview of computational modules is shown in Fig. 3.
+
+### Propagation modules - convolution operator
+
+Convolution operators that we introduce in this section are the mostly used propagation operators for GNN models. The main idea of convolution operators is to generalize convolutions from other domain to the graph domain. Advances in this direction are often categorized as spectral approaches and spatial approaches.
+
+#### 3.1.1 Spectral approaches
+
+Spectral approaches work with a spectral representation of the graphs. These methods are theoretically based on graph signal processing (Shuman et al., 2013) and define the convolution operator in the spectral domain.
+
+In spectral methods, a graph signal \(\mathbf{x}\) is firstly transformed to the spectral domain by the graph Fourier transform \(\mathcal{T}\), then the convolution operation is conducted. After the convolution, the resulted signal is transformed back using the inverse graph Fourier transform \(\mathcal{T}^{-1}\). These transforms are defined as:
+
+\[\mathcal{T}(\mathbf{x})=\mathbf{U}^{\top}\mathbf{x}, \tag{1}\] \[\mathcal{T}^{-1}(\mathbf{x})=\mathbf{U}\mathbf{x}.\]
+
+Here \(\mathbf{U}\) is the matrix of eigenvectors of the normalized graph Laplacian \(\mathbf{L}=\mathbf{I}_{\mathbf{N}}-\mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{ D}^{-\frac{1}{2}}\) (\(\mathbf{D}\) is the degree matrix and \(\mathbf{A}\) is the adjacency matrix of the graph). The normalized graph Laplacian is real symmetric positive semidefinite, so it can be factorized as \(\mathbf{L}=\mathbf{U}\mathbf{U}^{\top}\) (where \(\mathbf{A}\) is a diagonal matrix of the eigenvalues). Based on the convolution theorem (Mallat, 1999), the convolution operation is defined as:
+
+\[\mathbf{g}\star\mathbf{x} =\mathcal{T}^{-1}(\mathcal{T}(\mathbf{g})\odot\mathcal{T}( \mathbf{x})) \tag{2}\] \[=\mathbf{U}(\mathbf{U}^{\top}\mathbf{g}\odot\mathbf{U}^{\top} \mathbf{x}),\]
+
+where \(\mathbf{U}^{\top}\mathbf{g}\) is the filter in the spectral domain. If we simplify the filter by
+
+Figure 2: The general design pipeline for a GNN model.
+
+using a learnable diagonal matrix \(\mathbf{g}_{\mathbf{w}}\), then we have the basic function of the spectral methods:
+
+\[\mathbf{g}_{\mathbf{w}}\star\mathbf{x}=\mathbf{U}_{\mathbf{g}}\mathbf{U}^{ \dagger}\mathbf{x}. \tag{3}\]
+
+Next we introduce several typical spectral methods which design different filters \(\mathbf{g}_{\mathbf{w}}\).
+
+_Spectral Network._ Spectral network (Bruna et al., 2014) uses a learnable diagonal matrix as the filter, that is \(\mathbf{g}_{\mathbf{w}}=\text{diag}(\mathbf{w})\), where \(\mathbf{w}\in\mathbb{R}^{N}\) is the parameter. However, this operation is computationally inefficient and the filter is non-spatially localized. Henaff et al. (2015) attempt to make the spectral filters spatially localized by introducing a parameterization with smooth coefficients.
+
+_ChebNet._ Hammond et al. (2011) suggest that \(\mathbf{g}_{\mathbf{w}}\) can be approximated by a truncated expansion in terms of Chebyshev polynomials \(\mathbf{T}_{k}(x)\) up to \(\mathbb{K}^{\text{th}}\) order. Deferhard et al. (2016) propose the ChebNet based on this theory. Thus the operation can be written as:
+
+\[\mathbf{g}_{\mathbf{w}}\star\mathbf{x}\approx\sum_{k=0}^{\mathbf{c}}w_{k} \mathbf{T}_{k}\big{(}\hat{\mathbf{L}}\big{)}\mathbf{x}, \tag{4}\]
+
+where \(\hat{\mathbf{L}}=\frac{2}{4\text{mm}}\mathbf{L}-\mathbf{I}_{\mathbf{N}},\hat {\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{ \mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{     \mathbf{   }}}}}}}}}}}}}}\) denotes the largest eigenvalue of \(\mathbf{L}\). The range of the eigenvalues in \(\hat{\mathbf{L}}\) is [-1, 1]. \(\mathbf{w}\in\mathbb{R}^{K}\) is now a vector of Chebyshev coefficients. The Chebyshev polynomials are defined as \(\mathbf{T}_{k}(\mathbf{x})=2\mathbf{x}\mathbf{T}_{k-1}(\mathbf{x})-\mathbf{T} _{k-2}(\mathbf{x})\), with \(\mathbf{T}_{0}(\mathbf{x})=1\) and \(\mathbf{T}_{1}(\mathbf{x})=\mathbf{x}\). It can be observed that the operation is \(K\)-localized since it is a \(\mathbb{K}^{\text{th}}\)-order polynomial in the Laplacian. Deferhard et al. (2016) use this \(K\)-localized convolution to define a convolutional neural network which could remove the need to compute the eigenvectors of the Laplacian.
+
+_GCN._ Kipf and Welling (2017) simplify the convolution operation in Eq. (4) with \(K=1\) to alleviate the problem of overfitting. They further assume \(z_{\text{max}}\approx 2\) and simplify the equation to
+
+\[\mathbf{g}_{\mathbf{w}}\star\mathbf{x}\approx w_{0}\mathbf{x}+w_{1}(\mathbf{L }-\mathbf{I}_{\mathbf{w}})\mathbf{x}=w_{0}\mathbf{x}-w_{1}\mathbf{D}^{- \frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}}\mathbf{x} \tag{5}\]
+
+with two free parameters \(w_{0}\) and \(w_{1}\). With parameter constraint \(w=w_{0}=-w_{1}\), we can obtain the following expression:
+
+\[\mathbf{g}_{\mathbf{w}}\star\mathbf{x}\approx w\left(\mathbf{I}_{\mathbf{N}}+ \mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}}\right)\mathbf{x}. \tag{6}\]
+
+GCN further introduces a _renormalization trick_ to solve the exploding/vanishing gradient problem in Eq. (6): \(\mathbf{I}_{\mathbf{N}}+\mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{ 1}{2}}\rightarrow\mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}}\), with
+
+Figure 3: An overview of computational modules.
+
+\(\hat{\mathbf{A}}=\mathbf{A}+\mathbf{I}_{\mathbf{w}}\) and \(\tilde{\mathbf{D}}_{\mathbf{z}}=\sum\limits_{j}\hat{\mathbf{A}}_{y}\). Finally, the compact form of GCN is defined as:
+
+\[\mathbf{H}=\mathbf{D}^{-\frac{1}{2}}\hat{\mathbf{A}}\mathbf{D}^{-\frac{1}{2}} \hat{\mathbf{X}}\mathbf{W}, \tag{7}\]
+
+where \(\mathbf{X}\in\mathbb{R}^{R,r}\) is the input matrix, \(\mathbf{W}\in\mathbb{R}^{R,r^{\prime}}\) is the parameter and \(\mathbf{H}\in\mathbb{R}^{R,r^{\prime}}\) is the convolved matrix. \(F\) and \(F^{\prime}\) are the dimensions of the input and the output, respectively. Note that GCN can also be regarded as a spatial method that we will discuss later.
+
+_AGCN._ All of these models use the original graph structure to denote relations between nodes. However, there may have implicit relations between different nodes. The Adaptive Graph Convolution Network (AGCN) is proposed to learn the underlying relations (Li et al., 2018). AGCN learns a "residual" graph Laplacian and add it to the original Laplacian matrix. As a result, it is proven to be effective in several graph-structured datasets.
+
+_DGCN._ The dual graph convolutional network (DGCN) (Zhuang and Ma, 2018) is proposed to jointly consider the local consistency and global consistency on graphs. It uses two convolutional networks to capture the local and global consistency and adopts an unsupervised loss to ensemble them. The first convolutional network is the same as Eq. (7), and the second network replaces the adjacency matrix with positive pointwise mutual information (PPMI) matrix:
+
+\[\mathbf{H}=\rho\left(\mathbf{D}_{\rho}^{-1}\mathbf{A}_{\rho}\mathbf{D}_{ \rho}^{-1}\mathbf{H}\mathbf{W}\right), \tag{8}\]
+
+where \(\mathbf{A}_{\rho}\) is the PPMI matrix and \(\mathbf{D}_{\rho}\) is the diagonal degree matrix of \(\mathbf{A}_{\rho}\).
+
+_GWNN._ Graph wavelet neural network (GWNN) (Xu et al., 2019) uses the graph wavelet transform to replace the graph Fourier transform. It has several advantages: (1) graph wavelets can be fastly obtained without matrix decomposition; (2) graph wavelets are sparse and localized thus the results are better and more explainable. GWNN outperforms several spectral methods on the semi-supervised node classification task.
+
+_AGCN_ and _DGCN_ try to improve spectral methods from the perspective of augmenting graph Laplacian while _GWNN_ replaces the Fourier transform. In conclusion, spectral approaches are well theoretically based and there are also several theoretical analyses proposed recently (see Section 7.1.1). However, in almost all of the spectral approaches mentioned above, the learned filters depend on graph structure. That is to say, the filters cannot be applied to a graph with a different structure and those models can only be applied under the "transductive" setting of graph tasks.
+
+#### 3.1.2 Basic spatial approaches
+
+Spatial approaches define convolutions directly on the graph based on the graph topology. The major challenge of spatial approaches is defining the convolution operation with differently sized neighborhoods and maintaining the local invariance of CNNs.
+
+_Neural FPs._ Neural FPs (Duvenaud et al., 2015) uses different weight matrices for nodes with different degrees:
+
+\[\mathbf{t}=\mathbf{h}_{i}^{+}+\sum\limits_{j\in r_{i}}\mathbf{h}_{i}, \tag{9}\]
+
+\[\mathbf{h}_{i}^{+1+}=\sigma\left(\mathbf{H}\mathbf{W}_{i^{\prime}i^{\prime}}^ {+1}\right),\]
+
+where \(\mathbf{W}_{i^{\prime}i^{\prime}}^{+1}\) is the weight matrix for nodes with degree \(\lfloor r^{\prime}\cdot\rfloor\) at layer \(t+1\). The main drawback of the method is that it cannot be applied to large-scale graphs with more node degrees.
+
+_DCNN._ The diffusion convolutional neural network (DCNN) (Atwood and Towsley, 2016) uses transition matrices to define the neighborhood for nodes. For node classification, the diffusion representations of each node in the graph can be expressed as:
+
+\[\mathbf{H}= f(\mathbf{W}_{c}\odot\mathbf{P}^{*}\mathbf{X})\in\mathbb{R}^{R,r \times F,r}, \tag{10}\]
+
+where \(\mathbf{X}\in\mathbb{R}^{R,r}\) is the matrix of input features (\(F\) is the dimension). \(\mathbf{P}^{*}\) is an \(N\times K\times N\) tensor which contains the power series \(\{\mathbf{P},\mathbf{P}^{2},\...,\ \mathbf{P}^{k}\}\) of matrix \(\mathbf{P}\). And \(\mathbf{P}\) is the degree-normalized transition matrix from the graphs adjacency matrix \(\mathbf{A}\). Each entity is transformed to a diffusion convolutional representation which is a \(K\times F\) matrix defined by \(K\) hops of graph diffusion over \(F\) features. And then it will be defined by a \(K\times F\) weight matrix and a non-linear activation function \(f\).
+
+_PATCHY-SAN._ The PATCHY-SAN model (Niepert et al., 2016) extracts and normalizes a neighborhood of exactly \(k\) nodes for each node. The normalized neighborhood serves as the receptive field in the traditional convolutional operation.
+
+_LGCN._ The learnable graph convolutional network (LGCN) (Gao et al., 2018) also exploits CNNs as aggregators. It performs max pooling on neighborhood matrices of nodes to get top-k feature elements and then applies 1-D CNN to compute hidden representations.
+
+_GraphSAGE._ GraphSAGE (Hamilton et al., 2017) is a general inductive framework which generates embeddings by sampling and aggregating features from a node's local neighborhood:
+
+\[\mathbf{h}_{i}^{+1}=\alpha\mathbf{G}_{i+1}\left(\left(\mathbf{h}_{i}^{+}, \forall i\in\mathcal{I}_{r^{*}}^{-1}\right)\right), \tag{11}\]
+
+Instead of using the full neighbor set, GraphSAGE uniformly samples a fixed-size set of neighbors to aggregate information. \(\alpha\mathbf{G}_{i+1}\) is the aggregation function and GraphSAGE suggests three aggregators: mean aggregator, LSTM aggregator, and pooling aggregator. GraphSAGE with a mean aggregator can be regarded as an inductive version of GCN while the LSTM aggregator is not permutation invariant, which requires a specified order of the nodes.
+
+#### 3.1.3 Attention-based spatial approaches
+
+The attention mechanism has been successfully used in many sequence-based tasks such as machine translation (Bahdanau et al., 2015; Gehring et al., 2017; Vaswani et al., 2017), machine reading (Cheng et al., 2016) and so on. There are also several models which try to generalize the attention operator on graphs (Velickovic et al., 2018; Zhang et al., 2018). Compared with the operators we mentioned before, attention-based operators assign different weights for neighbors, so that they could alleviate noises and achieve better results.
+
+_GAT._ The graph attention network (GAT) (Velickovic et al., 2018) incorporates the attention mechanism into the propagation step. It computes the hidden states of each node by attending to its neighbors, following a _self-attention_ strategy. The hidden state of node \(v\) can be obtained by:
+
+\[\mathbf{h}_{i}^{+1}=\rho\left(\sum\limits_{c,r^{\prime}}\alpha_{v}\mathbf{W}_{c }^{*}\right),\]
+
+\[\alpha_{v}=\frac{\exp(\text{LeakyReLU}(\mathbf{a}^{T}[\mathbf{W}_{h},\parallel \mathbf{W}_{h}]))}{\sum\limits_{c\in\mathcal{I}_{r^{*}}}\exp(\text{LeakyReLU}( \mathbf{a}^{T}[\mathbf{W}_{h},\parallel\mathbf{W}_{h}]))}.\]
+
+where \(\mathbf{W}\) is the weight matrix associated with the linear transformation which is applied to each node, and \(\mathbf{a}\) is the weight vector of a single-layer MLP.
+
+Moreover, GAT utilizes the _multi-head attention_ used by Vaswani et al. (2017) to stabilize the learning process. It applies \(K\) independent attention head matrices to compute the hidden states and then concatenates their features (or computes the average), resulting in the following two output representations:
+
+\[\begin{split}&\mathbf{h}_{v}^{e+1}=\|_{k=1}^{e}\sigma\left(\sum_{v\in \mathcal{V}_{v}}\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!recurrent operators share same weights. Early methods based on recursive neural networks focus on dealing with directed acyclic graphs (Sperduti and Starita, 1997; Frasconi et al., 1998; Micheli et al., 2004; Hammer et al., 2004). Later, the concept of graph neural network (GNN) was first proposed in (Scarselli et al., 2009; Gori et al., 2005), which extended existing neural networks to process more graph types. We name the model as GNN in this paper to distinguish it with the general name. We first introduce GNN and its later variants which require convergence of the hidden states and then we talk about methods based on the gate mechanism.
+
+#### 3.2.1 Convergence-based methods
+
+In a graph, each node is naturally defined by its features and the related nodes. The target of GNN is to learn a state embedding \(\mathbf{h}_{v}\in\mathbb{R}^{d}\) which contains the information of the neighborhood and itself for each node. The state embedding \(\mathbf{h}_{v}\) is an \(s\)-dimension vector of node \(v\) and can be used to produce an output \(\mathbf{o}_{v}\) such as the distribution of the predicted node label. Then the computation steps of \(\mathbf{h}_{v}\) and \(\mathbf{o}_{v}\) are defined as:
+
+\[\mathbf{h}_{v}=f\left(\mathbf{x}_{v},\mathbf{x}_{v|i}\right)\mathbf{h}_{v^{ \prime}_{v}},\mathbf{x}_{v^{\prime}_{v}}\,, \tag{19}\]
+
+\(\mathbf{o}_{v}=g(\mathbf{h}_{v},\mathbf{x}_{v})\),
+
+where \(\mathbf{x}_{v},\mathbf{x}_{v|i},\mathbf{h}_{v^{\prime}_{v}},\mathbf{x}_{v^{ \prime}_{v}}\) are the features of \(\mathbf{v}\), the features of its edges, the states and the features of the nodes in the neighborhood of \(\mathbf{v}\), respectively. \(f\) here is a parametric function called the _local transition function_. It is shared among all nodes and updates the node state according to the input neighborhood. \(g\) is the _local output function_ that describes how the output is produced. Note that both \(f\) and \(g\) can be interpreted as the feedforward neural networks.
+
+Let \(\mathbf{H}\), \(\mathbf{0}\), \(\mathbf{X}\), and \(\mathbf{X}_{N}\) be the matrices constructed by stacking all the states, all the outputs, all the features, and all the node features, respectively. Then we have a compact form as:
+
+\[\mathbf{H}=F(\mathbf{H},\mathbf{X}), \tag{20}\] \[\mathbf{O}=G(\mathbf{H},\mathbf{X}_{N}),\]
+
+where \(F\), the _global transition function_, and \(G\), the _global output function_ are stacked versions of \(f\) and \(g\) for all nodes in a graph, respectively. The value of \(\mathbf{H}\) is the fixed point of Eq. (20) and is uniquely defined with the assumption that \(F\) is a contraction map.
+
+With the suggestion of Banach's fixed point theorem (Khamsi and Kirk, 2011), GNN uses the following classic iterative scheme to compute the state:
+
+\[\mathbf{H}^{+1}=F(\mathbf{H}^{\prime},\mathbf{X}), \tag{21}\]
+
+where \(\mathbf{H}^{\prime}\) denotes the \(t\)-th iteration of \(\mathbf{H}\). The dynamical system Eq. (21) converges exponentially fast to the solution for any initial value.
+
+Though experimental results have shown that GNN is a powerful architecture for modeling structural data, there are still several limitations:
+
+* GNN requires \(f\) to be a contraction map which limits the model's ability. And it is inefficient to update the hidden states of nodes iteratively towards the fixed point.
+* It is unsuitable to use the fixed points if we focus on the representation of nodes instead of graphs because the distribution of representation in the fixed point will be much smoother in value and less informative for distinguishing each node.
+
+GraphESNGraph echo state network (GraphESN) (Gallicchio and Micheli, 2010) generalizes the echo state network (ESN) (Jaeger, 2001) on graphs. It uses a fixed contractive encoding function, and only trains a readout function. The convergence is ensured by the contractivity of reservoir dynamics. As a consequence, GraphESN is more efficient than GNN.
+
+SSEStochastic Steady-state Embedding (SSE) (Dai et al., 2018) is also proposed to improve the efficiency of GNN. SSE proposes a learning framework which contains two steps. Embeddings of each node are updated by a parameterized operator in the update step and these embeddings are projected to the steady state constraint space to meet the steady-state conditions.
+
+LP-GNNLagrangian Propagation GNN (LP-GNN) (Tiezzi et al., 2020) formalizes the learning task as a constraint optimization problem in the Lagrangian framework and avoids the iterative computations for the fixed point. The convergence procedure is implicitly expressed by a constraint satisfaction mechanism.
+
+#### 3.2.2 Gate-based methods
+
+There are several works attempting to use the gate mechanism like GRU (Cho et al., 2014) or LSTM (Hochreiter and Schmidhuber, 1997) in the propagation step to diminish the computational limitations in GNN and improve the long-term propagation of information across the graph structure. They run a fixed number of training steps without the guarantee of convergence.
+
+GGNNThe gated graph neural network (GGNN) (Li et al., 2016) is proposed to release the limitations of GNN. It releases the requirement of function \(f\) to be a contraction map and uses the Gate Recurrent Units (GRU) in the propagation step. It also uses back-propagation through time (BPTT) to compute gradients. The computation step of GGNN can be found in Table 2.
+
+The node \(\nu\) first aggregates messages from its neighbors. Then the GRU-like update functions incorporate information from the other nodes and from the previous timestep to update each node's hidden state. \(\mathbf{h}_{v^{\prime}_{v}}\), gathers the neighborhood information of node \(v\), while \(\mathbf{z}\) and \(\mathbf{r}\) are the update and reset gates.
+
+LSTMs are also used in a similar way as GRU through the propagation process based on a tree or a graph.
+
+TreeLSTM.Tai et al. (2015) propose two extensions on the tree structure to the basic LSTM architecture: the _Child-Sum Tree-LSTM_ and
+
+\begin{table}
+\begin{tabular}{l l l} Variant & Aggregator & Updater \\ \hline GGNN & \(\mathbf{h}^{\prime}_{v^{\prime}_{v^{\prime}_{v}}}-\sum\limits_{k\in\mathcal{V }_{v^{\prime}_{v}}}\mathbf{h}^{-1}_{v^{\prime}_{v}}+\mathbf{b}\) & \(\mathbf{\zeta}_{v}=\sigma(\mathbf{W}\mathbf{h}^{\prime}_{v^{\prime}_{v^{\prime} _{v}}}+\mathbf{U}\mathbf{h}^{-1}_{v^{\prime}_{v}})\) \\  & \(\mathbf{\zeta}_{v}=\sigma(\mathbf{W}\mathbf{h}^{\prime}_{v^{\prime}_{v^{\prime} _{v}}}+\mathbf{U}\mathbf{h}^{\prime}_{v^{\prime}_{v}})\) \\  & & \(\mathbf{h}^{\prime}_{v}=\tanh(\mathbf{W}\mathbf{h}^{\prime}_{v^{\prime}_{v}}+ \mathbf{U}\mathbf{h}^{\prime}_{v^{\prime}_{v}})\) \\  & & \(\mathbf{h}^{\prime}_{v}=(1-\mathbf{z})\odot\mathbf{h}^{\prime}_{v^{\prime}_{v}}+ \zeta\odot\mathbf{h}^{\prime}_{v^{\prime}_{v}}\) \\ \hline Tree LSTM (Child sum) & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) & \(\mathbf{\zeta}_{v}=\sigma(\mathbf{W}^{\prime}_{v^{\prime}_{v}}+\mathbf{b}^{ \prime}_{v^{\prime}_{v}}+\mathbf{b}^{\prime}_{v^{\prime}_{v}})\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\ \hline Tree LSTM (N-ary) & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}=\frac{\mathbf{x}}{\sum\limits_{k\in\mathcal{V}_{v^{ \prime}_{v}}}}\mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\ Graph LSTM (Fung et al., 2017) & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v^{\prime}_{v}}}\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v^the _N-ary Tree-LSTM_. They are also extensions to the recursive neural network based models as we mentioned before. Tree is a special case of graph and each node in Tree-LSTM aggregates information from its children. Instead of a single forget gate in traditional LSTM, the Tree-LSTM unit for node \(v\) contains one forget gate \(\mathbf{f}_{v}\) for each child \(k\). The computation step of the Child-Sum Tree-LSTM is displayed in Table 2. \(\mathbf{f}_{v}^{t}\), \(\mathbf{o}_{v}^{t}\), and \(\mathbf{c}_{v}^{t}\) are the input gate, output gate and memory cell respectively. \(\mathbf{x}_{v}^{t}\) is the input vector at time \(t\). The _N-ary_ Tree-LSTM is further designed for a special kind of tree where each node has at most \(K\) children and the children are ordered. The equations for computing \(\mathbf{h}_{v,v}^{t}\), \(\mathbf{h}_{v,v}^{t}\), \(\mathbf{h}_{v,v}^{t}\), in Table 2 introduce separate parameters for each child \(k\). These parameters allow the model to learn more fine-grained representations conditioning on the states of a unit's children than the Child-Sum Tree-LSTM.
+
+_Graph LSTM_. The two types of Tree-LSTMs can be easily adapted to the graph. The graph-structured LSTM in (Zayats and Ostendorf, 2018) is an example of the _N-ary_ Tree-LSTM applied to the graph. However, it is a simplified version since each node in the graph has at most 2 incoming edges (from its parent and sibling predecessor). Peng et al. (2017) propose another variant of the Graph LSTM based on the relation extraction task. The edges of graphs in (Peng et al., 2017) have various labels so that Peng et al. (2017) utilize different weight matrices to represent different labels. In Table 2, \(m(v,k)\) denotes the edge label between node \(v\) and \(k\). Liang et al. (2016) propose a Graph LSTM network to address the semantic object parsing task. It uses the confidence-driven scheme to adaptively select the starting node and determine the node updating sequence. It follows the same idea of generalizing the existing LSTMs into the graph-structured data but has a specific updating sequence while methods mentioned above are agnostic to the order of nodes.
+
+_S-LSTM_. Zhang et al. (2018) propose Sentence LSTM (S-LSTM) for improving text encoding. It converts text into a graph and utilizes the Graph LSTM to learn the representation. The S-LSTM shows strong representation power in many NLP problems.
+
+### Propagation modules - skip connection
+
+Many applications unroll or stack the graph neural network layer aiming to achieve better results as more layers (i.e k layers) make each node aggregate more information from neighbors \(k\) hops away. However, it has been observed in many experiments that deeper models could not improve the performance and deeper models could even perform worse. This is mainly because more layers could also propagate the noisy information from an exponentially increasing number of expanded neighborhood members. It also causes the over smoothing problem because nodes tend to have similar representations after the aggregation operation when models go deeper. So that many methods try to add "skip connections" to make GNN models deeper. In this subsection we introduce three kinds of instantiations of skip connections.
+
+_Highway GCN_. Rahimi et al. (2018) propose a Highway GCN which uses layer-wise gates similar to highway networks (Zilly et al., 2016). The output of a layer is summed with its input with gating weights:
+
+\[\mathbf{T}(\mathbf{h}^{i})=\mathbf{e}(\mathbf{W}_{i}\mathbf{h}^{i}+\mathbf{b} ), \tag{22}\] \[\mathbf{h}^{i+1}=\mathbf{h}^{i+1}\odot\mathbf{T}(\mathbf{h})+ \mathbf{h}^{i}\odot(1-\mathbf{T}(\mathbf{h}^{i})).\]
+
+By adding the highway gates, the performance peaks at 4 layers in a specific problem discussed in (Rahimi et al., 2018). The column network (CLN) (Pham et al., 2017) also utilizes the highway network. But it has different functions to compute the gating weights.
+
+_JKN_. Xu et al. (2018) study properties and limitations of neighborhood aggregation schemes. They propose the jump knowledge network (JKN) which could learn adaptive and structure-aware representations. JKN selects from all of the intermediate representations (which "jump" to the last layer) for each node at the last layer, which makes the model adapt the effective neighborhood size for each node as needed. Xu et al. (2018) use three approaches of concatenation, max-pooling and LSTM-attention in the experiments to aggregate information. The JKN performs well on the experiments in social, bioinformatics and citation networks. It can also be combined with models like GCN, GraphSAGE and GAT to improve their performance.
+
+_DeepGCN_. Li et al. (2019) borrow ideas from ResNet (He et al., 2016, 2016) and DenseNet (Huang et al., 2017). ResGCN and DenseGCN are proposed by incorporating residual connections and dense connections to solve the problems of vanishing gradient and over smoothing. In detail, the hidden state of a node in ResGCN and DenseGCN can be computed as:
+
+\[\mathbf{h}_{\text{ion}}^{i+1}=\mathbf{h}^{i+1}+\mathbf{h}^{i}, \tag{23}\] \[\mathbf{h}_{\text{home}}^{i+1}=\left[\int_{v=1}^{i+1}\mathbf{h}^{i}.\right.\]
+
+The experiments of DeepGCNs are conducted on the point cloud semantic segmentation task and the best results are achieved with a 56-layer model.
+
+### Sampling modules
+
+GNN models aggregate messages for each node from its neighborhood in the previous layer. Intuitively, if we track back multiple GNN layers, the size of supporting neighbors will grow exponentially with the depth. To alleviate this "neighbor explosion" issue, an efficient and efficacious way is sampling. Besides, when we deal with large graphs, we cannot always store and process all neighborhood information for each node, thus the sampling module is needed to conduct the propagation. In this section, we introduce three kinds of graph sampling modules: node sampling, layer sampling, and subgraph sampling.
+
+#### 3.4.1 Node sampling
+
+A straightforward way to reduce the size of neighboring nodes would be selecting a subset from each node's neighborhood. GraphSAGE (Hamilton et al., 2017) samples a fixed small number of neighbors, ensuring a 2 to 50 neighborhood size for each node. To reduce sampling variance, Chen et al. (2018) introduce a control-variate based stochastic approximation algorithm for GCN by utilizing the historical activations of nodes as a control variate. This method limits the receptive field in the 1-hop neighborhood, and uses the historical hidden state as an affordable approximation.
+
+PinSage (Ying et al., 2018) proposes importance-based sampling method. By simulating random walks starting from target nodes, this approach chooses the top T nodes with the highest normalized visit counts.
+
+#### 3.4.2 Layer sampling
+
+Instead of sampling neighbors for each node, layer sampling retains a small set of nodes for aggregation in each layer to control the expansion factor. FastGCN (Chen et al., 2018) directly samples the receptive field for each layer. It uses importance sampling, where the important nodes are more likely to be sampled.
+
+In contrast to fixed sampling methods above, Huang et al. (2018) introduce a parameterized and trainable sampler to perform layer-wise sampling conditioned on the former layer. Furthermore, this adaptive sampler could optimize the sampling importance and reduce variance simultaneously. LADIES (Zouet al., 2019) intends to alleviate the sparsity issue in layer-wise sampling by generating samples from the union of neighbors of the nodes.
+
+#### 3.4.3 Subgraph sampling
+
+Rather than sampling nodes and edges which builds upon the full graph, a fundamentally different way is to sample multiple subgraphs and restrict the neighborhood search within these subgraphs. ClusterGCN (Chiang et al., 2019) samples subgraphs by graph clustering algorithms, while GraphSAINT (Zeng et al., 2020) directly samples nodes or edges to generate a subgraph.
+
+### Pooling modules
+
+In the area of computer vision, a convolutional layer is usually followed by a pooling layer to get more general features. Complicated and large-scale graphs usually carry rich hierarchical structures which are of great importance for node-level and graph-level classification tasks. Similar to these pooling layers, a lot of work focuses on designing hierarchical pooling layers on graphs. In this section, we introduce two kinds of pooling modules: direct pooling modules and hierarchical pooling modules.
+
+#### 3.5.1 Direct pooling modules
+
+Direct pooling modules learn graph-level representations directly from nodes with different node selection strategies. These modules are also called readout functions in some variants.
+
+_Simple Node Pooling._ Simple node pooling methods are used by several models. In these models, node-wise max/mean/sum/attention operations are applied on node features to get a global graph representation.
+
+_Set2Seq_. MPNN uses the Set2set method (Vinyals et al., 2015) as the readout function to get graph representations. Set2set is designed to deal with the unordered set \(T=\{(\mathbf{h}_{i}^{T},\mathbf{x}_{i})\}\) and uses a LSTM-based method to produce an order invariant representation after a predifined number of steps.
+
+_SortPooling._SortPooling (Zhang et al., 2018) first sorts the node embeddings according to the structural roles of the nodes and then the sorted embeddings are fed into CNNs to get the representation.
+
+#### 3.5.2 Hierarchical pooling modules
+
+The methods mentioned before directly learn graph representations from nodes and they do not investigate the hierarchical property of the graph structure. Next we will talk about methods that follow a hierarchical pooling pattern and learn graph representations by layers.
+
+_Graph Coarsening._ Early methods are usually based on graph coarsening algorithms. Spectral clustering algorithms are firstly used but they are inefficient because of the eigendecomposition step. Gracus (Dhillon et al., 2007) provides a faster way to cluster nodes and it is applied as a pooling module. For example, ChebNet and MoNet use Graclus to merge node pairs and further add additional nodes to make sure the pooling procedure forms a balanced binary tree.
+
+_ECC_. Edge-Conditioned Convolution (ECC) (Simonovsky and Komodakis, 2017) designs its pooling module with recursively downsampling operation. The downsampling method is based on splitting the graph into two components by the sign of the largest eigenvector of the Laplacian.
+
+_DiffPool._ DiffPool (Ying et al., 2018) uses a learnable hierarchical clustering module by training an assignment matrix \(\mathbf{S}^{t}\) in each layer:
+
+\[\begin{array}{l}\mathbf{S}^{t}=\operatorname{softmax}(\operatorname{GNN}_{i,\text{real}}(\mathbf{A}^{t},\mathbf{H})),\\ \mathbf{A}^{t+1}=(\mathbf{S})^{T}\mathbf{A}\mathbf{S}^{t},\end{array} \tag{24}\]
+
+where \(\mathbf{H}^{t}\) is the node feature matrix and \(\mathbf{A}^{t}\) is coarsened adjacency matrix of layer \(t\). \(\mathbf{S}^{t}\) denotes the probabilities that a node in layer \(t\) can be assigned to a coarser node in layer \(t+1\).
+
+_gPool._ gPool (Gao and Ji, 2019) uses a project vector to learn projection scores for each node and select nodes with top-k scores. Compared to DiffPool, it uses a vector instead of a matrix at each layer, thus it reduces the storage complexity. But the projection procedure does not consider the graph structure.
+
+_EigenPooling._ EigenPooling (Ma et al., 2019) is designed to use the node features and local structure jointly. It uses the local graph Fourier transform to extract subgraph information and suffers from the inefficiency of graph eigendecomposition.
+
+_SAGPool._ SAGPool (Lee et al., 2019) is also proposed to use features and topology jointly to learn graph representations. It uses a self-attention based method with a reasonable time and space complexity.
+
+Figure 4: An overview of variants considering graph type and scale.
+
+## 4 Variants considering graph type and scale
+
+In the above sections, we assume the graph to be the simplest format. However, many graphs in the real world are complex. In this subsection, we will introduce the approaches which attempt to address the challenges of complex graph types. An overview of these variants is shown in Fig. 4.
+
+### Directed graphs
+
+The first type is the directed graphs. Directed edges usually contain more information than undirected edges. For example, in a knowledge graph where a head entity is the parent class of a tail entity, the edge direction offers information about the partial order. Instead of simply adopting an asymmetric adjacency matrix in the convolution operator, we can model the forward and reverse directions of an edge differently. DGP (Kampffmeyer et al., 2019) uses two kinds of weight matrices \(\mathbf{W}_{p}\) and \(\mathbf{W}_{c}\) for the convolution in forward and reverse directions.
+
+### Heterogeneous graphs
+
+The second variant of graphs is heterogeneous graphs, where the nodes and edges are multi-typed or multi-modal. More specifically, in a heterogeneous graph \(\{V,E,\varphi,\psi\}\), each node \(\nu_{i}\) is associated with a type \(\varphi(\nu_{i})\) and each edge \(e_{i}\) with a type \(\psi(e_{i})\).
+
+#### 4.2.1 Meta-path-based methods
+
+Most approaches toward this graph type utilize the concept of meta-path. Meta-path is a path scheme which determines the type of node in each position of the path, e.g., \(\varphi_{1}\)-\(\varphi_{2}\)-\(\varphi_{3}\)-\(\varphi_{4}\)-\(\varphi_{5}\)-\(\varphi_{6}\)-\(\varphi_{7}\), where \(L\) is the length of the meta-path. In the training process, the meta-paths are instantiated as node sequences. By connecting the two end nodes of a meta-path instances, the meta-path captures the similarity of two nodes which may not be directly connected. Consequently, one heterogeneous graph can be reduced to several homogeneous graphs, on which graph learning algorithms can be applied. In early work, meta-path based similarity search is investigated (Sun et al., 2011). Recently, more GNN models which utilize the meta-path are proposed. HAN (Wang et al., 2019) first performs graph attention on the meta-path-based neighbors under each meta-path and then uses a semantic attention over output embeddings of nodes under all meta-path schemes to generate the final representation of nodes. MAGNN (Fu et al., 2020) proposes to take the intermediate nodes in a meta-path into consideration. It first aggregates the information along the meta-path using a neural module and then performs attention over different meta-path instances associated with a node and finally performs attention over different meta-path schemes. GTN (Yun et al., 2019) proposes a novel graph transformer layer which identifies new connections between unconnected nodes while learning representations of nodes. The learned new connections can connect nodes which are serveral hops away from each other but are closely related, which function as the meta-paths.
+
+#### 4.2.2 Edge-based methods
+
+There are also works which don't utilize meta-paths. These works typically use different functions in terms of sampling, aggregation, etc. for different kinds of neighbors and edges. HetGNN (Zhang et al., 2019) addresses the challenge by directly treating neighbors of different types differently in sampling, feature encoding and aggregation steps. HGT (Hu et al., 2020) defines the meta-relation to be the type of two neighboring nodes and their link \((\varphi(\nu),\psi(e_{i}),\varphi(\nu))\). It assigns different attention weight matrices to different meta-relations, empowering the model to take type information into consideration.
+
+#### 4.2.3 Methods for relational graphs
+
+The edge of some graphs may contain more information than the type, or the quantity of types may be too large, exerting difficulties to applying the meta-path or meta-relation based methods. We refer to this kind of graphs as relational graphs (Schlichtkrull et al., 2018), To handle the relational graphs, G2S (Beck et al., 2018) converts the original graph to a bipartite graph where the original edges also become nodes and one original edge is split into two new edges which means there are two new edges between the edge node and begin/end nodes. After this transformation, it uses a Gated Graph Neural Network followed by a Recurrent Neural Network to convert graphs with edge information into sentences. The aggregation function of GGNN takes both the hidden representations of nodes and the relations as the input. As another approach, R-GCN (Schlichtkrull et al., 2018) doesn't require to convert the original graph format. It assigns different weight matrices for the propagation on different kinds of edges. However, When the number of relations is very large, the number of parameters in the model explodes. Therefore, it introduces two kinds of regularizations to reduce the number of parameters for modeling amounts of relations: basis- and _block-diagonal_-decomposition. With the basis decomposition, each \(\mathbf{W}_{r}\) is defined as follows:
+
+\[\mathbf{W}_{r}=\sum_{k=1}^{B}d_{k}\mathbf{V}_{k}. \tag{25}\]
+
+Here each \(\mathbf{W}_{r}\) is a linear combination of basis transformations \(\mathbf{V}_{b}\in\mathbb{R}^{d_{k}\cdots d_{m}}\) with coefficients \(a_{b}\). In the block-diagonal decomposition, R-GCN defines each \(\mathbf{W}_{r}\) through the direct sum over a set of low-dimensional matrices, which need more parameters than the first one.
+
+#### 4.2.4 Methods for multiplex graphs
+
+In more complex scenarios, a pair of nodes in a graph can be associated with multiple edges of different types. By viewing under different types of edges, the graph can form multiple layers, in which each layer represents one type of relation. Therefore, multiplex graph can also be referred to as multi-view graph (multi-dimensional graph). For example, in YouTube, there can be three different relations between two users: sharing, subscription, comment. Edge types are not assumed independent with each other, therefore simply splitting the graph into subgraphs with one type of edges might not be an optimal solution. mGCN (Ma et al., 2019) introduces general representations and dimension-specific representations for nodes in each layer of GNN. The dimension-specific representations are projected from general representations using
+
+Figure 5: An overview of methods with unsupervised loss.
+
+different projection matrices and then aggregated to form the next layer's general representations.
+
+### Dynamic graphs
+
+Another variant of graphs is dynamic graphs, in which the graph structure, e.g. the existence of edges and nodes, keeps changing over time. To model the graph structured data together with the time series data, DCRNN (Li et al., 2018) and STGCN (Yu et al., 2018) first collect spatial information by GNNs, then feed the outputs into a sequence model like sequence-to-sequence models or RNNs. Differently, Structural-RNN (Jain et al., 2016) and ST-GCN (Yan et al., 2018) collect spatial and temporal messages at the same time. They extend static graph structure with temporal connections so they can apply traditional GNNs on the extended graphs. Similarly, DGNN (Manessi et al., 2020) feeds the output embeddings of each node from the GCN into separate LSTMs. The weights of LSTMs are shared between each node. On the other hand, EvolveGCN (Pareja et al., 2020) argues that directly modeling dynamics of the node representation will hamper the model's performance on graphs where node set keeps changing. Therefore, instead of treating node features as the input to RNN, it feeds the weights of the GCN into the RNN to capture the intrinsic dynamics of the graph interactions. Recently, a survey (Huang et al., 2020) classifies the dynamic networks into several categories based on the link duration, and groups the existing models into these categories according to their specialization. It also establishes a general framework for models of dynamic graphs and fits existing models into the general framework.
+
+### Other graph types
+
+For other variants of graphs, such as hypergraphs and signed graphs, there are also some models proposed to address the challenges.
+
+#### 4.4.1 Hypergraphs
+
+A hypergraph can be denoted by \(G=(V,E,W_{e})\), where an edge \(e\in E\) connects two or more vertices and is assigned a weight \(w\in W_{e}\). The adjacency matrix of a hypergraph can be represented in a \(|V|\times|E|\) matrix \(L\):
+
+\[L_{w}=\left\{\begin{aligned} 1,&\text{if}\quad v\in e \\ 0,&\text{if}\quad v\not\in e\end{aligned}\right\}. \tag{26}\]
+
+HGNN (Feng et al., 2019) proposes hypergraph convolution to process these high order interaction between nodes:
+
+\[\mathbf{H}=\mathbf{D}_{r}^{-}\mathbf{L}\mathbf{W}_{e}\mathbf{D}_{e}^{-} \mathbf{L}^{\prime}\mathbf{D}_{r}^{-}\mathbf{X}\mathbf{W}, \tag{27}\]
+
+where the \(\mathbf{D}_{r}\), \(\mathbf{W}_{e}\), \(\mathbf{D}_{e}\), \(\mathbf{X}\) are the node degree matrix, edge weight matrix, edge degree matrix and node feature matrix respectively. \(\mathbf{W}\) is the learnable parameters. This formula is derived by approximating the hypergraph Laplacian using truncated Chebyshev polynomials.
+
+#### 4.4.2 Signal graphs
+
+Signed graphs are the graphs with signed edges, i.e. an edge can be either positive or negative. Instead of simply treating the negative edges as the absent edges or another type of edges, SGCN (Derr et al., 2018) utilizes balance theory to capture the interactions between positive edges and negative edges. Intuitively, balance theory suggests that the friend (positive edge) of my friend is also my friend and the enemy (negative edge) of my enemy is my friend. Therefore it provides theoretical foundation for SGCN to model the interactions between positive edges and negative edges.
+
+### Large graphs
+
+As we mentioned in Section 3.4, sampling operators are usually used to process large-scale graphs. Besides sampling techniques, there are also other methods for the scaling problem. Leveraging approximate personalized PageRank, methods proposed by Klicpera et al. (2019) and Bojchevski et al. (2020) avoid calculating high-order propagation matrices. Rossi et al. (2020) propose a method to precompute graph convolutional filters of different sizes for efficient training and inference. PageRank-based models squeeze multiple GCN layers into one single propagation layer to mitigate the "neighbor explosion" issue, hence are highly scalable and efficient.
+
+## 5 Variants for different training settings
+
+In this section, we introduce variants for different training settings. For supervised and semi-supervised settings, labels are provided so that loss functions are easy to design for these labeled samples. For unsupervised settings, there are no labeled samples so that loss functions should depend on the information provided by the graph itself, such as input features or the graph topology. In this section, we mainly introduce variants for unsupervised training, which are usually based on the ideas of auto-encoders or contrastive learning. An overview of the methods we mention is shown in Fig. 5.
+
+### Graph auto-encoders
+
+For unsupervised graph representation learning, there has been a trend to extend auto-encoder (AE) to graph domains.
+
+Graph Auto-Encoder (GAE) (Kipf and Welling, 2016) first uses GCNs to encode nodes in the graph. Then it uses a simple decoder to reconstruct the adjacency matrix and compute the loss from the similarity between the original adjacency matrix and the reconstructed matrix:
+
+\[\mathbf{H}=\mathrm{GCN}(\mathbf{X},\mathbf{A}), \tag{28}\] \[\tilde{\mathbf{A}}=\rho(\mathbf{H}\mathbf{H}^{\prime}).\]
+
+Kipf and Welling (2016) also train the GAE model in a variational manner and the model is named as the variational graph auto-encoder (VGAE).
+
+Adversarially Regularized Graph Auto-encoder (ARGA) (Pan et al., 2018) employs generative adversarial networks (GANs) to regularize a GCN-based graph auto-encoder, which could learn more robust node representations.
+
+Instead of recovering the adjacency matrix, Wang et al. (2017), Park et al. (2019) try to reconstruct the feature matrix. MGAE (Wang et al., 2017) utilizes marginalized denoising auto-encoder to get robust node representation. To build a symmetric graph auto-encoder, GALA (Park et al., 2019) proposes Laplacian sharpening, the inverse operation of Laplacian smoothing, to decode hidden states. This mechanism alleviates the oversmoothing issue in GNN training.
+
+Different from above, AGE (Cui et al., 2020) states that the recovering losses are not compatible with downstream tasks. Therefore, they apply adaptive learning for the measurement of pairwise node similarity and achieve state-of-the-art performance on node clustering and link prediction.
+
+### Contrastive learning
+
+Besides graph auto-encoders, contrastive learning paves another way for unsupervised graph representation learning. Deep Graph Infomax (DGI) (Velickovic et al., 2019) maximizes mutual information between node representations and graph representations. Infograph (Sun et al., 2020) aims to learn graph representations by mutual information maximization between graph-level representations and the substructure-level representations of different scales including nodes, edges and triangles. Multi-view (Hassani and Khasahmadi, 2020) contrasts representations from first-order adjacency matrix and graph diffusion, achieves state-of-the-art performances on multiple graph learning tasks.
+
+## 6 A design example of GNN
+
+In this section, we give an existing GNN model to illustrated the design process. Taking the task of heterogeneous graph pretraining as an example, we use GPT-GNN (Hu et al., 2020) as the model to illustrate the design process.
+
+1. _Find graph structure._ The paper focuses on applications on the academic knowledge graph and the recommendation system. In the academic knowledge graph, the graph structure is explicit. In recommendation systems, users, items and reviews can be regarded as nodes and the interactions among them can be regarded as edges, so the graph structure is also easy to construct.
+2. _Specify graph type and scale._ The tasks focus on heterogeneous graphs, so that types of nodes and edges should be considered and incorporated in the final model. As the academic graph and the recommendation graph contain millions of nodes, so that the model should further consider the efficiency problem. In conclusion, the model should focus on large-scale heterogeneous graphs.
+3. _Design loss function._ As downstream tasks in (Hu et al., 2020) are all node-level tasks (e.g. Paper-Field prediction in the academic graph), so that the model should learn node representations in the pretraining step. In the pretraining step, no labeled data is available, so that a self-supervised graph generation task is designed to learn node embeddings. In the finetuning step, the model is finetuned based on the training data of each task, so that the supervised loss of each task is applied.
+4. _Build model using computational modules._ Finally the model is built with computational modules. For the propagation module, the authors use a convolution operator HGT (Hu et al., 2020) that we mentioned before. HGT incorporates the types of nodes and edges into the propagation step of the model and the skip connection is also added in the architecture. For the sampling module, a specially designed sampling method HG sampling (Hu et al., 2020) is applied, which is a heterogeneous version of LADIES (Zou et al., 2019). As the model focuses on learning node representations, the pooling module is not needed. The HGT layer are stacked multiple layers to learn better node embeddings.
+
+## 7 Analyses of GNNs
+
+### Theoretical aspect
+
+In this section, we summarize the papers about the theoretic foundations and explanations of graph neural networks from various perspectives.
+
+Figure 6: Application scenarios. (lcons made by Freeplk from Flaticon)
+
+#### 7.1.1 Graph signal processing
+
+From the spectral perspective of view, GCNs perform convolution operation on the input features in the spectral domain, which follows graph signal processing in theory.
+
+There exists several works analyzing GNNs from graph signal processing. Li et al. (2018c) first address the graph convolution in graph neural networks is actually Laplacian smoothing, which smooths the feature matrix so that nearby nodes have similar hidden representations. Laplacian smoothing reflects the homophily assumption that nearby nodes are supposed to be similar. The Laplacian matrix serves as a low-pass filter for the input features. SGC (Wu et al., 2019b) further removes the weight matrices and nonlinearities between layers, showing that the low-pass filter is the reason why GNNs work.
+
+Following the idea of low-pass filtering, Zhang et al. (2019c), Cui et al. (2020), NT and Maehara (19), Chen et al. (2020b) analyze different filters and provide new insights. To achieve low-pass filtering for all the eigenvalues, AGC (Zhang et al., 2019c) designs a graph filter \(I-\frac{1}{2}L\) according to the frequency response function. AGE (Cui et al., 2020) further demonstrates that filter with \(I-\frac{1}{\alpha\alpha}L\) could get better results, where \(\lambda_{\text{max}}\) is the maximum eigenvalue of the Laplacian matrix. Despite linear filters, GraphHeat (Xuetal et al., 2019a) leverages heat kernels for better low-pass properties. NT and Maehara (Net and Maehara, 2019) state that graph convolution is mainly a denoising process for input features, the model performances heavily depend on the amount of noises in the feature matrix. To alleviate the over-smoothing issue, Chen et al. (2020b) present two metrics for measuring the smoothness of node representations and the over-smoothness of GNN models. The authors conclude that the information-to-noise ratio is the key factor for over-smoothing.
+
+#### 7.1.2 Generalization
+
+The generalization ability of GNNs have also received attentions recently. Scarselli et al. (2018) prove the VC-dimensions for a limited class of GNNs. Garg et al. (2020) further give much tighter generalization bounds based on Rademacher bounds for neural networks.
+
+Verma and Zhang (2019) analyze the stability and generalization properties of single-layer GNNs with different convolutional filters. The authors conclude that the stability of GNNs depends on the largest eigenvalue of the filters. Knyazev et al. (2019) focus on the generalization ability of attention mechanism in GNNs. Their conclusion shows that attention helps GNNs generalize to larger and noisy graphs.
+
+#### 7.1.3 Expressivity
+
+On the expressivity of GNNs, Xu et al. (2019b), Morris et al. (2019) show that GCNs and GraphSAGE are less discriminative than
+
+\begin{table}
+\begin{tabular}{l l l} \hline Area & Application & References \\ \hline Graph Mining & Graph Matching & (Riba et al., 2018; Li et al., 2019b) \\  & Graph Clustering & (Zhang et al., 2019; Ying et al., 2018; Tsitsulin et al., 2020) \\ \hline Physics & Physical Systems Modeling & (Bhattaglia et al., 2016; Sukhbatar Ferguset et al., 2016; Wasters et al., 2017; Hohen, 2017; Kipf et al., 2018; Sanchez et al., 2018) \\ \hline Chemistry & Molecular Fingerprints & (Davenaud et al., 2015; Kearnes et al., 2016) \\  & Chemical Reaction & Do et al. (2019) \\  & Prediction & \\ \hline Biology & Protein Interface Prediction & Fort et al. (2017) \\  & Side Effects Prediction & Zünik et al. (2018) \\  & Disease Classification & Rhee et al. (2018) \\ \hline Knowledge Graph & KB Completion & (Hamaguchi et al., 2017; Schlichtrull et al., 2018; Shang et al., 2019) \\  & KG Alignment & (Wang et al., 2018; Zhang et al., 2019; Xu et al., 2019c) \\ \hline Generation & Graph Generation & (Shahir et al., 2018; Nowak et al., 2018; Mei et al., 2018; You et al., 2018a, 2018b; De Cao and Kipf, 2018; Li et al., 2018; Shi et al., 2020; Liu et al., 2019; Grover et al., 2019) \\ \hline Combinatorial Optimization & Combinatorial Optimization & (Shahir et al., 2017; Nowak et al., 2018; Li et al., 2018; Koel et al., 2019; Bello et al., 2017; Vinyals et al., 2015; Sutton and Barto, 2018; Dai et al., 2016; Gase et al., 2019; Zheng et al., 2020; Selsum et al., 2019; Sato et al., 2019) \\ \hline Traffic Network & Traffic State Prediction & (Cui et al., 2018; Yu et al., 2018; Zheng et al., 2020; Guo et al., 2019) \\ \hline Recommendation & User-item Interaction & (van den Berg et al., 2017; Ying et al., 2018a) \\ Systems & Prediction & Social Recommendation & (Wu et al., 2019c; Fan et al., 2019) \\ \hline Others (Structural) & Stock Market & (Matsuunaga et al., 2019; Yang et al., 2019; Chen et al., 2018; Li et al., 2020; Kim et al., 2019) \\  & Software Defined Networks & Rusek et al. (2019) \\  & AMR Graph to Text & (Song et al., 2018; Baek et al., 2018) \\ \hline Text & Text Classification & (Wang et al., 2018; Yao et al., 2019; Zhang et al., 2018; Tai et al., 2015) \\  & Sequence Labeling & (Zhang et al., 2018; Markehessian and Titov, 2017) \\  & Neural Machine Translation & (Bhattaglia et al., 2017; Marchesgiani et al., 2016; Beck et al., 2018) \\  & Relation Extraction & (Miewan and Bassi, 2016; Zhou et al., 2017; Song et al., 2018b; Zhang et al., 2018) \\  & Event Extraction & (Nguyen and Grishman, 2018; Liu et al., 2019; Liu et al., 2020; Zhou et al., 2020) \\  & Fact Verification & (Zhou et al., 2019; Liu et al., 2020; Zhou et al., 2020) \\  & Question Answering & (Gong et al., 2018; De Cao et al., 2019; Qiu et al., 2019; Tu et al., 2019; Ding et al., 2019) \\  & Rational Reasoning & (Santoro et al., 2017; Palm et al., 2018; Battaglia et al., 2016) \\ \hline image & Social Relationship & Wang et al. (2018) \\  & Understanding & (Garcia and Bruna, 2018; Wang et al., 2018; Lee et al., 2018; Kampflingyer et al., 2019; Mamino et al., 2017) \\  & Image Classification & (Finey et al., 2017; Wang et al., 2018; Narsisirhan et al., 2018; Narsisirhan et al., 2018) \\  & Visual Question Answering & (Hu et al., 2018; Gu et al., 2018) \\  & Object Detection & (Qi et al., 2018; Jain et al., 2016) \\  & Interaction Detection & (Qi et al., 2018; Jain et al., 2016) \\  & Region Classification & Chen et al. (2018) \\  & Semantic Segmentation & (Zhang et al., 2016; Li et al., 2017) \\ \hline Other (Non-structural) & Program Verification & (Allamanis et al., 2016; Li et al., 2016) \\ \hline \end{tabular}
+\end{table}
+Table 3Applications of graph neural networks.
+
+Weisfeiler-Leman (WL) test, an algorithm for graph isomorphism testing. Xu et al. (2019) also propose GINs for more expressive GNNs. Going beyond WL test, Barcelo et al. (2019) discuss if GNNs are expressible for \(FOC_{2}\), a fragment of first order logic. The authors find that existing GNNs can hardly fit the logic. For learning graph topologic structures, Garg et al. (2020) prove that locally dependent GNN variants are not capable to learn global graph properties, including diameters, biggest/smallest cycles, or motifs.
+
+Lukas (2020) and Dehmamy et al. (2019) argue that existing works only consider the expressivity when GNNs have infinite layers and units. Their work investigates the representation power of GNNs with finite depth and width. Oono and Suzuki (2020) discuss the asymptotic behaviors of GNNs as the model deepens and model them as dynamic systems.
+
+#### 7.1.4 Invariance
+
+As there are no node orders in graphs, the output embeddings of GNNs are supposed to be permutation-invariant or equivariant to the input features. Maron et al. (2019) characterize permutation-invariant or equivariant linear layers to build invariant GNNs. Maron et al. (2019) further prove the result that the universal invariant GNNs can be obtained with higher-order tensorization. Keriven and Peyre (2019) provide an alternative proof and extend this conclusion to the equivariant case. Chen et al. (2019) build connections between permutation-invariance and graph isomorphism testing. To prove their equivalence, Chen et al. (2019) leverage sigma-algebra to describe the expressivity of GNNs.
+
+#### 7.1.5 Transferability
+
+A deterministic characteristic of GNNs is that the parameterization is united with graphs, which suggests the ability to transfer across graphs (so-called transferability) with performance guarantees. Levie et al. (2019) investigate the transferability of spectral graph filters, showing that such filters are able to transfer on graphs in the same domain. Ruiz et al. (2020) analyze GNN behaviour on graphons. Graphon refers to the limit of a sequence of graphs, which can also be seen as a generator for dense graphs. The authors conclude that GNNs are transferable across graphs obtained deterministically from the same graphon with different sizes.
+
+#### 7.1.6 Label efficiency
+
+(Semi-) Supervised learning for GNNs needs a considerable amount of labeled data to achieve a satisfying performance. Improving the label efficiency has been studied in the perspective of active learning, in which informative nodes are actively selected to be labeled by an oracle to train the GNNs. Cai et al. (2017), Gao et al. (2018), Hu et al. (2020) demonstrate that by selecting the informative nodes such as the high-degree nodes and uncertain nodes, the labeling efficiency can be dramatically improved.
+
+### Empirical aspect
+
+Besides theoretical analysis, empirical studies of GNNs are also required for better comparison and evaluation. Here we include several empirical studies for GNN evaluation and benchmarks.
+
+#### 7.2.1 Evaluation
+
+Evaluating machine learning models is an essential step in research. Concerns about experimental reproducibility and replicability have been raised over the years. Whether and to what extent do GNN models work? Which parts of the models contribute to the final performance? To investigate such fundamental questions, studies about fair evaluation strategies are urgently needed.
+
+On semi-supervised node classification task, Shchur et al. (2018) explore how GNN models perform under same training strategies and hyperparameter tune. Their works concludes that different dataset splits lead to dramatically different rankings of models. Also, simple models could outperform complicated ones under proper settings. Errica et al. (2020) review several graph classification models and point out that they are compared improperly. Based on rigorous evaluation, structural information turns up to not be fully exploited for graph classification. You et al. (2020) discuss the architectural designs of GNN models, such as the number of layers and the aggregation function. By a huge amount of experiments, this work provides comprehensive guidelines for GNN designation over various tasks.
+
+#### 7.2.2 Benchmarks
+
+High-quality and large-scale benchmark datasets such as ImageNet are significant in machine learning research. However in graph learning, widely-adopted benchmarks are problematic. For example, most node classification datasets contain only 3000 to 20,000 nodes, which are small compared with real-world graphs. Furthermore, the experimental protocols across studies are not unified, which is hazardous to the literature. To mitigate this issue, Dwivedi et al. (2020), Hu et al. (2020) provide scalable and reliable benchmarks for graph learning. Dwivedi et al. (2020) build medium-scale benchmark datasets in multiple domains and tasks, while OGB (Hu et al., 2020) offers large-scale datasets. Furthermore, both works evaluate current GNN models and provide leaderboards for further comparison.
+
+## 8 Applications
+
+Graph neural networks have been explored in a wide range of domains across supervised, semi-supervised, unsupervised and reinforcement learning settings. In this section, we generally group the applications in two scenarios: (1) Structural scenarios where the data has explicit relational structure. These scenarios, on the one hand, emerge from scientific researches, such as graph mining, modeling physical systems and chemical systems. On the other hand, they rise from industrial applications such as knowledge graphs, traffic networks and recommendation systems. (2) Non-structural scenarios where the relational structure is implicit or absent. These scenarios generally include image (computer vision) and text (natural language processing), which are two of the most actively developing branches of AI researches. A simple illustration of these applications is in Fig. 6. Note that we only list several representative applications instead of providing an exhaustive list. The summary of the applications could be found in Table 3.
+
+### Structural scenarios
+
+In the following subsections, we will introduce GNNs' applications in structural scenarios, where the data are naturally performed in the graph structure.
+
+#### 8.1.1 Graph mining
+
+The first application is to solve the basic tasks in graph mining. Generally, graph mining algorithms are used to identify useful structures for downstream tasks. Traditional graph mining challenges include frequent sub-graph mining, graph matching, graph classification, graph clustering, etc. Although with deep learning, some downstream tasks can be directly solved without graph mining as an intermediate step, the basic challenges are worth being studied in the GNNs' perspective.
+
+**Graph Matching.** The first challenge is graph matching. Traditional methods for graph matching usually suffer from high computational complexity. The emergence of GNNs allows researchers to capture the structure of graphs using neural networks, thus offering another solution to the problem. Riba et al. (2018) propose a siamese MPNN model to learn the graph editing distance. The Siamese framework is two parallel MPNNs with the same structure and weight sharing. The training objective is to embed a pair of graphs with small editing distance into close latent space. Li et al. (2019) design similar methods while experiments on more real-world scenario such as similarity search in control flow graph.
+
+**Graph Clustering**. Graph clustering is to group the vertices of a graph into clusters based on the graph structure and/or node attributes. Various works (Zhang et al., 2019c) in node representation learning are developed and the representation of nodes can be passed to traditional clustering algorithms. Apart of learning node embeddings, graph pooling (Ying et al., 2018b) can be seen as a kind of clustering. More recently, Tsitsulin et al. (2020) directly target at the clustering task. They study the desirable property of a good graph clustering method and propose to optimize the spectral modularity, which is a remarkably useful graph clustering metric.
+
+#### 8.1.2 Physics
+
+Modeling real-world physical systems is one of the most fundamental aspects of understanding human intelligence. A physical system can be modeled as the objects in the system and pair-wise interactions between objects. Simulation in the physical system requires the model to learn the law of the system and make predictions about the next state of the system. By modeling the objects as nodes and pair-wise interactions as edges, the systems can be simplified as graphs. For example, in particle systems, particles can interact with each other via multiple interactions, including collision (Hoshen, 2017), spring connection, electromagnetic force (Kipf et al., 2018), etc., where particles are seen as nodes and interactions are seen as edges. Another example is the robotic system, which is formed by multiple bodies (e.g., arms, legs) connected with joints. The bodies and joints can be seen as nodes and edges, respectively. The model needs to infer the next state of the bodies based on the current state of the system and the principles of physics.
+
+Before the advent of graph neural networks, works process the graph representation of the systems using the available neural blocks. Interaction Networks (Battaglia et al., 2016) utilizes MLP to encode the incidence matrices of the graph. CommNet (Sukhbaatar reguest et al., 2016) performs nodes updates using the nodes' previous representations and the average of all nodes' previous representations. VAIN (Hoshen, 2017) further introduces the attention mechanism. VIN (Watters et al., 2017) combines CNNs, RNNs and IN (Battaglia et al., 2016).
+
+The emergence of GNNs let us perform GNN-based reasoning about objects, relations, and physics in a simplified but effective way. NRI (Kipf et al., 2018) takes the trajectory of objects as input and infers an explicit interaction graph, and learns a dynamic model simultaneously. The interaction graphs are learned from former trajectories, and trajectory predictions are generated from decoding the interaction graphs.
+
+Sanchez et al. (2018) propose a Graph Network-based model to encode the graph formed by bodies and joints of a robotic system. They further learn the policy of stably controlling the system by combining GNs with Reinforcement learning.
+
+#### 8.1.3 Chemistry and biology
+
+**Molecular Fingerprints.** Molecular fingerprints serve as a way to encode the structure of molecules. The simplest fingerprint can be a one-hot vector, where each digit represents the existence or absence of a particular substructure. These fingerprints can be used in molecule searching, which is a core step in computer-aided drug design. Conventional molecular fingerprints are hand-made and fixed (e.g., the one-hot vector). However, molecules can be naturally seen as graphs, with atoms being the nodes and chemical-bonds being the edges. Therefore, by applying GNNs to molecular graphs, we can obtain better fingerprints.
+
+Duvenaud et al. (2015) propose neural graph fingerprints (Neural FPs), which calculate substructure feature vectors via GCNs and sum to get overall representations. Kearnes et al. (2016) explicitly model atom and atom pairs independently to emphasize atom interactions. It introduces edge representation \(\textbf{e}_{uv}^{t}\) instead of aggregation function, i.e. \(\textbf{h}_{\ell^{\prime}_{v}}^{t}=\sum\limits_{\textbf{u}\in\mathcal{T}(v)} \textbf{e}_{uv}^{t}\).
+
+**Chemical Reaction Prediction.** Chemical reaction product prediction is a fundamental issue in organic chemistry. Graph Transformation Policy Network (Do et al., 2019) encodes the input molecules and generates an intermediate graph with a node pair prediction network and a policy network.
+
+**Protein Interface Prediction.** Proteins interact with each other using the interface, which is formed by the amino acid residues from each participating protein. The protein interface prediction task is to determine whether particular residues constitute part of a protein. Generally, the prediction for a single residue depends on other neighboring residues. By letting the residues to be nodes, the proteins can be represented as graphs, which can leverage the GNN-based machine learning algorithms. Fout et al. (2017) propose a GCN-based method to learn ligand and receptor protein residue representation and to merge them for pair-wise classification. MR-GNN (Xu et al., 2019d) introduces a multi-resolution approach to extract and summarize local and global features for better prediction.
+
+**Biomedical Engineering.** With Protein-Protein Interaction Network, Rhee et al. (2018) leverage graph convolution and relation network for breast cancer subtype classification. Zitnik et al. (2018) also suggest a GCN-based model for polypharmacy side effects prediction. Their work models the drug and protein interaction network and separately deals with edges in different types.
+
+#### 8.1.4 Knowledge graph
+
+The knowledge graph (KG) represents a collection of real-world entities and the relational facts between pairs of the entities. It has wide application, such as question answering, information retrieval and knowledge guided generation. Tasks on KGs include learning low-dimensional embeddings which contain rich semantics for the entities and relations, predicting the missing links between entities, and multi-hop reasoning over the knowledge graph. One line of research treats the graph as a collection of triples, and proposes various kinds of loss functions to distinguish the correct triples and false triples (Bordes et al., 2013). The other line leverages the graph nature of KG, and uses GNN-based methods for various tasks. When treated as a graph, KG can be seen as a heterogeneous graph. However, unlike other heterogeneous graphs such as social networks, the logical relations are of more importance than the pure graph structure.
+
+R-GCN (Schlichkrull et al., 2018) is the first work to incorporate GNNs for knowledge graph embedding. To deal with various relations, R-GCN proposes relation-specific transformation in the message passing steps. Structure-Aware Convolutional Network (Shang et al., 2019) combines a GCN encoder and a CNN decoder together for better knowledge representations.
+
+A more challenging setting is knowledge base completion for out-of-knowledge-base (OORE) entities. The OOKB entities are unseen in the training set, but directly connect to the observed entities in the training set. The embeddings of OOKB entities can be aggregated from the observed entities. Hamaguchi et al. (2017) use GNNs to solve the problem, which achieve satisfying performance both in the standard KBC setting and the OOKB setting.
+
+Besides knowledge graph representation learning, Wang et al. (2018b) utilize GCN to solve the cross-lingual knowledge graph alignment problem. The model embeds entities from different languages into a unified embedding space and aligns them based on the embedding similarity. To align large-scale heterogeneous knowledge graphs, OAG (Zhang et al., 2019) uses graph attention networks to model various types of entities. With representing entities as their surrounding subgraphs, Xu et al. (2019c) transfer the entity alignment problem to a graph matching problem and then solve it by graph matching networks.
+
+#### 8.1.5 Generative models
+
+Generative models for real-world graphs have drawn significant attention for their important applications including modeling social interactions, discovering new chemical structures, and constructing knowledge graphs. As deep learning methods have powerful ability to learn the implicit distribution of graphs, there is a surge in neural graph generative models recently.
+
+NetGAN (Shchur et al., 2018) is one of the first work to build neural graph generative model, which generates graphs via random walks. It transforms the problem of graph generation to the problem of walk generation which takes the random walks from a specific graph as input and trains a walk generative model using GAN architecture. While the generated graph preserves important topological properties of the original graph, the number of nodes is unable to change in the generating process, which is as same as the original graph. GraphRNN (You et al., 2018) manages to generate the adjacency matrix of a graph by generating the adjacency vector of each node step by step, which can output networks with different numbers of nodes. Li et al. (2018) propose a model which generates edges and nodes sequentially and utilizes a graph neural network to extract the hidden state of the current graph which is used to decide the action in the next step during the sequential generative process. GraphAF (Shi et al., 2020) also formulates graph generation as a sequential decision process. It combines the flow-based generation with the autogressive model. Towards molecule generation, it also conducts validity check of the generated molecules using existing chemical rules after each step of generation.
+
+Instead of generating graph sequentially, other works generate the adjacency matrix of graph at once. MolGAN (De Cao and Kipf, 2018) utilizes a permutation-invariant discriminator to solve the node variant problem in the adjacency matrix. Besides, it applies a reward network for RL-based optimization towards desired chemical properties. What's more, Ma et al. (2018) propose constrained variational auto-encoders to ensure the semantic validity of generated graphs. And, GCPN (You et al., 2018) incorporates domain-specific rules through reinforcement learning. GNF (Liu et al., 2019) adapts normalizing flow to the graph data. Normalizing flow is a kind of generative model which uses a intertable mapping to transform observed data into latent vector space. Transforming from the latent vector back into the observed data using the inverse matrix serves as the generating process. GNF combines normalizing flow with a permutation-invariant graph auto-encoder to take graph structured data as the input and generate new graphs at the test time. Graphite (Grover et al., 2019) integrates GNN into variational auto-encoders to encode the graph structure and features into latent variables. More specifically, it uses isotropic Gaussian as the latent variables and then uses iterative refinement strategy to decode from the latent variables.
+
+#### 8.1.6 Combinatorial optimization
+
+Combinatorial optimization problems over graphs are set of NP-hard problems which attract much attention from scientists of all fields. Some specific problems like traveling salesman problem (TSP) and minimum spanning trees (MST) have got various heuristic solutions. Recently, using a deep neural network for solving such problems has been a hot-spot, and some of the solutions further leverage graph neural network because of their graph structure.
+
+Bello et al. (2017) first propose a deep-learning approach to tackle TSP. Their method consists of two parts: a Pointer Network (Vinyals et al., 2015) for parameterizing rewards and a policy gradient (Sutton and Barto, 2018) module for training. This work has been proved to be comparable with traditional approaches. However, Pointer Networks are designed for sequential data like texts, while order-invariant encoders are more appropriate for such work.
+
+Khail et al. (2017), Kool et al. (2019) improve the above method by including graph neural networks. The former work first obtains the node embeddings from structure2vec (Dai et al., 2016), then feed them into a Q-learning module for making decisions. The latter one builds an attention-based encoder-decoder system. By replacing reinforcement learning module with an attention-based decoder, it is more efficient for training. These works achieve better performances than previous algorithms, which prove the representation power of graph neural networks. More generally, Gasse et al. (2019) represent the state of a combinatorial problem as a bipartite graph and utilize GCN to encode it.
+
+For specific combinatorial optimization problems, Nowak et al. (2018) focus on Quadratic Assignment Problem i.e. measuring the similarity of two graphs. The GNN based model learns node embeddings for each graph independently and matches them using attention mechanism. This method offers intriguingly good performance even in regimes where standard relaxation-based techniques appear to suffer. Zheng et al. (2020) use a generative graph neural network to model the DAG-structure learning problem, which is also a combinatorial optimization and NP-hard problem. NeuroSAT (Selsam et al., 2019) learns a message passing neural network to classify the satisfiability of SAT problem. It proves that the learned model can generalize to novel distributions of SAT and other problems which can be converted to SAT.
+
+Unlike previous works which try to design specific GNNs to solve combinatorial problems, Sato et al. (2019) provide a theoretical analysis of GNN models on these problems. It establishes connections between GNNs and the distributed local algorithms which is a group of classical algorithms on graphs for solving these problems. Moreover, it demonstrates the optimal approximation ratios to the optimal solutions that the most powerful GNN can reach. It also proves that most of existing GNN models cannot exceed this upper bound. Furthermore, it adds coloring to the node feature to improve the approximation ratios.
+
+#### 8.1.7 Traffic networks
+
+Predicting traffic states is a challenging task since traffic networks are dynamic and have complex dependencies. Cui et al. (2018) combine GNNs and LSTMs to capture both spatial and temporal dependencies. STGCN (Yu et al., 2018) constructs ST-Conv blocks with spatial and temporal convolution layers, and applies residual connection with bottleneck strategies. Zheng et al. (2020), Guo et al. (2019) both incorporate attention mechanism to better model spatial temporal correlation.
+
+#### 8.1.8 Recommendation systems
+
+User-item interaction prediction is one of the classic problems in recommendation. By modeling the interaction as a graph, GNNs can be utilized in this area. GC-MC (van den Berg et al., 2017) firstly applies GCN on user-item rating graphs to learn user and item embeddings. To efficiently adopt GNNs in web-scale scenarios, PinSage (Ying et al., 2018) builds computational graphs with weighted sampling strategy for the bipartite graph to reduce repeated computation.
+
+Social recommendation tries to incorporate user social networks to enhance recommendation performance. GraphRec (Fan et al., 2019) learns user embeddings from both item side and user side. Wu et al. (2019) go beyond static social effects. They attempt to model homophily and influence effects by dual attentions.
+
+#### 8.1.9 Other Applications in structural scenarios
+
+Because of the ubiquity of graph-structured data, GNNs have been applied to a larger variety of tasks than what we have introduced above. We list more scenarios very briefly. In financial market, GNNs are used to model the interaction between different stocks to predict the future trends of the stocks (Matsunaga et al., 2019; Yang et al., 2019; Chen et al., 2018; Li et al., 2020). Kim et al. (2019) also predict the market index movement by formulating it as a graph classification problem. In Software-Defined Networks (SDN), GNNs are used to optimize the routing performance (Pusket et al., 2019). In Abstract Meaning Representation (AMR) graph to Text generation tasks, Song et al. (2018), Beck et al. (2018) use GNNs to encode the graph representation of the abstract meaning.
+
+### Non-structural scenarios
+
+In this section we will talk about applications on non-structural scenarios. Generally, there are two ways to apply GNNs on non-structuralscenarios: (1) Incorporate structural information from other domains to improve the performance, for example using information from knowledge graphs to alleviate the zero-shot problems in image tasks; (2) Infer or assume the relational structure in the task and then apply the model to solve the problems defined on graphs, such as the method in (Zhang et al., 2018) which models text into graphs. Common non-structure scenarios include image, text, and programming source code (Allamanis et al., 2018; Li et al., 2016). However, we only give detailed introduction to the first two scenarios.
+
+#### 8.2.1 Image
+
+**Few(Zero)-shot Image Classification.** Image classification is a very basic and important task in the field of computer vision, which attracts much attention and has many famous datasets like ImageNet (Russakovsky et al., 2015). Recently, **zero-shot and few-shot learning** become more and more popular in the field of image classification. In \(N\)-shot learning, to make predictions for the test data samples in some classes, only \(N\) training samples in the same classes are provided in the training set. Thereby, few-shot learning restricts \(N\) to be small, and zero-shot requires \(N\) to be 0. Models must learn to generalize from the limited training data to make new predictions for testing data. Graph neural networks, on the other hand, can assist the image classification system in these challenging scenarios.
+
+First, knowledge graphs can be used as extra information to guide zero-shot recognition classification (Wang et al., 2018; Kampffmeyer et al., 2019). Wang et al. (2018) make the visual classifiers learn not only from the visual input but also from word embeddings of the categories' names and their relationships to other categories. A knowledge graph is developed to help connect the related categories, and they use a 6-layer GCN to encode the knowledge graph. As the over-smoothing effect happens when the graph convolution architecture becomes deep, the 6-layer GCN used in (Wang et al., 2018) will wash out much useful information in the representation. To solve the smoothing problem, Kampffmeyer et al. (2019) use a single layer GCN with a larger neighborhood which includes both one-hop and multi-hop nodes in the graph. And it is proven effective in building a zero-shot classifier from existing ones. As most knowledge graphs are large for reasoning, Marino et al. (2017) select some related entities to build a sub-graph based on the result of object detection and apply GGNN to the extracted graph for prediction. Besides, Lee et al. (2018) also leverage the knowledge graph between categories: It further defines three types of relations between categories: super-subordinate, positive correlation, and negative correlation and propagates the confidence of relation labels in the graph directly.
+
+Except for the knowledge graph, the similarity between images in the dataset is also helpful for the few-shot learning (Garcia and Bruna, 2018). Garcia and Bruna (2018) build a weighted fully-connected image network based on the similarity and do message passing in the graph for few-shot recognition.
+
+**Visual Reasoning.** Computer-vision systems usually need to perform reasoning by incorporating both spatial and semantic information. So it is natural to generate graphs for reasoning tasks.
+
+A typical visual reasoning task is visual question answering (VQA). In this task, a model needs to answer the questions about an image given the text description of the questions. Usually, the answer lies in the spatial relations among objects in the image. Teney et al. (2017) construct an image scene graph and a question syntactic graph. Then they apply GGNN to train the embeddings for predicting the final answer. Despite spatial connections among objects, Norcliffebrown et al. (2018) build the relational graphs conditioned on the questions. With knowledge graphs, Wang et al. (2018), Narasimhan et al. (2018) can perform finer relation exploration and more interpretable reasoning process.
+
+Other applications of visual reasoning include object detection, interaction detection, and region classification. In object detection (Hu et al., 2018; Gu et al., 2018), GNNs are used to calculate RoI features. In interaction detection (Qi et al., 2018; Jain et al., 2016), GNNs are message-passing tools between humans and objects. In region classification (Chen et al., 2018), GNNs perform reasoning on graphs that connects regions and classes.
+
+**Semantic Segmentation.** Semantic segmentation is a crucial step towards image understanding. The task here is to assign a unique label (or category) to every single pixel in the image, which can be considered as a dense classification problem. However, regions in images are often not grid-like and need non-local information, which leads to the failure of traditional CNN. Several works utilize graph-structured data to handle it. Liang et al. (2016) use Graph-LSTM to model long-term dependency together with spatial connections by building graphs in the form of distance-based superpixel map and applying LSTM to propagate neighborhood information globally. Subsequent work improves it from the perspective of encoding hierarchical information (Liang et al., 2017).
+
+Furthermore, 3D semantic segmentation (RGBD semantic segmentation) and point clouds classification utilize more geometric information and therefore are hard to model by a 2D CNN. Qi et al. (2017) construct a k-nearest neighbor (KNN) graph and use a 3D GNN as the propagation model. After unrolling for several steps, the prediction model takes the hidden state of each node as input and predicts its semantic label. As there are always too many points in point clouds classification task, Landrieu and Simonovsky (2018) solve large-scale 3D point clouds segmentation by building superpoint graphs and generating embeddings for them. To classify supernodes, Landrieu and Simonovsky (2018) leverage GGNN and graph convolution. Wang et al. (2018) propose to model point interactions through edges. They calculate edge representation vectors by feeding the coordinates of its terminal nodes. Then node embeddings are updated by edge aggregation.
+
+#### 8.2.2 Text
+
+The graph neural networks could be applied to several tasks based on texts. It could be applied to both sentence-level tasks (e.g. text classification) as well as word-level tasks (e.g. sequence labeling). We list several major applications on text in the following.
+
+**Text Classification.** Text classification is an important and classical problem in natural language processing. Traditional text classification uses bag-of-words features. However, representing a text as a graph of words can further capture semantics between non-consecutive and long distance words (Peng et al., 2018). Peng et al. (2018) use a graph-CNN based deep learning model to first convert texts to graph-of-words, and then use graph convolution operations in (Niepert et al., 2016) to convolve the word graph. Zhang et al. (2018) propose the Sentence LSTM to encode text. They view the whole sentence as a single state, which consists of sub-states for individual words and an overall sentence-level state. They use the global sentence-level representation for classification tasks. These methods either view a document or a sentence as a graph of word nodes. Yao et al. (2019) regard the documents and words as nodes to construct the corpus graph and use the Text GCN to learn embeddings of words and documents. Sentiment classification could also be regarded as a text classification problem and a Tree-LSTM approach is proposed by (Yai et al., 2015).
+
+**Sequence Labeling.** Given a sequence of observed variables (such as words), sequence labeling is to assign a categorical label for each variable. Typical tasks include POS-tagging, where we label the words in a sentence by their part-of-speech, and Named Entity Recognition (NER), where we predict whether each word in a sentence belongs to a part of a Named Entity. If we consider each variable in the sequence as a node and the dependencies as edges, we can utilize the hidden state of GNNs to address the task. Zhang et al. (2018) utilize the Sentence LSTM to label the sequence. They have conducted experiments on POS-tagging and NER tasks and achieves promising performances.
+
+Semantic role labeling is another task of sequence labeling. Marcheggiani and Titov (2017) present a Syntactic GCN to solve the problem. The Syntactic GCN which operates on the direct graph with labeled edges is a special variant of the GCN (Kipf and Welling, 2017). It integrates edge-wise gates which let the model regulate contributions of individual dependency edges. The Syntactic GCNs over syntactic dependency trees are used as sentence encoders to learn latent feature representations of words in the sentence.
+
+**Neural Machine Translation.** The neural machine translation (NMT) task is to translate text from source language to target language automatically using neural networks. It is usually considered as a sequence-to-sequence task. Transformer (Vaswani et al., 2017) introduces the attention mechanisms and replaces the most commonly used recurrent or convolutional layers. In fact, the Transformer assumes a fully connected graph structure between words. Other graph structure can be explored with GNNs.
+
+One popular application of GNN is to incorporate the syntactic or semantic information into the NMT task. Bastings et al. (2017) utilize the Syntactic GCN on syntax-aware NMT tasks. Marcheggiani et al. (2018) incorporate information about the predicate-argument structure of source sentences (namely, semantic-role representations) using Syntactic GCN and compare the results between incorporating only syntactic, only semantic information and both of the information. Beck et al. (2018) utilize the GGNN in syntax-aware NMT. They convert the syntactic dependency graph into a new structure called the Levi graph (_Levi_, 1942) by turning the edges into additional nodes and thus edge labels can be represented as embeddings.
+
+**Relation Extraction.** Extracting semantic relations between entities in texts helps to expand existing knowledge base. Traditional methods use CNNs or RNNs to learn entities' feature and predict the relation type for a pair of entities. A more sophisticated way is to utilize the dependency structure of the sentence. A document graph can be built where nodes represent words and edges represent various dependencies such as adjacency, syntactic dependencies and discourse relations. Zhang et al. (2018) propose an extension of graph convolutional networks that is tailored for relation extraction and apply a pruning strategy to the input trees.
+
+Cross-sentence N-ary relation extraction detects relations among \(n\) entities across multiple sentences. Peng et al. (2017) explore a general framework for cross-sentence \(n\)-ary relation extraction by applying graph LSTMs on the document graphs. Song et al. (2018) also use a graph-state LSTM model and speed up computation by allowing more parallelization.
+
+**Event Extraction.** Event extraction is an important information extraction task to recognize instances of specified types of events in texts. This is always conducted by recognizing the event triggers and then predicting the arguments for each trigger. Nguyen and Grishman (2018) investigate a convolutional neural network (which is the Syntactic GCN exactly) based on dependency trees to perform event detection. Liu et al. (2018) propose a Jointly Multiple Events Extraction (JMEE) framework to jointly extract multiple event triggers and arguments by introducing syntactic shortcut arcs to enhance information flow to attention-based graph convolution networks to model graph information.
+
+**Fact Verification.** Fact verification is a task requiring models to extract evidence to verify given claims. However, some claims require reasoning on multiple pieces of evidence. GNN-based methods like GEAR (Zhou et al., 2019) and KQAT (Liu et al., 2020) are proposed to conduct evidence aggregating and reasoning based on a fully connected evidence graph. Zhong et al. (2020) build an inner-sentence graph with the information from semantic role labeling and achieve promising results.
+
+**Other Applications on Text.** GNNs can also be applied to many other tasks on text. For example, GNNs are also used in question answering and reading comprehension (Song et al., 2018; De Cao et al., 2019; Qiu et al., 2019; Tu et al., 2019; Ding et al., 2019). Another important direction is relational reasoning, relational networks (Santoro et al., 2017), interaction networks (Battaglia et al., 2016) and recurrent relational networks (Palm et al., 2018) are proposed to solve the relational reasoning task based on text.
+
+## 9 Open problems
+
+Although GNNs have achieved great success in different fields, it is remarkable that GNN models are not good enough to offer satisfying solutions for any graph in any condition. In this section, we list some open problems for further researches.
+
+**Robustness.** As a family of models based on neural networks, GNNs are also vulnerable to adversarial attacks. Compared to adversarial attacks on images or text which only focuses on features, attacks on graphs further consider the structural information. Several works have been proposed to attack existing graph models (Zugner et al., 2018; Dai et al., 2018) and more robust models are proposed to defend (Zhu et al., 2019). We refer to (Sun et al., 2018) for a comprehensive review.
+
+**Interpretability.** Interpretability is also an important research direction for neural models. But GNNs are also black-boxes and lack of explanations. Only a few methods (Ying et al., 2019; Baldassarre and Azizpour, 2019) are proposed to generate example-level explanations for GNN models. It is important to apply GNN models on real-world applications with trusted explanations. Similar to the fields of CV and NLP, interpretability on graphs is also an important direction to investigate.
+
+**Graph Pretraining.** Neural network-based models require abundant labeled data and it is costly to obtain enormous human-labeled data. Self-supervised methods are proposed to guide models to learn from unlabeled data which is easy to obtain from websites or knowledge bases. These methods have achieved great success in the area of CV and NLP with the idea of pretraining (Krizhevsky et al., 2012; Devlin et al., 2019). Recently, there have been works focusing on pretraining on graphs (Qiu et al., 2020; Hu et al., 2020, 2020; Zhang et al., 2020), but they have different problem settings and focus on different aspects. This field still has many open problems requiring research efforts, such as the design of the pretraining tasks, the effectiveness of existing GNN models on learning structural or feature information, etc.
+
+**Complex Graph Structures.** Graph structures are flexible and complex in real life applications. Various works are proposed to deal with complex graph structures such as dynamic graphs or heterogeneous graphs as we have discussed before. With the rapid development of social networks on the Internet, there are certainly more problems, challenges and application scenarios emerging and requiring more powerful models.
+
+## 10 Conclusion
+
+Over the past few years, graph neural networks have become powerful and practical tools for machine learning tasks in graph domain. This progress owes to advances in expressive power, model flexibility, and training algorithms. In this survey, we conduct a comprehensive review of graph neural networks. For GNN models, we introduce its variants categorized by computation modules, graph types, and training types. Moreover, we also summarize several general frameworks and introduce several theoretical analyses. In terms of application taxonomy, we divide the GNN applications into structural scenarios, non-structural scenarios, and other scenarios, then give a detailed review for applications in each scenario. Finally, we suggest four open problems indicating the major challenges and future research directions of graph neural networks, including robustness, interpretability, pretraining and complex structure modeling.
+
+**Declaration of competing interest**
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+## Acknowledgements
+
+This work is supported by the National Key Research and Development Program of China (No. 2018YFB1004503), the National Natural Science Foundation of China (NSFC No.61772302) and the Beijing Academy of Artificial Intelligence (BAAI). This work is also supported by 2019 Tencent Marketing Solution Rhino-Bird Focused Research Program
+
+## Appendix A Datasets
+
+Many tasks related to graphs are released to test the performance of various graph neural networks. Such tasks are based on the following commonly used datasets. We list the datasets in Table 4.
+
+## Appendix B Implementations
+
+We first list several platforms that provide codes for graph computing in Table 6.
+
+\begin{table}
+\begin{tabular}{l l l} \hline \hline Field & Datasets & \\ \hline Citation Networks & Pubmed (Yang et al., 2016) Coren (Yang et al., 2016) Gieseer (Yang et al., 2016) DBLP (Tang et al., 2008) \\ Bio-chemical & MUTA (Obbath et al., 1991) NCI-1 (Wale et al., 2008) PPI (Zitnik and Leskovec, 2017) DBD (Dobson and Digg, 2003) PROTEIN (Borgswardt et al., 2005) PTC \\ Graphs & (Tohonen et al., 2003) \\ Social Networks & Reddit (Hamilton et al., 2017) HogGatalog (Zafrani and Liu, 2009) \\ Knowledge Graphs & FBI3 (Scher et al., 2013) PBI5K (Bordes et al., 2013) PBI5K237 (Toutsono et al., 2015) WIN1 (Scher et al., 2013) WIN18 (Broder et al., 2013) WIN18B \\ \hline \hline \end{tabular}
+\end{table}
+Table 4: Datasets commonly used in tasks related to graph.
+
+\begin{table}
+\begin{tabular}{l l l} \hline \hline Field & Datasets & \\ \hline Citation Networks & Pubmed (Yang et al., 2016) Coren (Yang et al., 2016) Gieseer (Yang et al., 2016) DBLP (Tang et al., 2008) \\ Bio-chemical & MUTA (Obbath et al., 1991) NCI-1 (Wale et al., 2008) PPI (Zitnik and Leskovec, 2017) DBD (Dobson and Digg, 2003) PROTEIN (Borgswardt et al., 2005) PTC \\ Graphs & (Tohonen et al., 2003) \\ Social Networks & Reddit (Hamilton et al., 2017) HogGatalog (Zafrani and Liu, 2009) \\ Knowledge Graphs & FBI3 (Scher et al., 2013) PBI5K (Bordes et al., 2013) PBI5K237 (Toutsono et al., 2015) WIN1 (Scher et al., 2013) WIN18 (Broder et al., 2013) WIN18B \\ \hline \hline \end{tabular}
+\end{table}
+Table 5: Popular graph learning dataset collections.
+
+\begin{table}
+\begin{tabular}{l l l} \hline \hline Platform & Link & Reference \\ \hline PyTorch Geometric & [https://github.com/rustly1s/pytorch_geometric](https://github.com/rustly1s/pytorch_geometric) & Fey and Lensen (2019) \\ Deep Graph Library & [http://github.com/dmlc/dgl](http://github.com/dmlc/dgl) & Wang et al. (2019b) \\ AlGraph & [https://github.com/allabo/aliggraph](https://github.com/allabo/aliggraph) & Zhu et al. (2019a) \\ GraphVite & [https://github.com/DeepGraphLearning/graphvite](https://github.com/DeepGraphLearning/graphvite) & Zhu et al. (2019b) \\ Paddle Graph Learning & [http://github.com/Paddle/PGL](http://github.com/Paddle/PGL) & \\ Euler & [https://github.com/allabo/euler](https://github.com/allabo/euler) & \\ Plato & [https://github.com/tencent/plato](https://github.com/tencent/plato) & \\ CogBlt. & [https://github.com/THUDM/cogBl/](https://github.com/THUDM/cogBl/) & \\ OpenNE & [https://github.com/thunlp/OpenNE/tree/pyTorch](https://github.com/thunlp/OpenNE/tree/pyTorch) & \\ \hline \hline \end{tabular}
+
+* Next we list the hyperlinks of the current open source implementations of some famous GNN models in Table 7: Source code of the models mentioned in the survey.
+
+\begin{table}
+\begin{tabular}{l l l} \hline \hline Model & Link & \\ \hline GCNN (2015) & [https://github.com/yujial/sgnn](https://github.com/yujial/sgnn) \\ Neurals PPs (2015) & [https://github.com/Https://neurals-fingerprint](https://github.com/Https://neurals-fingerprint) \\ CheNet (2016) & [https://github.com/ddell/cnn_graph](https://github.com/ddell/cnn_graph) \\ DNGR (2016) & [https://github.com/shelson/Cos/DNGR](https://github.com/shelson/Cos/DNGR) \\ SDNE (2016) & [https://github.com/uouranorms/SDNE](https://github.com/uouranorms/SDNE) \\ GAE (2016) & [https://github.com/linaosen/Variational-Graph-Auto-Encoders](https://github.com/linaosen/Variational-Graph-Auto-Encoders) \\ DRNR (2016) & [https://github.com/adpole/DRSE](https://github.com/adpole/DRSE) \\ Structural RNN (2016) & [https://github.com/shelsonlin399/RNNep](https://github.com/shelsonlin399/RNNep) \\ DCNN (2016) & [https://github.com/cours/dcm](https://github.com/cours/dcm) \\ GCN (2017) & [https://github.com/kipkip/gcn](https://github.com/kipkip/gcn) \\ CayleyNet (2017) & [https://github.com/amadin/CayleyNet](https://github.com/amadin/CayleyNet) \\ GraphSage (2017) & [https://github.com/williamed/GraphSAGE](https://github.com/williamed/GraphSAGE) \\ GAT (2017) & [https://github.com/Petar/V-GAT](https://github.com/Petar/V-GAT) \\ CIN (2017) & [https://github.com/rnrgmt/Column_networks](https://github.com/rnrgmt/Column_networks) \\ ECC (2017) & [https://github.com/myg007/ee](https://github.com/myg007/ee) \\ MPAN8 (2017) & [https://github.com/brain](https://github.com/brain) research/mpnn \\ MolNet (2017) & [https://github.com/pierebaque/GeometricConvolutionBench](https://github.com/pierebaque/GeometricConvolutionBench) & \\ \hline \hline \end{tabular}
+\end{table}
+Table 6: Popular platforms for graph computing.
+
+## References
+
+* M. Alsamis, M. Brockschmidt, and M. Khademi (2018)Learning to represent programs with graphs. Proc. ICLR. Cited by: SS1.
+* J. Arwood and D. Towsley (2016)Diffusion-convolutional neural networks. In Proceedings of NIPS, pp. 2001-2009. Cited by: SS1.
+* D. Cho, K. Bengio, and Y. Bengio (2015)Neural machine translation by jointly learning to align and translate. In Proceedings of ICML, Cited by: SS1.
+* F. Baldassur, H. Azizpur, and H. Bengio (2019)Eulagability techniques for graph convolutional networks. ICML Workshop on Learning and Reasoning with Graph-Structured Representation. Cited by: SS1.
+* P. Bertolfo, E. V. Korolev, M. Moret, J. R. Ruetter, and J. Silva (2019)The logical expressions of graph neural networks. Proceedings of ICLR. Cited by: SS1.
+* J. Battings, V. Liu, W. M. Marchespiani, and K. Siman (2017)Graph convolutional encoders for syntax-aware neural machine translation. In Proceedings of EMNLP, pp. 1957-1967. Cited by: SS1.
+* P. Battaglia, R. Pascanu, R. Lai, D. R. Reende, and J. L. B.
+
+Dobson, P.D., Doug, A.J., 2003. Distinguishing enzyme structures from non-enzymes without alignments. J. Mol. Biol. 330, 771-783.
+* Drewanad et al. (2015) Drewanad, D.N., Mackintari, D., Agulizarparaprisrisris, J., Gomezhommetili, R., Hirzel, T.D., Asperuguantil, A., Adams, R.P., 2015. Convolutional networks on graphs for learning molecular fingerprints. In: Proceedings of NIPS, pp. 2224-2232.
+* Dwivedi et al. (2020) Dwivedi, V., Joshi, C., Laurent, T., Bengio, Y., Brevano, X., 2020. Benchmarking Graph Neural Networks. arXiv preprint arXiv:2003.00982.
+* Erica et al. (2020) Erica, F., Podda, M., Maccio, D., Micheli, A., 2020. A short comparison of graph neural networks for graph classification. In: Proceedings of ICLR.
+* Pan et al. (2019) Pan, W., Xia, Y., Li, Q., He, Z., Zhao, E., Tang, J., Yin, D., 2019. Graph neural networks for social recommendation. In: Proceedings of WWW, pp. 417-426.
+* Feng et al. (2019) Feng, Y., You, H., Zhang, Z., Ji, R., Gao, Y., 2019. Hypergraph neural networks. In: Proceedings of AAAI, Vol. 33, pp. 3558-3565.
+* Fox and Lissen (2019) Fox, J., Lissen, J., 2019. Fast graph representation learning with PyTorch Geometric. In: ICLR Workshop on Representation Learning on Graphs and Manifolds.
+* Fout et al. (2017) Fout, A., Byrd, J., Shariari, R., Ben-Hur, A., 2017. Protein interface prediction using graph convolutional networks. In: Proceedings of NIPS, pp. 6533-6542.
+* Frasconi and Serberini (1998) Frasconi, P., et al., 2008. A general framework for adaptive processing of data structures. IEEE Trans. 198, 768-769.
+* Fu et al. (2020) Fu, X., Zhang, J., Meng, Z., King, L., Morgan, 2020. MetaGraph aggregation graph neural network for heterogeneous graph embedding. Proceedings of WWW, 2331-2341.
+* Gallicchio and Micheli (2010) Gallicchio, C., Micheli, A., 2010. Graph echo state networks. In: Proceedings of IJCNN. IEEE, pp. 1-8.
+* Gao and Si (2019) Gao, H., Ji, S., 2019. Graph u-nets. In: Proceedings of ICML, pp. 2083-2092.
+* Gao and Si (2018) Gao, H., Wang, Z., Ji, S., 2018. Large-scale learnable graph convolutional networks. In: Proceedings of ISDO., pp. 1416-1414.
+* Gao et al. (2018) Gao, H., Yang, H., Zhou, C., Wu, J., Pan, S., Hu, Y., 2018b. Active discriminative network representation learning. In: Proceedings of IJCAI.
+* Garcia and Berraus (2018) Garcia, V., Bruna, J., 2018. Few-shot learning with graph neural networks. Proceedings of ICLR.
+* Garg et al. (2020) Garg, V.K., Jegelka, S., Jaskidakis, T., 2020. Generalization and representational limits of graph neural networks. Proceedings of ICML, 3419-3430.
+* Gasse et al. (2019) Gasse, M., Chetelat, D., Ferroni, N., Charlin, L., Lodi, A., 2019. Exact combinatorial optimization with graph convolutional neural networks. In: Proceedings of NeurIPS, pp. 15580-15592.
+* Gehring et al. (2017) Gehring, J., Ali, M., Graffner, D., Dampulin, Y.N., 2017. A convolutional encoder model for neural machine translation. In: Proceedings of ACL, 1, pp. 123-135.
+* Gilner et al. (2017) Gilner, J., Schoenholz, S.S., Billey, P.F., Vinyals, O., Dahl, E.G., 2017. Neural message passing for quantum chemistry. Proceedings of ICML, 1263-1272.
+* Gori et al. (2025) Gori, M., Mondaffi, G., Soareski, F., 2025. A new model for learning in graph domain. Proceedings of IJCNN. 2, IEEE, pp. 729-734.
+* Goyal and Ferrara (2018) Goyal, P., Ferrara, E., 2018. Graph embedding techniques, applications, and performance: a survey. Knowl. Base Syst. 151, 78-94.
+* Grover and Leskovec (2016) Grover, L., Leskovec, J., 2016. nodevec: scalable feature learning for networks. In: Proceedings of ICDM. ACM, pp. 855-864.
+* Grover and Zweis (2019) Grover, Zweis, A., Zweis, A., 2019. Graph: iterative generative modeling of graphs. In: Proceedings of ICML, pp. 2442-2444.
+* Gu et al. (2018) Gu, J., Hu, H., Wang, L., Wei, Y., Dai, J., 2018. Learning region features for object detection. In: Proceedings of ICCV, pp. 381-395.
+* Guo et al. (2019) Guo, S., Lin, Y., Feng, N., Song, C., Wan, H., 2019. Attention based spatial-temporal graph discovery in traffic flow forecasting. Proceedings of AAAI 33, 922-929.
+* Hamaguchi et al. (2017) Hamaguchi, T., Owa, H., Shimbo, M., Matsumoto, Y., 2017. Knowledge transfer for out-of-knowledge entities: a graph neural network approach. In: Proceedings of IJCAI, pp. 1802-1806.
+* Hamilton and Ying (2019) Hamilton, W.L., Ying, Z., Leskovec, J., 2019. Lattice representation learning on large graphs. In: Proceedings of NIPS, pp. 1024-1034.
+* Hamilton et al. (2017) Hamilton, W.L., Ying, R., Leskovec, J., 2017. Representation learning on graphs: methods and applications. IEEE DataTables Engineering Bulletin, 50, 52-74.
+* Hamilton et al. (2017) Hamilton, W.L., Zhang, J., Danescu-Mizil, C., Jurdsky, D., Leskovec, J., 2017c. Loyalty in online communities. In: Proceedings of ICWSM, pp. 540-543.
+* Hammer et al. (2004) Hammer, H., Micheli, A., Serberini, A., Strickler, M., 2004. Recursive self-organizing networks. In: Neural Network. 170, 1601-1605.
+* Hammond et al. (2011) Hammond, D.K., Vandergheynst, P., Golomani, R., 2011. Wavelets on graphs via spectral graph theory. Appl. Comput. Harmon. Anal. 30, 129-150.
+* Hassani et al. (2020) Hassani, K., Khashamham, A.H., 2020. Contrastive multi-view representation learning on graphs. In: Proceedings of ICML, pp. 4116-4126.
+* He et al. (2016) He, X., Zhang, X., Ren, S., Sun, J., 2016a. Deep residual learning for image recognition. In: Proceedings of CVPR, pp. 770-778.
+* He et al. (2016) He, K., Zhang, X., Ren, S., Sun, J., 2016a. Identity mappings in deep residual networks. In: Proceedings of ECCV, Springer, pp. 630-645.
+* Heaff et al. (2015) Heaff, H., Burns, J., LeC., 2015. Deep Convolutional Networks on Graph-Structured Data. arXiv preprint arXiv:1506.05163.
+* Hochreiter and Schmidhuber (1997) Hochreiter, S., Schmidhuber, J., 1997. Long short-term memory. Neural comput. 9, 1735-1780.
+* Hohen (2017) Hohen, Y., 2017. Vaint: attentional multi-agent predictive modeling. In: Proceedings of NIPS, pp. 2698-2708.
+* Hu et al. (2018) Hu, H., Gu, J., Zhang, Z., Dai, J., Wei, Y., 2018. Relation networks for object detection. In: Proceedings of CVPR, pp. 3588-3597.
+* Hu et al. (2020a) Hu, H., Dong, Y., Wang, K., Sun, Y., 2020a. Heterogeneous graph transformer. In: Proceedings of WWW, pp. 2704-2710.
+* Hu et al. (2020b) Hu, Z., Dong, Y., Wang, K., Chang, K.W., Sun, Y., 2020b. Gpt-gnn generative pre-training of graph neural networks. In: Proceedings of ICDO, pp. 1857-1867.
+* Hu et al. (2020c) Hu, S., Xiong, Z., Qu, M., Yuan, X., Cote, M.A., Liu, Z., Tang, J., 2020c. Graph policy network for transferable active learning on graphs. In: Proceedings of NeurIPS, 33.
+* Hu et al. (2020d) Hu, W., Fey, M., Zitnik, M., Dong, Y., Ren, H., Liu, R., Cattats, M., Leskovec, J., 2020d. Open graph benchmark: datasets for machine learning on graphs. Proceedings of NeurIPS.
+* Hu et al. (2020e) Hu, W., Liu, B., Gomes, J., Thrill, M., Liang, P., Pande, V., Leskovec, J., 2020e. Strategies for pre-training graph neural networks. Proceedings of ICLR.
+* Huang et al. (2017) Huang, G., Liu, Z., Van Der Maaten, L., Weinberger, K.Q., 2017. Densely connected convolutional networks. In: Proceedings of CVPR, pp. 4700-4708.
+* Huang et al. (2018) Huang, W., Zhang, T., Rong, Y., Huang, J., 2018. Adaptive sampling towards fast graph representation learning. Proceedings of NeurIPS 6558-4867.
+* Huang et al. (2020) Huang, Y., Xu, H., Duan, Z., Ren, A., Feng, J., Wang, X., 2020. Modeling Complex Spatial Patterns with Temporal Features via Heterogeneous Graph Embedding Networks. arXiv preprint arXiv:2008.08617.
+* Jaeger (2001) Jaeger, H., 2001. The "Echo State" Approach to Analysis and Training Recurrent Neural Networks-With an Erratum Note, vol. 148. German National Research Center for Information Technology GMD Technical Report, p. 13.
+* Jain et al. (2016) Jain, A., Zamir, A., Savaree, S., Suenas, A., 2016. Structural-rnn deep learning on spatio-temporal graphs. In: Proceedings of CVPR, pp. 5308-5317.
+* Kampliew et al. (2019) Kampliewiew, M., Chen, Y., Liang, X., Wang, H., Zhang, Y., Xing, P., 2019. Rethinking Knowledge Graph Propagation for Zero-Shot Learning. Proceedings of CVPR, pp. 11487-11496.
+* Kermas et al. (2016) Kermas, S., McCloskey, K., Berndl, M., Pande, V., Riley, P., 2016. Molecular graph convolutions: moving beyond fingerprints. J. Comput. Aided Mol. Des. 30, 595-608.
+* Keriwan and Pey (2019) Keriwan, N., Peyr, G., 2019. Universal invariant and equivariant graph neural networks. In: Proceedings of NeurIPS, pp. 7092-7101.
+* Khalil et al. (2017) Khalil, E., Dai, H * Liu et al. (2019) Liu, J., Kumar, A., Ba, J., Kiros, J., Swersky, K., 2019. Graph normalizing flows. In: Proceedings of NeurIPS, pp. 13578-13588.
+* Liu et al. (2012) Liu, Z., Xiong, C., Sun, M., Liu, Z., 2012. Dimension-grained fact verification with kernel graph attention network. In: Proceedings of ACL, pp. 7342-7351.
+* Looksa (2020) Looksa, A. 2020. What graph neural networks cannot learn: depth vs width. In: Proceedings of ICLR.
+* Ma et al. (2018) Ma, T., Chen, J., Xiao, C., 2018. Constrained generation of semantically valid graphs via regularizing variational autoencoders. Proceedings of NeurIPS 7113-7124.
+* Ma et al. (2019) Ma, Y., Wang, S., Aggarwal, C., Tang, J., 2019. Graph convolutional networks with eigenpooling. In: Proceedings of KDD, pp. 723-731.
+* Ma et al. (2019) Ma, Y., Wang, S., Aggarwal, C., Yin, D., Tang, J., 2019. Multi-dimensional graph convolutional networks. In: Proceedings of SDM, pp. 657-665.
+* Mallat (1999) Mallat, S., 1999. A Wavelet Tour of Signal Processing. Elsevier.
+* Mengnessi et al. (2020) Mengnessi, P., Rozza, A., Mantu, M., 2020. Dynamic graph convolutional networks. Pattern Recogn. 97, 1070000.
+* Marchesiani and Tikov (2017) Marchesiani, D., Tikov, J., 2017. Encoding sentences with graph convolutional networks for semantic role labeling. In: Proceedings of EMNLP, pp. 1506-1515.
+* Marchesiani et al. (2018) Marchesiani, D., Bastings, J., Trov, L., 2018. Exploiting semantics in neural machine translation with graph convolutional networks. Proceedings of NALR, 486-492.
+* Martins et al. (2017) Martins, K., SukthTang, J., Qu, M., Wang, M., Zhang, M., Yan, J., Mei, Q., 2015. Line large-scale information network embedding. In: Proceedings of WWW, pp. 1067-1077.
+* Teney et al. (2017) Teney, D., Liu, L., Den Hengel, A.V., 2017. Graph-structured representations for visual question answering. In: Proceedings of CVPR, pp. 3233-3241.
+* Trezzi et al. (2020) Trezzi, M., Marra, G., Melosci, S., Maggini, M., 2020. Deep Lagrangian Constraint-Based Propagation in Graph Neural Networks. arXiv preprint arXiv:2005.02392.
+* Tovinecn et al. (2003) Tovinecn, H., Srinivasan, A., King, R.D., Kramer, S., Helma, C., 2003. Statistical evaluation of the predictive toxicology challenge 2000-2001. Bioinformatics 19, 1183-1193.
+* Toutanova et al. (2015) Toutanova, K., Chen, D., Pantel, P., Ponn, L., Choudhury, P., Gamon, M., 2015. Representing text for joint embedding of text and knowledge bases. In: Proceedings of EMNLP, pp. 1499-1509.
+* Tsitsulin et al. (2020) Tsitsulin, A., Falovich, J., Perozzi, B., Muller, E., 2020. Graph Clustering with Graph Neural Networks. arXiv preprint arXiv:2006.16904.
+* Tu et al. (2019) Tu, M., Wang, G., Huang, J., Tang, Y., He, X., Zhou, B., 2019. Multi-hop reading compression across multiple documents by reasoning over heterogeneous graphs. In: Proceedings of ACL, pp. 2704-2713.
+* den Berg et al. (2017) den Berg, R., Jeff, Y.N., Welling, M., 2017. Graph convolutional matrix completion. arXiv preprint arXiv:1706.02263.
+* Vanzani et al. (2017) Vanzani, A., Shazeer, N., Parmar, N., Jones, L., Uszkoreit, J., Gomez, A.N., Kaiser, L., 2017. Attention is all you need. In: Proceedings of NIPS, pp. 5998-6008.
+* Velickovic et al. (2018) Velickovic, P., Cucurill, G., Casnova, A., Romero, A., Lio, P., Bengio, Y., 2018. Graph attention networks. In: Proceedings of ICLR.
+* Velickovic et al. (2019) Velickovic, P., Pedus, W., Hamilton, W.L., Li, P., Bengio, Y., Heim, R.D., 2019. Deep graph infomax. In: Proceedings of ICLR.
+* Verma et al. (2019) Verma, S., Zhang, Z., 2019. Stability and generalization of graph convolutional neural networks. In: Proceedings of KDD, pp. 1539-1549.
+* Vinyals and Souliov (2015) Vinyals, O., Bengio, S., Koltun, M., 2015. Order Matters: Sequence to Sequence for Sets arXiv preprint arXiv:1501.06391.
+* Vinyals et al. (2015b) Vinyals, O., Fortunato, M., Jaitly, N., 2015b. Pointer networks. In: Proceedings of NIPS, pp. 2062-2070.
+* Wale et al. (2008) Wale, N., Watson, L., Karypis, G., 2008. Comparison of descriptor spaces for chemical compound retrieval and classification. Knowl. Inf. Ser. 14, 347-347.
+* Wang et al. (2012) Wang, H., Leskovec, J., 2012. Unifying Graph Convolutional Neural Networks and Label Propagation. arXiv preprint arXiv:2002.06755.
+* Wang et al. (2017) Wang, C., Pan, S., Liang, G., Zhu, X., Jiang, J., 2017. Merge marginalized graph autoencoder for graph clustering. In: Proceedings of CIKM, pp. 889-898.
+* Wang et al. (2018a) Wang, X., Girshick, R., Gupta, A., He, K., 2018a. Non-local neural networks. In: Proceedings of CVPR, pp. 7794-7803.
+* Wang et al. (2018b) Wang, Z., Liu, Q., Yan, J., Zhang, Y., 2018b. Cross-lingual knowledge graph alignment via graph convolutional networks. Proceedings of EMNLP 349-357.
+* Wang et al. (2018c) Wang, Z., Chen, T., Ren, J.S.J., Yu, W., Cheng, H., Liu, L., 2018c. Deep reasoning with knowledge graph for social relationship understanding. Proceedings of UCAI 1021-1028.
+* Wang and Gupta (2018d) Wang, X., Ye, Y., Gupta, A., 2018d. Zero-shot recognition via semantic embeddings and knowledge graphs. Proceedings of CVPR 6857-6866.
+* Wang et al. (2018e) Wang, Y., Sun, Y., Lin, J., Sharma, S.E., Hornstein, M.M., Solomon, J.M., 2018e. Dynamic Graph Cm for Learning on Point Clouds. ACM Transactions on Graphics 38.
+* Wang et al. (2019) Wang, X., Ji, H., Shi, C., Wang, B., Ye, Y., Cui, P., Yu, P., 2019. Heterogeneous graph attention network. In: Proceedings of WWW, pp. 2022-2032.
+* Wang et al. (2019) Wang, M., Tu, L., Zheng, D., Gan, Q., Gati, Y., Ye, Z., Li, M., Zhou, J., Huang, Q., Ma, C., Huang, Z., Guo, Q., Zhang, H., Lin, Z., Zhao, J., Li, J., Lyanda, A.J., Zhang, Z., 2019. Depth Graph Library: towards Efficient and Scalable Deep Learning Graphs, ICLR Workshop on Representation Learning on Graphs and Manifolds.
+* Waters et al. (2017) Waters, N., Zoran, D., Weber, T., Hartstiglia, P., Pascanu, R., Tachetti, A., 2017. Visual interaction networks: learning a physics simulator from video. In: Proceedings of NIPS, pp. 6539-5447.
+* Wu et al. (2020) Wu, Y., Liu, D., Yu, W., Lu, L., Chen, E., 2020. Graph convolutional networks with markov random field learning for social spammer detection. In: Proceedings of AAAI, pp. 1054-1061.
+* Wu et al. (2019) Wu, Z., Pan, S., Chen, F., Long, G., Zhang, C., Yu, P.S., 2019a. A Comprehensive Survey on Graph Neural Networks at arXiv preprint arXiv:1901.00596.
+* Wu et al. (2019b) Wu, F., Zhao, J., Han, Z., Zhang, T., Fifty, C., Yu, T., Weinberger, K.O., 2019b. Simplifying graph convolutional networks: In: Volume 97 of Proceedings of Machine Learning Research, PMLR, pp. 6681-6687.
+* Wu et al. (2019c) Wu, Q., Zhang, H., Gao, X., He, P., Wang, P., Gao, H., Chen, G., 2019c. Dual graph attention networks for deep latent representation of multitarget social effects in recommender systems. In: Proceedings of WWW, pp. 2091-2102.
+* Xu et al. (2018) Xu, K., Li, C., Tian, Y., Sonobe, T., Kawanokyoshi, K., Jegelka, S., 2018. Representation learning on graphs with jumping knowledge networks. In: Proceeding of ICMI, pp. 5449-5458.
+* Xu et al. (2019a) Xu, B., Shen, H., Cao, Q., Qiu, Y., Cheng, X., 2019a. Graph wavelet neural network. In: Proceedings of ICML.
+* Xu et al. (2019b) Xu, K., Hu, W., Leskovec, J., Jegelka, S., 2019b. How powerful are graph neural networks? In: Proceedings of ICLR.
+* Xu et al. (2019c) Xu, K., Wang, L. Yu, M., Feng, Y., Song, Y., Wang, Z., Yu, D., 2019c. Cross-lingual knowledge graph alignment via graph matching neural network. In: Proceedings of ACL. Association for Computational Linguistics, pp. 3156-3161.
+* Xu et al. (2018) Xu, N., Wang, P., Chen, L., Jao, J., Zhao, J., Gim, M.K., 2019d. multi-resolution and dual graph neural network for predicting structured entity interactions. In: Proceedings of IJCAI, pp. 3968-3974.
+* Yan et al. (2018) Yan, S., Xiong, Y., Lin, D., 2018. Spatial temporal graph convolutional networks for skeleton-based action recognition. Proceedings of AAAI 32.
+* Yang et al. (2015) Yang, C., Liu, Z., Zhao, D., Sun, M., Chang, F.V., 2015. Network representation learning with rich text information. In: Proceedings of IJCAI, pp. 2111-2117.
+* Yang et al. (2016) Yang, Z., Cohen, W., Salakhutdinov, R., 2016. Revisiting semi-supervised learning with graph embeddings. In: Proceedings of ICML, PMLR, pp. 90-48.
+* Yang et al. (2019) Yang, Y., Wei, Z., Chen, Q., Wu, L., 2019. Using external knowledge for financial event prediction based on graph neural networks. In: Proceedings of EMNLP, pp. 2161-2164.
+* Yang et al. (2020) Yang, C., Xiao, Y., Zhang, Y., Sun, Y., Han, J., 2020. Heterogeneous Network Representation Learning: Survey, Benchmark, Evaluation, and beyond. arXiv preprint arXiv:2004.00216.
+* Yao et al. (2017) Yao, L., Mao, C., Liu, Y., 2017. Graph convolutional networks for text classification. Proceedings of AAAI 333, 7370-7377.
+* Ying et al. (2018a) Ying, R., He, R., Chen, E., Eisenbuchtale, P., Hamilton, W.L., Leskovec, J., 2018a. Graph convolutional neural networks for web-scale recommender systems. In: Proceedings of XDD Update 97-9848.
+* Ying et al. (2018b) Ying, Z., You, J., Morris, C., Ren, X., Hamilton, W., Leskovec, J., 2018b. Hierarchical graph representation learning with differentiable pooling. Proceedings of NeurIPS 4805-4815.
+* Ying et al. (2019) Ying, Z., Bourgeset, D., You, J., Zitnik, M., Leskovec, J., Ganespjaar, D., 2019. Generating explanations for graph neural networks. Proceedings of NeurIPS 9244-9255.
+* You et al. (2018) You, J., Liu, B., Ying, Z., Pande, V., Leskovec, J., 2018a. Graph convolutional policy network for goal-directed molecular graph generation. Proceedings of NeurIPS 6410-6421.
+* You et al. (2018b) You, J., Ying, R., Ren, X., Hamilton, W., Leskovec, J., Graghun, 2018b. Generating realistic graphs with deep auto-arviseable models. Proceedings of ICML 5694-5703.
+* You et al. (2020) You, J., Ying, J., Leskovec, J., 2020. Deep scene for graph neural networks. In: Proceedings of NeurIPS, pp. 33.
+* Yu and Zhu (2018) Yu, B., Yin, H., Zhu, Z., 2018. Spatio-temporal Graph Convolutional Networks: A Deep Learning Framework for Traffic Forecasting. Proceduralin. Of IJCAI, pp. 3634-3640.
+* Yun et al. (2019) Yun, S., Jeong, M., Kim, R., Kang, J., Kim, H.J., 2019. Graph transformer networksZilly, J.G., Srivastava, R.K., Koutnik, J., Schmidhuber, J., 2016. Recurrent highway networks. In: Proceedings of ICML, pp. 4189-4198.
+* Zitnik and Leskovec (2017) Zitnik, M., Leskovec, J., 2017. Predicting multicellular function through multi-layer tissue networks. Bioinformatics 33, 1190-1198.
+* Zitnik et al. (2018) Zitnik, M., Agrawal, M., Leskovec, J., 2018. Modeling polypharmacy side effects with graph convolutional networks. Bioinformatics 34, 1457-1466.
+* Zou et al. (2019) Zou, D., Han, Z., Wang, Y., Jiang, S., Sun, Y., Gu, Q., 2019. Layer-dependent importance sampling for training deep and large graph convolutional networks. In: Proceedings of NeurIPS, pp. 11249-11259.
+* Zigner et al. (2018) Zigner, D., Akbarnejad, A., Gunnemann, S., 2018. Adversarial attacks on neural networks for graph data. In: Proceedings of KDD, pp. 2847-2856.
+* Rossi et al. (2020) E. Rossi, P., Pasca, B. Chamberlain, D., Byward, H. Bronstein, F. Monti, 2020. Sign: scalable inception graph neural networks, arXiv preprint arXiv:2004.11198.
+
+## Erratum
+
+We are sorry for the mistakes we've made unconsciously in the paper and here are the errata. If you have any further questions, please send us an email.
+
+* On Page 58 and 68 the citation "Huang et al. (2020)" should be corrected to "Skarding et al. (2021)". The corresponding reference should be corrected to "Foundations and modelling of dynamic networks using dynamic graph neural networks: A survey" by Joakim Skarding, Bogdan Gabrys and Katarzyna Musial.

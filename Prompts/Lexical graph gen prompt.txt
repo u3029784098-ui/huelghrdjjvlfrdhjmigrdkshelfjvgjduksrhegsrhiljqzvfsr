@@ -1,0 +1,379 @@
+Given a folder containing subfolders, like this one.
+
+hierarchy_sample_1
+
+├── content.txt
+
+└── l0-n1-Graph neural networks: A review of methods and applications
+
+    ├── content.txt
+
+    ├── l1-n10-Acknowledgements
+
+    │   └── content.txt
+
+    ├── l1-n11-Appendix A Datasets
+
+    │   └── content.txt
+
+    ├── l1-n12-Appendix B Implementations
+
+    │   └── content.txt
+
+    ├── l1-n1-2 General design pipeline of GNNs
+
+    │   ├── content.txt
+
+    │   ├── l2-n1-Find graph structure
+
+    │   │   └── content.txt
+
+    │   ├── l2-n2-Specify graph type and scale
+
+    │   │   └── content.txt
+
+    │   ├── l2-n3-Design loss function
+
+    │   │   └── content.txt
+
+    │   └── l2-n4-Build model using computational modules
+
+    │       └── content.txt
+
+    ├── l1-n13-References
+
+    │   └── content.txt
+
+    ├── l1-n14-Erratum
+
+    │   └── content.txt
+
+    ├── l1-n2-3 Instantiations of computational modules
+
+    │   ├── content.txt
+
+    │   ├── l2-n1-Propagation modules - convolution operator
+
+    │   │   ├── content.txt
+
+    │   │   ├── l3-n1-3.1.1 Spectral approaches
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n2-3.1.2 Basic spatial approaches
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n3-3.1.3 Attention-based spatial approaches
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n4-3.2.1 Convergence-based methods
+
+    │   │   │   └── content.txt
+
+    │   │   └── l3-n5-3.2.2 Gate-based methods
+
+    │   │       └── content.txt
+
+    │   ├── l2-n2-Propagation modules - skip connection
+
+    │   │   └── content.txt
+
+    │   ├── l2-n3-Sampling modules
+
+    │   │   ├── content.txt
+
+    │   │   ├── l3-n1-3.4.1 Node sampling
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n2-3.4.2 Layer sampling
+
+    │   │   │   └── content.txt
+
+    │   │   └── l3-n3-3.4.3 Subgraph sampling
+
+    │   │       └── content.txt
+
+    │   └── l2-n4-Pooling modules
+
+    │       ├── content.txt
+
+    │       ├── l3-n1-3.5.1 Direct pooling modules
+
+    │       │   └── content.txt
+
+    │       └── l3-n2-3.5.2 Hierarchical pooling modules
+
+    │           └── content.txt
+
+    ├── l1-n3-4 Variants considering graph type and scale
+
+    │   ├── content.txt
+
+    │   ├── l2-n1-Directed graphs
+
+    │   │   └── content.txt
+
+    │   ├── l2-n2-Heterogeneous graphs
+
+    │   │   ├── content.txt
+
+    │   │   ├── l3-n1-4.2.1 Meta-path-based methods
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n2-4.2.2 Edge-based methods
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n3-4.2.3 Methods for relational graphs
+
+    │   │   │   └── content.txt
+
+    │   │   └── l3-n4-4.2.4 Methods for multiplex graphs
+
+    │   │       └── content.txt
+
+    │   ├── l2-n3-Dynamic graphs
+
+    │   │   └── content.txt
+
+    │   ├── l2-n4-Other graph types
+
+    │   │   ├── content.txt
+
+    │   │   ├── l3-n1-4.4.1 Hypergraphs
+
+    │   │   │   └── content.txt
+
+    │   │   └── l3-n2-4.4.2 Signal graphs
+
+    │   │       └── content.txt
+
+    │   └── l2-n5-Large graphs
+
+    │       └── content.txt
+
+    ├── l1-n4-5 Variants for different training settings
+
+    │   ├── content.txt
+
+    │   ├── l2-n1-Graph auto-encoders
+
+    │   │   └── content.txt
+
+    │   └── l2-n2-Contrastive learning
+
+    │       └── content.txt
+
+    ├── l1-n5-6 A design example of GNN
+
+    │   └── content.txt
+
+    ├── l1-n6-7 Analyses of GNNs
+
+    │   ├── content.txt
+
+    │   ├── l2-n1-Theoretical aspect
+
+    │   │   ├── content.txt
+
+    │   │   ├── l3-n1-7.1.1 Graph signal processing
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n2-7.1.2 Generalization
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n3-7.1.3 Expressivity
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n4-7.1.4 Invariance
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n5-7.1.5 Transferability
+
+    │   │   │   └── content.txt
+
+    │   │   └── l3-n6-7.1.6 Label efficiency
+
+    │   │       └── content.txt
+
+    │   └── l2-n2-Empirical aspect
+
+    │       ├── content.txt
+
+    │       ├── l3-n1-7.2.1 Evaluation
+
+    │       │   └── content.txt
+
+    │       └── l3-n2-7.2.2 Benchmarks
+
+    │           └── content.txt
+
+    ├── l1-n7-8 Applications
+
+    │   ├── content.txt
+
+    │   ├── l2-n1-Structural scenarios
+
+    │   │   ├── content.txt
+
+    │   │   ├── l3-n1-8.1.1 Graph mining
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n2-8.1.2 Physics
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n3-8.1.3 Chemistry and biology
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n4-8.1.4 Knowledge graph
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n5-8.1.5 Generative models
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n6-8.1.6 Combinatorial optimization
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n7-8.1.7 Traffic networks
+
+    │   │   │   └── content.txt
+
+    │   │   ├── l3-n8-8.1.8 Recommendation systems
+
+    │   │   │   └── content.txt
+
+    │   │   └── l3-n9-8.1.9 Other Applications in structural scenarios
+
+    │   │       └── content.txt
+
+    │   └── l2-n2-Non-structural scenarios
+
+    │       ├── content.txt
+
+    │       ├── l3-n1-8.2.1 Image
+
+    │       │   └── content.txt
+
+    │       └── l3-n2-8.2.2 Text
+
+    │           └── content.txt
+
+    ├── l1-n8-9 Open problems
+
+    │   └── content.txt
+
+    ├── l1-n9-10 Conclusion
+
+    │   └── content.txt
+
+    └── l5-n1-Abstract
+
+        └── content.txt
+
+
+
+Write a function  def create_knowledge_graph(folder_path, level_labels=["H1", "H2", "H3", "H4", "H5", "H6"]) that creates nodes and push them to Neo4j as follows:
+
+
+
+
+
+Create a node labeled Document. Example, "hierarchy_sample_1" labeled as Document, having an identifier as a hash of the foldername, and property "name": name of the folder (hierarchy_sample_1) in our example.
+
+
+
+You noticed that the subfolder are in this format l{number}-n{number}-name. The letter "l" denotes the level. For example "l0" denotes the label H1, when you create the node in neo4j, you should create it as label "H1", "l1" is labeled as "H2", ... according to the level_labels in the create_knowledge_graph heading fucntion. The letter "n" denotes the order of the title of the same level.  Example, in our case:
+
+    ├──l1-n10-Acknowledgements
+
+    ├── l1-n11-Appendix A Datasets
+
+    ├── l1-n12-Appendix B Implementations
+
+So, you will create a relationship "NEXT" between the nodes of the same level.
+
+(node1: H2 {id, name: "Acknowledgements"})-[NEXT]->(node2: H2 {id, name: "Appendix A Datasets"})-[NEXT]->(node3: H2 {id, name: "Appendix B Implementations"})
+
+
+
+
+
+If there is a parent-child relationship, it should be created with "HAS_CHILD". If a node of level 1 has level 2 childs, a relationship "HAS_CHILD" should be created. Another case that can happen. If a node of level 2 for example has a child directly a node of level 5, it should also be relationship "HAS_CHILD". It doesn't matter if the level is lower by 1 or two, the most important is lower. But if a node of level 1 has a child of level 2 and this one has a child from level3 for example, we shouldn't have level1 and level3 relationship, because there is an intermediate. 
+
+
+
+Certain subfolder names (without considering level "l" and number "n") contain numbers, add a proprety "number" in that node if applicable.
+
+
+
+"content.txt" should be chunked using this function 
+
+from langchain.text_splitter import CharacterTextSplitter
+
+from langchain_ollama import OllamaEmbeddings, ChatOllama
+
+from langchain_experimental.graph_transformers import LLMGraphTransformer        
+
+text_splitter = CharacterTextSplitter(
+
+            separator=separator,
+
+            chunk_size=chunk_size,
+
+            chunk_overlap=chunk_overlap,
+
+        )
+
+
+
+chunks = text_splitter.split_documents(docs)
+
+
+
+
+
+Each chunk and its next chunk should linked by "NEXT" relationship. 
+
+
+
+The chunks should contain embeddings
+
+
+
+The first chunk should be linked to his parent via relationship "HAS" in the inverse direction, meaning that, for example
+
+hierarchy_sample_1
+
+├── content.txt
+
+
+
+(hierarchy_sample_1: Document)-[HAS]->(c1: CHUNK)
+
+c1 is the first chunk of the content.txt file. The first chunk should be linked to the next chunk via "NEXT" relationship and so on. (c1: Chunk)-[NEXT]->(c2:Chunk)
+
+
+
+Same thing for others, example 2:
+
+   ├── l1-n1-2 General design pipeline of GNNs
+
+    │   ├── content.txt
+
+
+
+(n: H2 {id, name: General design pipeline of GNNs, number: 2})-[HAS]->(c:Chunk)

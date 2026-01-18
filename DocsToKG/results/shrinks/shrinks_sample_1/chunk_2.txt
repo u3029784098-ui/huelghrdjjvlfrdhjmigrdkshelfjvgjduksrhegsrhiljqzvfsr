@@ -1,0 +1,72 @@
+ry with time, the graph is regarded as a dynamic graph. The time information should be carefully considered in dynamic graphs.
+
+Note these categories are orthogonal, which means these types can be combined, e.g. one can deal with a dynamic directed heterogeneous graph. There are also several other graph types designed for different tasks such as hypergraphs and signed graphs. We will not enumerate all types here but the most important idea is to consider the additional information provided by these graphs. Once we specify the graph type, the additional information provided by these graph types should be further considered in the design process.
+
+As for the graph scale, there is no clear classification criterion for "small" and "large" graphs. The criterion is still changing with the development of computation devices (e.g. the speed and memory of GPUs). In this paper, when the adjacency matrix or the graph Laplacian of a graph (the space complexity is \(O(n^{2})\)) cannot be stored and processed by the device, then we regard the graph as a large-scale graph and then some sampling methods should be considered.
+
+### Design loss function
+
+In this step we should design the loss function based on our task type and the training setting.
+
+For graph learning tasks, there are usually three kinds of tasks:
+
+* **Node-level** tasks focus on nodes, which include node classification, node regression, node clustering, etc. Node classification tries to categorize nodes into several classes, and node regression predicts a continuous value for each node. Node clustering aims to partition the nodes into several disjoint groups, where similar nodes should be in the same group.
+* **Edge-level** tasks are edge classification and link prediction, which require the model to classify edge types or predict whether there is an edge existing between two given nodes.
+* **Graph-level** tasks include graph classification, graph regression, and graph matching, all of which need the model to learn graph representations.
+
+From the perspective of supervision, we can also categorize graph learning tasks into three different training settings:
+
+* **Supervised setting** provides labeled data for training.
+* **Semi-supervised setting** gives a small amount of labeled nodes and a large amount of unlabeled nodes for training. In the test phase, the **transductive setting** requires the model to predict the labels of the given unlabeled nodes, while the **inductive setting** provides new unlabeled nodes from the same distribution to infer. Most node and edge classification tasks are semi-supervised. Most recently, a mixed transductive-inductive scheme is undertaken by Wang and Leskovec (2020) and Rossi et al. (2018), carving a new path towards the mixed setting.
+* **Unsupervised setting** only offers unlabeled data for the model to find patterns. Node clustering is a typical unsupervised learning task.
+
+With the task type and the training setting, we can design a specific loss function for the task. For example, for a node-level semi-supervised classification task, the cross-entropy loss can be used for the labeled nodes in the training set.
+
+### Build model using computational modules
+
+Finally, we can start building the model using the computational modules. Some commonly used computational modules are:
+
+\begin{table}
+\begin{tabular}{l l} \hline \hline Notations & Descriptions \\ \hline \hline \(\mathbf{g}^{n}\) & \(m\)-dimensional Euclidean space \\ \(\alpha,\mathbf{n},\mathbf{A}\) & Scalar, vector and matrix \\ \(\mathbf{A}^{r}\) & Matrix transpose \\ \(\mathbf{l}_{v}\) & Identity matrix of dimension \(N\) \\ \(\mathbf{g}_{v}\) **x** & Convolution of \(\mathbf{g}_{v}\) and \(\mathbf{s}\) \\ \(N,N^{r}\) & Number of nodes in the graph \\ \(N^{r}\) & Number of edges in the graph \\ \(\cdot,r\) & Neighborhood set of node \\ \(\mathbf{s}^{r}\) & Vector \(a\) of node \(v\) at time step \(t\) \\ \(\mathbf{h}_{v}\) & Hidden state of node \(v\) \\ \(\mathbf{h}^{r}_{i}\) & Hidden state of node \(v\) at time step \(t\) \\ \(\mathbf{o}^{r}_{i}\) & Output of node \(v\) at time step \(t\) \\ \(\mathbf{e}_{vw}\) & Features of edge from node \(v\) to \(w\) \\ \(\mathbf{n}_{v}\) & Features of edge with label \(k\) \\ \(\mathbf{W}^{r}\),\(\mathbf{U}^{r}\) & Matrices for computing i, a \\ \(\mathbf{W}^{r}\),\(\mathbf{U}^{r}\) & Vectors for computing i, a \\ \(\rho\) & An alternative non-linear function \\ \(\sigma\) & The logistic sigmoid function \\ tanh & The hyperbolic tangent function \\ LealeyReLU & The LealeyReLU function \\ \(\odot\) & Element-wise multiplication operation \\ \(\parallel\) & Vector concatenation \\ \hline \hline \end{tabular}
+\end{table}
+Table 1: Notations used in this paper.
+
+* **Propagation Module.** The propagation module is used to propagate information between nodes so that the aggregated information could capture both feature and topological information. In propagation modules, the **convolution operator** and **recurrent operator** are usually used to aggregate information from neighbors while the **skip connection** operation is used to gather information from historical representations of nodes and mitigate the over-smoothing problem.
+* **Sampling Module.** When graphs are large, sampling modules are usually needed to conduct propagation on graphs. The sampling module is usually combined with the propagation module.
+* **Pooling Module.** When we need the representations of high-level subgraphs or graphs, pooling modules are needed to extract information from nodes.
+
+With these computation modules, a typical GNN model is usually built by combining them. A typical architecture of the GNN model is illustrated in the middle part of Fig. 2 where the convolutional operator, recurrent operator, sampling module and skip connection are used to propagate information in each layer and then the pooling module is added to extract high-level information. These layers are usually stacked to obtain better representations. Note this architecture can generalize most GNN models while there are also exceptions, for example, NDCN (Zang and Wang, 2020) combines ordinary differential equation systems (ODEs) and GNNs. It can be regarded as a continuous-time GNN model which integrates GNN layers over continuous time without propagating through a discrete number of layers.
+
+An illustration of the general design pipeline is shown in Fig. 2. In later sections, we first give the existing instantiations of computational modules in Section 3, then introduce existing variants which consider different graph types and scale in Section 4. Then we survey on variants designed for different training settings in Section 5. These sections correspond to details of step (4), step (2), and step (3) in the pipeline. And finally, we give a concrete design example in Section 6.
+
+## 3 Instantiations of computational modules
+
+In this section we introduce existing instantiations of three computational modules: propagation modules, sampling modules and pooling modules. We introduce three sub-components of propagation modules: convolution operator, recurrent operator and skip connection in Section 3.1, 3.2, and 3.3 respectively. Then we introduce sampling modules and pooling modules in Section 3.4 and 3.5. An overview of computational modules is shown in Fig. 3.
+
+### Propagation modules - convolution operator
+
+Convolution operators that we introduce in this section are the mostly used propagation operators for GNN models. The main idea of convolution operators is to generalize convolutions from other domain to the graph domain. Advances in this direction are often categorized as spectral approaches and spatial approaches.
+
+#### 3.1.1 Spectral approaches
+
+Spectral approaches work with a spectral representation of the graphs. These methods are theoretically based on graph signal processing (Shuman et al., 2013) and define the convolution operator in the spectral domain.
+
+In spectral methods, a graph signal \(\mathbf{x}\) is firstly transformed to the spectral domain by the graph Fourier transform \(\mathcal{T}\), then the convolution operation is conducted. After the convolution, the resulted signal is transformed back using the inverse graph Fourier transform \(\mathcal{T}^{-1}\). These transforms are defined as:
+
+\[\mathcal{T}(\mathbf{x})=\mathbf{U}^{\top}\mathbf{x}, \tag{1}\] \[\mathcal{T}^{-1}(\mathbf{x})=\mathbf{U}\mathbf{x}.\]
+
+Here \(\mathbf{U}\) is the matrix of eigenvectors of the normalized graph Laplacian \(\mathbf{L}=\mathbf{I}_{\mathbf{N}}-\mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{ D}^{-\frac{1}{2}}\) (\(\mathbf{D}\) is the degree matrix and \(\mathbf{A}\) is the adjacency matrix of the graph). The normalized graph Laplacian is real symmetric positive semidefinite, so it can be factorized as \(\mathbf{L}=\mathbf{U}\mathbf{U}^{\top}\) (where \(\mathbf{A}\) is a diagonal matrix of the eigenvalues). Based on the convolution theorem (Mallat, 1999), the convolution operation is defined as:
+
+\[\mathbf{g}\star\mathbf{x} =\mathcal{T}^{-1}(\mathcal{T}(\mathbf{g})\odot\mathcal{T}( \mathbf{x})) \tag{2}\] \[=\mathbf{U}(\mathbf{U}^{\top}\mathbf{g}\odot\mathbf{U}^{\top} \mathbf{x}),\]
+
+where \(\mathbf{U}^{\top}\mathbf{g}\) is the filter in the spectral domain. If we simplify the filter by
+
+Figure 2: The general design pipeline for a GNN model.
+
+using a learnable diagonal matrix \(\mathbf{g}_{\mathbf{w}}\), then we have the basic function of the spectral methods:
+
+\[\mathbf{g}_{\mathbf{w}}\star\mathbf{x}=\mathbf{U}_{\mathbf{g}}\mathbf{U}^{ \dagger}\mathbf{x}. \tag{3}\]
+
+Next we introduce several typical spectral methods which design different filters \(\mathbf{g}_{\mathbf{w}}\).
+
+_Spectral Network._ Spectral network (Bruna et al., 2014) uses a learnable diagonal matrix as the filter, that is \(\mathbf{g}_{\mathbf{w}}=\text{diag}(\mathbf{w})\), where \(\mathbf{w}\in\mathbb{R}^{N}\) is the parameter. However, this operation is computationally inefficient and the filter is non-spatially lo

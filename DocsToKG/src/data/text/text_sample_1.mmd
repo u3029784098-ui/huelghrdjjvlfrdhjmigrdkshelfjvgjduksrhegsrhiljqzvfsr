@@ -1,0 +1,89 @@
+# Graph neural networks: A review of methods and applications
+
+
+###### Abstract
+
+Lots of learning tasks require dealing with graph data which contains rich relation information among elements. Modeling physics systems, learning molecular fingerprints, predicting protein interface, and classifying diseases demand a model to learn from graph inputs. In other domains such as learning from non-structural data like texts and images, reasoning on extracted structures (like the dependency trees of sentences and the scene graphs of images) is an important research topic which also needs graph reasoning models. Graph neural networks (GNNs) are neural models that capture the dependence of graphs via message passing between the nodes of graphs. In recent years, variants of GNNs such as graph convolutional network (GCN), graph attention network (GAT), graph recurrent network (GRN) have demonstrated ground-breaking performances on many deep learning tasks. In this survey, we propose a general design pipeline for GNN models and discuss the variants of each component, systematically categorize the applications, and propose four open problems for future research.
+
+GNN, Graph neural networks, GNN,is straightforward to generalize CNNs on graphs. As shown in Fig. 1, it is hard to define localized convolutional filters and pooling operators, which hinders the transformation of CNN from Euclidean domain to non-Euclidean domain. Extending deep neural models to non-Euclidean domains, which is generally referred to as geometric deep learning, has been an emerging research area (Bronstein et al., 2017). Under this umbrella term, deep learning on graphs receives enormous attention.
+
+The other motivation comes from _graph representation learning_(Cui et al., 2018; Hamilton et al., 2017; Zhang et al., 2018; Cai et al., 2018; Goyal and Ferrara, 2018), which learns to represent graph nodes, edges or subgraphs by low-dimensional vectors. In the field of graph analysis, traditional machine learning approaches usually rely on hand engineered features and are limited by its inflexibility and high cost. Following the idea of _representation learning_ and the success of word embedding (Mikolov et al., 2013), DeepWalk (Perozzi et al., 2014), regarded as the first graph embedding method based on representation learning, applies SkipGram model (Mikolov et al., 2013) on the generated random walks. Similar approaches such as node2vec (Grover and Leskovec, 2016), LINE (Tang et al., 2015) and TADW (Yang et al., 2015) also achieved breakthroughs. However, these methods suffer from two severe drawbacks (Hamilton et al., 2017). First, no parameters are shared between nodes in the encoder, which leads to computationally inefficiency, since it means the number of parameters grows linearly with the number of nodes. Second, the direct embedding methods lack the ability of generalization, which means they cannot deal with dynamic graphs or generalize to new graphs.
+
+Based on CNNs and graph embedding, variants of graph neural networks (GNNs) are proposed to collectively aggregate information from graph structure. Thus they can model input and/or output consisting of elements and their dependency.
+
+There exists several comprehensive reviews on graph neural networks. Bronstein et al. (2017) provide a thorough review of geometric deep learning, which presents its problems, difficulties, solutions, applications and future directions. Zhang et al. (2019) propose another comprehensive overview of graph convolutional networks. However, they mainly focus on convolution operators defined on graphs while we investigate other computation modules in GNNs such as skip connections and pooling operators.
+
+Papers by Zhang et al. (2018), Wu et al. (2019), Chami et al. (2020) are the most up-to-date survey papers on GNNs and they mainly focus on models of GNN. Wu et al. (2019) categorize GNNs into four groups: recurrent graph neural networks, convolutional graph neural networks, graph autoencoders, and spatial-temporal graph neural networks. Zhang et al. (2018) give a systematic overview of different graph deep learning methods and Chami et al. (2020) propose a Graph Encoder Decoder Model to unify network embedding and graph neural network models. Our paper provides a different taxonomy with them and we mainly focus on classic GNN models. Besides, we summarize variants of GNNs for different graph types and also provide a detailed summary of GNNs' applications in different domains.
+
+There have also been several surveys focusing on some specific graph learning fields. Sun et al. (2018) and Chen et al. (2020) give detailed overviews for adversarial learning methods on graphs, including graph data attack and defense. Lee et al. (2018) provide a review over graph attention models. The paper proposed by Yang et al. (2020) focuses on heterogeneous graph representation learning, where nodes or edges are of multiple types. Huang et al. (2020) review over existing GNN models for dynamic graphs. Peng et al. (2020) summarize graph embeddings methods for combinatorial optimization. We conclude GNNs for heterogeneous graphs, dynamic graphs and combinatorial optimization in Section 4.2, Section 4.3, and Section 8.1.6 respectively.
+
+In this paper, we provide a thorough review of different graph neural network models as well as a systematic taxonomy of the applications. To summarize, our contributions are:
+
+* We provide a detailed review over existing graph neural network models. We present a general design pipeline and discuss the variants of each module. We also introduce researches on theoretical and empirical analyses of GNN models.
+* We systematically categorize the applications and divide the applications into structural scenarios and non-structural scenarios. We present several major applications and their corresponding methods for each scenario.
+* We propose four open problems for future research. We provide a thorough analysis of each problem and propose future research directions.
+
+The rest of this survey is organized as follows. In Section 2, we present a general GNN design pipeline. Following the pipeline, we discuss each step in detail to review GNN model variants. The details are included in Section 3 to Section 6. In Section 7, we revisit research works over theoretical and empirical analyses of GNNs. In Section 8, we introduce several major applications of graph neural networks applied to structural scenarios, non-structural scenarios and other scenarios. In Section 9, we propose four open problems of graph neural networks as well as several future research directions. And finally, we conclude the survey in Section 10.
+
+## 2 General design pipeline of GNNs
+
+In this paper, we introduce models of GNNs in a designer view. We first present the general design pipeline for designing a GNN model in this section. Then we give details of each step such as selecting computational modules, considering graph type and scale, and designing loss function in Section 3, 4, and 5, respectively. And finally, we use an example to illustrate the design process of GNN for a specific task in Section 6.
+
+Figure 1: Left: image in Euclidean space. Right: graph in non-Euclidean space.
+
+In later sections, we denote a graph as \(G=(V,E)\), where \(|V|=N\) is the number of nodes in the graph and \(|E|=N^{*}\) is the number of edges. \(\mathbf{A}\in\mathbb{R}^{N,N}\) is the adjacency matrix. For graph representation learning, we use \(\mathbf{h}_{v}\) and \(\mathbf{o}_{v}\) as the hidden state and output vector of node \(v\). The detailed descriptions of the notations could be found in Table 1.
+
+In this section, we present the general design pipeline of a GNN model for a specific task on a specific graph type. Generally, the pipeline contains four steps: (1) find graph structure, (2) specify graph type and scale, (3) design loss function and (4) build model using computational modules. We give general design principles and some background knowledge in this section. The design details of these steps are discussed in later sections.
+
+### Find graph structure
+
+At first, we have to find out the graph structure in the application. There are usually two scenarios: structural scenarios and non-structural scenarios. In structural scenarios, the graph structure is explicit in the applications, such as applications on molecules, physical systems, knowledge graphs and so on. In non-structural scenarios, graphs are implicit so that we have to first build the graph from the task, such as building a fully-connected "word" graph for text or building a scene graph for an image. After we get the graph, the later design process attempts to find an optimal GNN model on this specific graph.
+
+### Specify graph type and scale
+
+After we get the graph in the application, we then have to find out the graph type and its scale.
+
+Graphs with complex types could provide more information on nodes and their connections. Graphs are usually categorized as:
+
+* **Directed/Undirected Graphs.** Edges in directed graphs are all directed from one node to another, which provide more information than undirected graphs. Each edge in undirected graphs can also be regarded as two directed edges.
+* **Homogeneous/Heterogeneous Graphs.** Nodes and edges in homogeneous graphs have same types, while nodes and edges have different types in heterogeneous graphs. Types for nodes and edges play important roles in heterogeneous graphs and should be further considered.
+* **Static/Dynamic Graphs.** When input features or the topology of the graph vary with time, the graph is regarded as a dynamic graph. The time information should be carefully considered in dynamic graphs.
+
+Note these categories are orthogonal, which means these types can be combined, e.g. one can deal with a dynamic directed heterogeneous graph. There are also several other graph types designed for different tasks such as hypergraphs and signed graphs. We will not enumerate all types here but the most important idea is to consider the additional information provided by these graphs. Once we specify the graph type, the additional information provided by these graph types should be further considered in the design process.
+
+As for the graph scale, there is no clear classification criterion for "small" and "large" graphs. The criterion is still changing with the development of computation devices (e.g. the speed and memory of GPUs). In this paper, when the adjacency matrix or the graph Laplacian of a graph (the space complexity is \(O(n^{2})\)) cannot be stored and processed by the device, then we regard the graph as a large-scale graph and then some sampling methods should be considered.
+
+### Design loss function
+
+In this step we should design the loss function based on our task type and the training setting.
+
+For graph learning tasks, there are usually three kinds of tasks:
+
+* **Node-level** tasks focus on nodes, which include node classification, node regression, node clustering, etc. Node classification tries to categorize nodes into several classes, and node regression predicts a continuous value for each node. Node clustering aims to partition the nodes into several disjoint groups, where similar nodes should be in the same group.
+* **Edge-level** tasks are edge classification and link prediction, which require the model to classify edge types or predict whether there is an edge existing between two given nodes.
+* **Graph-level** tasks include graph classification, graph regression, and graph matching, all of which need the model to learn graph representations.
+
+From the perspective of supervision, we can also categorize graph learning tasks into three different training settings:
+
+* **Supervised setting** provides labeled data for training.
+* **Semi-supervised setting** gives a small amount of labeled nodes and a large amount of unlabeled nodes for training. In the test phase, the **transductive setting** requires the model to predict the labels of the given unlabeled nodes, while the **inductive setting** provides new unlabeled nodes from the same distribution to infer. Most node and edge classification tasks are semi-supervised. Most recently, a mixed transductive-inductive scheme is undertaken by Wang and Leskovec (2020) and Rossi et al. (2018), carving a new path towards the mixed setting.
+* **Unsupervised setting** only offers unlabeled data for the model to find patterns. Node clustering is a typical unsupervised learning task.
+
+With the task type and the training setting, we can design a specific loss function for the task. For example, for a node-level semi-supervised classification task, the cross-entropy loss can be used for the labeled nodes in the training set.
+
+### Build model using computational modules
+
+Finally, we can start building the model using the computational modules. Some commonly used computational modules are:
+
+\begin{table}
+\begin{tabular}{l l} \hline \hline Notations & Descriptions \\ \hline \hline \(\mathbf{g}^{n}\) & \(m\)-dimensional Euclidean space \\ \(\alpha,\mathbf{n},\mathbf{A}\) & Scalar, vector and matrix \\ \(\mathbf{A}^{r}\) & Matrix transpose \\ \(\mathbf{l}_{v}\) & Identity matrix of dimension \(N\) \\ \(\mathbf{g}_{v}\) **x** & Convolution of \(\mathbf{g}_{v}\) and \(\mathbf{s}\) \\ \(N,N^{r}\) & Number of nodes in the graph \\ \(N^{r}\) & Number of edges in the graph \\ \(\cdot,r\) & Neighborhood set of node \\ \(\mathbf{s}^{r}\) & Vector \(a\) of node \(v\) at time step \(t\) \\ \(\mathbf{h}_{v}\) & Hidden state of node \(v\) \\ \(\mathbf{h}^{r}_{i}\) & Hidden state of node \(v\) at time step \(t\) \\ \(\mathbf{o}^{r}_{i}\) & Output of node \(v\) at time step \(t\) \\ \(\mathbf{e}_{vw}\) & Features of edge from node \(v\) to \(w\) \\ \(\mathbf{n}_{v}\) & Features of edge with label \(k\) \\ \(\mathbf{W}^{r}\),\(\mathbf{U}^{r}\) & Matrices for computing i, a \\ \(\mathbf{W}^{r}\),\(\mathbf{U}^{r}\) & Vectors for computing i, a \\ \(\rho\) & An alternative non-linear function \\ \(\sigma\) & The logistic sigmoid function \\ tanh & The hyperbolic tangent function \\ LealeyReLU & The LealeyReLU function \\ \(\odot\) & Element-wise multiplication operation \\ \(\parallel\) & Vector concatenation \\ \hline \hline \end{tabular}
+\end{table}
+Table 1: Notations used in this paper.
+
+* **Propagation Module.** The propagation module is used to propagate information between nodes so that the aggregated information could capture both feature and topological information. In propagation modules, the **convolution operator** and **recurrent operator** are usually used to aggregate information from neighbors while the **skip connection** operation is used to gather information from historical representations of nodes and mitigate the over-smoothing problem.
+* **Sampling Module.** When graphs are large, sampling modules are usually needed to conduct propagation on graphs. The sampling module is usually combined with the propagation module.
+* **Pooling Module.** When we need the representations of high-level subgraphs or graphs, pooling modules are needed to extract information from nodes.
+
+With these computation modules, a typical GNN model is usually built by combining them. A typical architecture of the GNN model is illustrated in the middle part of Fig. 2 where the convolutional operator, recurrent operator, sampling module and skip connection are used to propagate information in each layer and then the pooling module is added to extract high-level information. These layers are usually stacked to obtain better representations. Note this architecture can generalize most GNN models while there are also exceptions, for example, NDCN (Zang and Wang, 2020) combines ordinary differential equation systems (ODEs) and GNNs. It can be regarded as a continuous-time GNN model which integrates GNN layers over continuous time without propagating through a discrete number of layers.
+
+An illustration of the general design pipeline is shown in Fig. 2. In later sections, we first give the existing instantiations of computational modules in Section 3, then introduce existing variants which consider different graph types and scale in Section 4. Then we survey on variants designed for different training settings in Section 5. These sections correspond to details of step (4), step (2), and step (3) in the pipeline. And finally, we give a concrete design example in Section 6.

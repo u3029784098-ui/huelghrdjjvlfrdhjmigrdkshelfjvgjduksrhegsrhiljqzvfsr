@@ -1,0 +1,7 @@
+Direct pooling modules learn graph-level representations directly from nodes with different node selection strategies. These modules are also called readout functions in some variants.
+
+_Simple Node Pooling._ Simple node pooling methods are used by several models. In these models, node-wise max/mean/sum/attention operations are applied on node features to get a global graph representation.
+
+_Set2Seq_. MPNN uses the Set2set method (Vinyals et al., 2015) as the readout function to get graph representations. Set2set is designed to deal with the unordered set \(T=\{(\mathbf{h}_{i}^{T},\mathbf{x}_{i})\}\) and uses a LSTM-based method to produce an order invariant representation after a predifined number of steps.
+
+_SortPooling._SortPooling (Zhang et al., 2018) first sorts the node embeddings according to the structural roles of the nodes and then the sorted embeddings are fed into CNNs to get the representation.

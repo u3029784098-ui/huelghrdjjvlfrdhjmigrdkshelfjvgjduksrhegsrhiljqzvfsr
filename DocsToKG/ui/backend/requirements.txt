@@ -1,0 +1,20 @@
+# Backend Dependencies for DocsToKG
+
+# Database
+mysql-connector-python==8.2.0
+
+# Environment variables
+python-dotenv==1.0.0
+
+# Logging and utilities
+pydantic==2.5.0
+
+# Optional: For async database operations
+asyncio-contextmanager==1.0.0
+
+# Optional: For API development (FastAPI)
+fastapi==0.104.1
+uvicorn==0.24.0
+
+# Optional: For data validation
+typing-extensions==4.8.0

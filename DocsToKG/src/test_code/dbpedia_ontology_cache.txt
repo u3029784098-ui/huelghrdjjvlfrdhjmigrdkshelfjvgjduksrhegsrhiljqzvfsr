@@ -1,0 +1,28 @@
+DBpedia Ontology Schema
+
+Common Prefixes:
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbr: <http://dbpedia.org/resource/>
+PREFIX dbp: <http://dbpedia.org/property/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+Important Usage Notes:
+1. Resources use dbr: prefix (e.g., dbr:France, dbr:Albert_Einstein)
+2. Use underscores in resource names (e.g., dbr:New_York_City)
+3. Always add LIMIT to queries (e.g., LIMIT 10)
+4. Use FILTER(lang(?variable) = 'en') for text fields to get English results
+5. Property names use camelCase (e.g., birthDate, populationTotal)
+
+Common DBpedia Classes (use with rdf:type or 'a'):
+
+
+Common DBpedia Properties:
+
+
+Example Query Patterns:
+- Find person info: SELECT ?name WHERE { dbr:PersonName foaf:name ?name }
+- Find with property: SELECT ?value WHERE { dbr:Resource dbo:property ?value }
+- Current leader: SELECT ?leader WHERE { dbr:Country dbo:leader ?leader }
+- With type filter: SELECT ?label WHERE { ?x a dbo:City ; rdfs:label ?label . FILTER(lang(?label) = 'en') } LIMIT 10

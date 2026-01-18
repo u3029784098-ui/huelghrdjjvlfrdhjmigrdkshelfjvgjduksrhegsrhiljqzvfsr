@@ -1,0 +1,25 @@
+Spatial approaches define convolutions directly on the graph based on the graph topology. The major challenge of spatial approaches is defining the convolution operation with differently sized neighborhoods and maintaining the local invariance of CNNs.
+
+_Neural FPs._ Neural FPs (Duvenaud et al., 2015) uses different weight matrices for nodes with different degrees:
+
+\[\mathbf{t}=\mathbf{h}_{i}^{+}+\sum\limits_{j\in r_{i}}\mathbf{h}_{i}, \tag{9}\]
+
+\[\mathbf{h}_{i}^{+1+}=\sigma\left(\mathbf{H}\mathbf{W}_{i^{\prime}i^{\prime}}^ {+1}\right),\]
+
+where \(\mathbf{W}_{i^{\prime}i^{\prime}}^{+1}\) is the weight matrix for nodes with degree \(\lfloor r^{\prime}\cdot\rfloor\) at layer \(t+1\). The main drawback of the method is that it cannot be applied to large-scale graphs with more node degrees.
+
+_DCNN._ The diffusion convolutional neural network (DCNN) (Atwood and Towsley, 2016) uses transition matrices to define the neighborhood for nodes. For node classification, the diffusion representations of each node in the graph can be expressed as:
+
+\[\mathbf{H}= f(\mathbf{W}_{c}\odot\mathbf{P}^{*}\mathbf{X})\in\mathbb{R}^{R,r \times F,r}, \tag{10}\]
+
+where \(\mathbf{X}\in\mathbb{R}^{R,r}\) is the matrix of input features (\(F\) is the dimension). \(\mathbf{P}^{*}\) is an \(N\times K\times N\) tensor which contains the power series \(\{\mathbf{P},\mathbf{P}^{2},\...,\ \mathbf{P}^{k}\}\) of matrix \(\mathbf{P}\). And \(\mathbf{P}\) is the degree-normalized transition matrix from the graphs adjacency matrix \(\mathbf{A}\). Each entity is transformed to a diffusion convolutional representation which is a \(K\times F\) matrix defined by \(K\) hops of graph diffusion over \(F\) features. And then it will be defined by a \(K\times F\) weight matrix and a non-linear activation function \(f\).
+
+_PATCHY-SAN._ The PATCHY-SAN model (Niepert et al., 2016) extracts and normalizes a neighborhood of exactly \(k\) nodes for each node. The normalized neighborhood serves as the receptive field in the traditional convolutional operation.
+
+_LGCN._ The learnable graph convolutional network (LGCN) (Gao et al., 2018) also exploits CNNs as aggregators. It performs max pooling on neighborhood matrices of nodes to get top-k feature elements and then applies 1-D CNN to compute hidden representations.
+
+_GraphSAGE._ GraphSAGE (Hamilton et al., 2017) is a general inductive framework which generates embeddings by sampling and aggregating features from a node's local neighborhood:
+
+\[\mathbf{h}_{i}^{+1}=\alpha\mathbf{G}_{i+1}\left(\left(\mathbf{h}_{i}^{+}, \forall i\in\mathcal{I}_{r^{*}}^{-1}\right)\right), \tag{11}\]
+
+Instead of using the full neighbor set, GraphSAGE uniformly samples a fixed-size set of neighbors to aggregate information. \(\alpha\mathbf{G}_{i+1}\) is the aggregation function and GraphSAGE suggests three aggregators: mean aggregator, LSTM aggregator, and pooling aggregator. GraphSAGE with a mean aggregator can be regarded as an inductive version of GCN while the LSTM aggregator is not permutation invariant, which requires a specified order of the nodes.

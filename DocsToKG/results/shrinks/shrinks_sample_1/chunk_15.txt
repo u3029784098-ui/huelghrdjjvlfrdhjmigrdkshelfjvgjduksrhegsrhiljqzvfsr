@@ -1,0 +1,18 @@
+8b) Ying, Z., You, J., Morris, C., Ren, X., Hamilton, W., Leskovec, J., 2018b. Hierarchical graph representation learning with differentiable pooling. Proceedings of NeurIPS 4805-4815.
+* Ying et al. (2019) Ying, Z., Bourgeset, D., You, J., Zitnik, M., Leskovec, J., Ganespjaar, D., 2019. Generating explanations for graph neural networks. Proceedings of NeurIPS 9244-9255.
+* You et al. (2018) You, J., Liu, B., Ying, Z., Pande, V., Leskovec, J., 2018a. Graph convolutional policy network for goal-directed molecular graph generation. Proceedings of NeurIPS 6410-6421.
+* You et al. (2018b) You, J., Ying, R., Ren, X., Hamilton, W., Leskovec, J., Graghun, 2018b. Generating realistic graphs with deep auto-arviseable models. Proceedings of ICML 5694-5703.
+* You et al. (2020) You, J., Ying, J., Leskovec, J., 2020. Deep scene for graph neural networks. In: Proceedings of NeurIPS, pp. 33.
+* Yu and Zhu (2018) Yu, B., Yin, H., Zhu, Z., 2018. Spatio-temporal Graph Convolutional Networks: A Deep Learning Framework for Traffic Forecasting. Proceduralin. Of IJCAI, pp. 3634-3640.
+* Yun et al. (2019) Yun, S., Jeong, M., Kim, R., Kang, J., Kim, H.J., 2019. Graph transformer networksZilly, J.G., Srivastava, R.K., Koutnik, J., Schmidhuber, J., 2016. Recurrent highway networks. In: Proceedings of ICML, pp. 4189-4198.
+* Zitnik and Leskovec (2017) Zitnik, M., Leskovec, J., 2017. Predicting multicellular function through multi-layer tissue networks. Bioinformatics 33, 1190-1198.
+* Zitnik et al. (2018) Zitnik, M., Agrawal, M., Leskovec, J., 2018. Modeling polypharmacy side effects with graph convolutional networks. Bioinformatics 34, 1457-1466.
+* Zou et al. (2019) Zou, D., Han, Z., Wang, Y., Jiang, S., Sun, Y., Gu, Q., 2019. Layer-dependent importance sampling for training deep and large graph convolutional networks. In: Proceedings of NeurIPS, pp. 11249-11259.
+* Zigner et al. (2018) Zigner, D., Akbarnejad, A., Gunnemann, S., 2018. Adversarial attacks on neural networks for graph data. In: Proceedings of KDD, pp. 2847-2856.
+* Rossi et al. (2020) E. Rossi, P., Pasca, B. Chamberlain, D., Byward, H. Bronstein, F. Monti, 2020. Sign: scalable inception graph neural networks, arXiv preprint arXiv:2004.11198.
+
+## Erratum
+
+We are sorry for the mistakes we've made unconsciously in the paper and here are the errata. If you have any further questions, please send us an email.
+
+* On Page 58 and 68 the citation "Huang et al. (2020)" should be corrected to "Skarding et al. (2021)". The corresponding reference should be corrected to "Foundations and modelling of dynamic networks using dynamic graph neural networks: A survey" by Joakim Skarding, Bogdan Gabrys and Katarzyna Musial.

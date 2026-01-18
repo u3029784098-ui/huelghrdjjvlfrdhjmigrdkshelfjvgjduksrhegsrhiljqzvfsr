@@ -1,0 +1,63 @@
+017) & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v^{\prime}_{v}}}\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v^the _N-ary Tree-LSTM_. They are also extensions to the recursive neural network based models as we mentioned before. Tree is a special case of graph and each node in Tree-LSTM aggregates information from its children. Instead of a single forget gate in traditional LSTM, the Tree-LSTM unit for node \(v\) contains one forget gate \(\mathbf{f}_{v}\) for each child \(k\). The computation step of the Child-Sum Tree-LSTM is displayed in Table 2. \(\mathbf{f}_{v}^{t}\), \(\mathbf{o}_{v}^{t}\), and \(\mathbf{c}_{v}^{t}\) are the input gate, output gate and memory cell respectively. \(\mathbf{x}_{v}^{t}\) is the input vector at time \(t\). The _N-ary_ Tree-LSTM is further designed for a special kind of tree where each node has at most \(K\) children and the children are ordered. The equations for computing \(\mathbf{h}_{v,v}^{t}\), \(\mathbf{h}_{v,v}^{t}\), \(\mathbf{h}_{v,v}^{t}\), in Table 2 introduce separate parameters for each child \(k\). These parameters allow the model to learn more fine-grained representations conditioning on the states of a unit's children than the Child-Sum Tree-LSTM.
+
+_Graph LSTM_. The two types of Tree-LSTMs can be easily adapted to the graph. The graph-structured LSTM in (Zayats and Ostendorf, 2018) is an example of the _N-ary_ Tree-LSTM applied to the graph. However, it is a simplified version since each node in the graph has at most 2 incoming edges (from its parent and sibling predecessor). Peng et al. (2017) propose another variant of the Graph LSTM based on the relation extraction task. The edges of graphs in (Peng et al., 2017) have various labels so that Peng et al. (2017) utilize different weight matrices to represent different labels. In Table 2, \(m(v,k)\) denotes the edge label between node \(v\) and \(k\). Liang et al. (2016) propose a Graph LSTM network to address the semantic object parsing task. It uses the confidence-driven scheme to adaptively select the starting node and determine the node updating sequence. It follows the same idea of generalizing the existing LSTMs into the graph-structured data but has a specific updating sequence while methods mentioned above are agnostic to the order of nodes.
+
+_S-LSTM_. Zhang et al. (2018) propose Sentence LSTM (S-LSTM) for improving text encoding. It converts text into a graph and utilizes the Graph LSTM to learn the representation. The S-LSTM shows strong representation power in many NLP problems.
+
+### Propagation modules - skip connection
+
+Many applications unroll or stack the graph neural network layer aiming to achieve better results as more layers (i.e k layers) make each node aggregate more information from neighbors \(k\) hops away. However, it has been observed in many experiments that deeper models could not improve the performance and deeper models could even perform worse. This is mainly because more layers could also propagate the noisy information from an exponentially increasing number of expanded neighborhood members. It also causes the over smoothing problem because nodes tend to have similar representations after the aggregation operation when models go deeper. So that many methods try to add "skip connections" to make GNN models deeper. In this subsection we introduce three kinds of instantiations of skip connections.
+
+_Highway GCN_. Rahimi et al. (2018) propose a Highway GCN which uses layer-wise gates similar to highway networks (Zilly et al., 2016). The output of a layer is summed with its input with gating weights:
+
+\[\mathbf{T}(\mathbf{h}^{i})=\mathbf{e}(\mathbf{W}_{i}\mathbf{h}^{i}+\mathbf{b} ), \tag{22}\] \[\mathbf{h}^{i+1}=\mathbf{h}^{i+1}\odot\mathbf{T}(\mathbf{h})+ \mathbf{h}^{i}\odot(1-\mathbf{T}(\mathbf{h}^{i})).\]
+
+By adding the highway gates, the performance peaks at 4 layers in a specific problem discussed in (Rahimi et al., 2018). The column network (CLN) (Pham et al., 2017) also utilizes the highway network. But it has different functions to compute the gating weights.
+
+_JKN_. Xu et al. (2018) study properties and limitations of neighborhood aggregation schemes. They propose the jump knowledge network (JKN) which could learn adaptive and structure-aware representations. JKN selects from all of the intermediate representations (which "jump" to the last layer) for each node at the last layer, which makes the model adapt the effective neighborhood size for each node as needed. Xu et al. (2018) use three approaches of concatenation, max-pooling and LSTM-attention in the experiments to aggregate information. The JKN performs well on the experiments in social, bioinformatics and citation networks. It can also be combined with models like GCN, GraphSAGE and GAT to improve their performance.
+
+_DeepGCN_. Li et al. (2019) borrow ideas from ResNet (He et al., 2016, 2016) and DenseNet (Huang et al., 2017). ResGCN and DenseGCN are proposed by incorporating residual connections and dense connections to solve the problems of vanishing gradient and over smoothing. In detail, the hidden state of a node in ResGCN and DenseGCN can be computed as:
+
+\[\mathbf{h}_{\text{ion}}^{i+1}=\mathbf{h}^{i+1}+\mathbf{h}^{i}, \tag{23}\] \[\mathbf{h}_{\text{home}}^{i+1}=\left[\int_{v=1}^{i+1}\mathbf{h}^{i}.\right.\]
+
+The experiments of DeepGCNs are conducted on the point cloud semantic segmentation task and the best results are achieved with a 56-layer model.
+
+### Sampling modules
+
+GNN models aggregate messages for each node from its neighborhood in the previous layer. Intuitively, if we track back multiple GNN layers, the size of supporting neighbors will grow exponentially with the depth. To alleviate this "neighbor explosion" issue, an efficient and efficacious way is sampling. Besides, when we deal with large graphs, we cannot always store and process all neighborhood information for each node, thus the sampling module is needed to conduct the propagation. In this section, we introduce three kinds of graph sampling modules: node sampling, layer sampling, and subgraph sampling.
+
+#### 3.4.1 Node sampling
+
+A straightforward way to reduce the size of neighboring nodes would be selecting a subset from each node's neighborhood. GraphSAGE (Hamilton et al., 2017) samples a fixed small number of neighbors, ensuring a 2 to 50 neighborhood size for each node. To reduce sampling variance, Chen et al. (2018) introduce a control-variate based stochastic approximation algorithm for GCN by utilizing the historical activations of nodes as a control variate. This method limits the receptive field in the 1-hop neighborhood, and uses the historical hidden state as an affordable approximation.
+
+PinSage (Ying et al., 2018) proposes importance-based sampling method. By simulating random walks starting from target nodes, this approach chooses the top T nodes with the highest normalized visit counts.
+
+#### 3.4.2 Layer sampling
+
+Instead of sampling neighbors for each node, layer sampling retains a small set of nodes for aggregation in each layer to control the expansion factor. FastGCN (Chen et al., 2018) directly samples the receptive field for each layer. It uses importance sampling, where the important nodes are more likely to be sampled.
+
+In contrast to fixed sampling methods above, Huang et al. (2018) introduce a parameterized and trainable sampler to perform layer-wise sampling conditioned on the former layer. Furthermore, this adaptive sampler could optimize the sampling importance and reduce variance simultaneously. LADIES (Zouet al., 2019) intends to alleviate the sparsity issue in layer-wise sampling by generating samples from the union of neighbors of the nodes.
+
+#### 3.4.3 Subgraph sampling
+
+Rather than sampling nodes and edges which builds upon the full graph, a fundamentally different way is to sample multiple subgraphs and restrict the neighborhood search within these subgraphs. ClusterGCN (Chiang et al., 2019) samples subgraphs by graph clustering algorithms, while GraphSAINT (Zeng et al., 2020) directly samples nodes or edges to generate a subgraph.
+
+### Pooling modules
+
+In the area of computer vision, a convolutional layer is usually followed by a pooling layer to get more general features. Complicated and large-scale graphs usually carry rich hierarchical structures which are of great importance for node-level and graph-level classification tasks. Similar to these pooling layers, a lot of work focuses on designing hierarchical pooling layers on graphs. In this section, we introduce two kinds of pooling modules: direct pooling modules and hierarchical pooling modules.
+
+#### 3.5.1 Direct pooling modules
+
+Direct pooling modules learn graph-level representations directly from nodes with different node selection strategies. These modules are also called readout functions in some variants.
+
+_Simple Node Pooling._ Simple node pooling methods are used by several models. In these models, node-wise max/mean/sum/attention operations are applied on node features to get a global graph representation.
+
+_Set2Seq_. MPNN uses the Set2set method (Vinyals et al., 2015) as the readout function to get graph representations. Set2set is designed to deal with the unordered set \(T=\{(\mathbf{h}_{i}^{T},\mathbf{x}_{i})\}\) and uses a LSTM-based method to produce an order invariant representation after a predifined number of steps.
+
+_SortPooling._SortPooling (Zhang et al., 2018) first sorts the node embeddings according to the structural roles of the nodes and then the sorted embeddings are fed into CNNs to get the representation.
+
+#### 3.5.2 Hierarchical pooling modules
+
+The methods mentioned before directly learn graph representations from nodes and they do not investigate the hierarchical property of the graph structure. Next we will talk about methods that follow a hierarchical pooling pattern and learn graph representations by layers.
+
+_Graph Coarsening._ Early methods a

@@ -1,0 +1,1 @@
+In the following subsections, we will introduce GNNs' applications in structural scenarios, where the data are naturally performed in the graph structure.

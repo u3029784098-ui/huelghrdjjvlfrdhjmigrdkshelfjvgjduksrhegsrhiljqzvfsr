@@ -1,0 +1,3 @@
+In this section, we summarize the papers about the theoretic foundations and explanations of graph neural networks from various perspectives.
+
+Figure 6: Application scenarios. (lcons made by Freeplk from Flaticon)

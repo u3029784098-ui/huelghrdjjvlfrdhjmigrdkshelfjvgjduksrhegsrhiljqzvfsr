@@ -1,0 +1,266 @@
+Formula,Tag,Location start,Location end
+"\mathcal{T}(\mathbf{x})=\mathbf{U}^{\top}\mathbf{x},",1,18197,18261
+\mathcal{T}^{-1}(\mathbf{x})=\mathbf{U}\mathbf{x}.,,18262,18316
+\mathbf{g}\star\mathbf{x} =\mathcal{T}^{-1}(\mathcal{T}(\mathbf{g})\odot\mathcal{T}( \mathbf{x})),2,18895,19004
+"=\mathbf{U}(\mathbf{U}^{\top}\mathbf{g}\odot\mathbf{U}^{\top} \mathbf{x}),",,19005,19083
+\mathbf{g}_{\mathbf{w}}\star\mathbf{x}=\mathbf{U}_{\mathbf{g}}\mathbf{U}^{ \dagger}\mathbf{x}.,3,19368,19474
+"\mathbf{g}_{\mathbf{w}}\star\mathbf{x}\approx\sum_{k=0}^{\mathbf{c}}w_{k} \mathbf{T}_{k}\big{(}\hat{\mathbf{L}}\big{)}\mathbf{x},",4,20368,20509
+\mathbf{g}_{\mathbf{w}}\star\mathbf{x}\approx w_{0}\mathbf{x}+w_{1}(\mathbf{L }-\mathbf{I}_{\mathbf{w}})\mathbf{x}=w_{0}\mathbf{x}-w_{1}\mathbf{D}^{- \frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}}\mathbf{x},5,21720,21939
+\mathbf{g}_{\mathbf{w}}\star\mathbf{x}\approx w\left(\mathbf{I}_{\mathbf{N}}+ \mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}}\right)\mathbf{x}.,6,22078,22246
+"\mathbf{H}=\mathbf{D}^{-\frac{1}{2}}\hat{\mathbf{A}}\mathbf{D}^{-\frac{1}{2}} \hat{\mathbf{X}}\mathbf{W},",7,22758,22875
+"\mathbf{H}=\rho\left(\mathbf{D}_{\rho}^{-1}\mathbf{A}_{\rho}\mathbf{D}_{ \rho}^{-1}\mathbf{H}\mathbf{W}\right),",8,24142,24265
+"\mathbf{t}=\mathbf{h}_{i}^{+}+\sum\limits_{j\in r_{i}}\mathbf{h}_{i},",9,25805,25886
+"\mathbf{h}_{i}^{+1+}=\sigma\left(\mathbf{H}\mathbf{W}_{i^{\prime}i^{\prime}}^ {+1}\right),",,25888,25982
+"\mathbf{H}= f(\mathbf{W}_{c}\odot\mathbf{P}^{*}\mathbf{X})\in\mathbb{R}^{R,r \times F,r},",10,26488,26590
+"\mathbf{h}_{i}^{+1}=\alpha\mathbf{G}_{i+1}\left(\left(\mathbf{h}_{i}^{+}, \forall i\in\mathcal{I}_{r^{*}}^{-1}\right)\right),",11,27917,28055
+"\mathbf{h}_{i}^{+1}=\rho\left(\sum\limits_{c,r^{\prime}}\alpha_{v}\mathbf{W}_{c }^{*}\right),",,29402,29499
+"\alpha_{v}=\frac{\exp(\text{LeakyReLU}(\mathbf{a}^{T}[\mathbf{W}_{h},\parallel \mathbf{W}_{h}]))}{\sum\limits_{c\in\mathcal{I}_{r^{*}}}\exp(\text{LeakyReLU}( \mathbf{a}^{T}[\mathbf{W}_{h},\parallel\mathbf{W}_{h}]))}.",,29501,29721
+"\begin{split}&\mathbf{h}_{v}^{e+1}=\|_{k=1}^{e}\sigma\left(\sum_{v\in \mathcal{V}_{v}}\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!recurrent operators share same weights. Early methods based on recursive neural networks focus on dealing with directed acyclic graphs (Sperduti and Starita, 1997; Frasconi et al., 1998; Micheli et al., 2004; Hammer et al., 2004). Later, the concept of graph neural network (GNN) was first proposed in (Scarselli et al., 2009; Gori et al., 2005), which extended existing neural networks to process more graph types. We name the model as GNN in this paper to distinguish it with the general name. We first introduce GNN and its later variants which require convergence of the hidden states and then we talk about methods based on the gate mechanism.
+
+#### 3.2.1 Convergence-based methods
+
+In a graph, each node is naturally defined by its features and the related nodes. The target of GNN is to learn a state embedding \(\mathbf{h}_{v}\in\mathbb{R}^{d}\) which contains the information of the neighborhood and itself for each node. The state embedding \(\mathbf{h}_{v}\) is an \(s\)-dimension vector of node \(v\) and can be used to produce an output \(\mathbf{o}_{v}\) such as the distribution of the predicted node label. Then the computation steps of \(\mathbf{h}_{v}\) and \(\mathbf{o}_{v}\) are defined as:
+
+\[\mathbf{h}_{v}=f\left(\mathbf{x}_{v},\mathbf{x}_{v|i}\right)\mathbf{h}_{v^{ \prime}_{v}},\mathbf{x}_{v^{\prime}_{v}}\,,",19,30219,32760
+"\mathbf{H}=F(\mathbf{H},\mathbf{X}),",20,33648,33697
+"\mathbf{O}=G(\mathbf{H},\mathbf{X}_{N}),",,33698,33742
+"\mathbf{H}^{+1}=F(\mathbf{H}^{\prime},\mathbf{X}),",21,34196,34259
+"\mathbf{T}(\mathbf{h}^{i})=\mathbf{e}(\mathbf{W}_{i}\mathbf{h}^{i}+\mathbf{b} ),",22,43267,43360
+\mathbf{h}^{i+1}=\mathbf{h}^{i+1}\odot\mathbf{T}(\mathbf{h})+ \mathbf{h}^{i}\odot(1-\mathbf{T}(\mathbf{h}^{i})).,,43361,43477
+"\mathbf{h}_{\text{ion}}^{i+1}=\mathbf{h}^{i+1}+\mathbf{h}^{i},",23,44823,44898
+\mathbf{h}_{\text{home}}^{i+1}=\left[\int_{v=1}^{i+1}\mathbf{h}^{i}.\right.,,44899,44978
+"\begin{array}{l}\mathbf{S}^{t}=\operatorname{softmax}(\operatorname{GNN}_{i,\text{real}}(\mathbf{A}^{t},\mathbf{H})),\\ \mathbf{A}^{t+1}=(\mathbf{S})^{T}\mathbf{A}\mathbf{S}^{t},\end{array}",24,50466,50668
+\mathbf{W}_{r}=\sum_{k=1}^{B}d_{k}\mathbf{V}_{k}.,25,56883,56945
+"L_{w}=\left\{\begin{aligned} 1,&\text{if}\quad v\in e \\ 0,&\text{if}\quad v\not\in e\end{aligned}\right\}.",26,60283,60403
+"\mathbf{H}=\mathbf{D}_{r}^{-}\mathbf{L}\mathbf{W}_{e}\mathbf{D}_{e}^{-} \mathbf{L}^{\prime}\mathbf{D}_{r}^{-}\mathbf{X}\mathbf{W},",27,60518,60661
+"\mathbf{H}=\mathrm{GCN}(\mathbf{X},\mathbf{A}),",28,63360,63420
+\tilde{\mathbf{A}}=\rho(\mathbf{H}\mathbf{H}^{\prime}).,,63421,63480
+"G=(V,E)",,7590,7601
+|V|=N,,7609,7618
+|E|=N^{*},,7659,7672
+"\mathbf{A}\in\mathbb{R}^{N,N}",,7697,7730
+\mathbf{h}_{v},,7798,7816
+\mathbf{o}_{v},,7821,7839
+v,,7886,7891
+O(n^{2}),,10866,10878
+\mathbf{g}^{n},,13316,13334
+m,,13337,13342
+"\alpha,\mathbf{n},\mathbf{A}",,13374,13406
+\mathbf{A}^{r},,13438,13456
+\mathbf{l}_{v},,13479,13497
+N,,13529,13534
+\mathbf{g}_{v},,13538,13556
+\mathbf{g}_{v},,13580,13598
+\mathbf{s},,13603,13617
+"N,N^{r}",,13621,13632
+N^{r},,13667,13676
+"\cdot,r",,13711,13722
+\mathbf{s}^{r},,13753,13771
+a,,13781,13786
+v,,13795,13800
+t,,13814,13819
+\mathbf{h}_{v},,13823,13841
+v,,13865,13870
+\mathbf{h}^{r}_{i},,13874,13896
+v,,13920,13925
+t,,13939,13944
+\mathbf{o}^{r}_{i},,13948,13970
+v,,13988,13993
+t,,14007,14012
+\mathbf{e}_{vw},,14016,14035
+v,,14065,14070
+w,,14074,14079
+\mathbf{n}_{v},,14083,14101
+k,,14132,14137
+\mathbf{W}^{r},,14141,14159
+\mathbf{U}^{r},,14160,14178
+\mathbf{W}^{r},,14212,14230
+\mathbf{U}^{r},,14231,14249
+\rho,,14282,14290
+\sigma,,14331,14341
+\odot,,14459,14468
+\parallel,,14512,14525
+\mathbf{x},,17882,17896
+\mathcal{T},,17974,17989
+\mathcal{T}^{-1},,18141,18161
+\mathbf{U},,18323,18337
+\mathbf{L}=\mathbf{I}_{\mathbf{N}}-\mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{ D}^{-\frac{1}{2}},,18402,18502
+\mathbf{D},,18504,18518
+\mathbf{A},,18544,18558
+\mathbf{L}=\mathbf{U}\mathbf{U}^{\top},,18697,18739
+\mathbf{A},,18747,18761
+\mathbf{U}^{\top}\mathbf{g},,19091,19122
+\mathbf{g}_{\mathbf{w}},,19281,19308
+\mathbf{g}_{\mathbf{w}},,19558,19585
+\mathbf{g}_{\mathbf{w}}=\text{diag}(\mathbf{w}),,19702,19753
+\mathbf{w}\in\mathbb{R}^{N},,19761,19792
+\mathbf{g}_{\mathbf{w}},,20094,20121
+\mathbf{T}_{k}(x),,20201,20222
+\mathbb{K}^{\text{th}},,20229,20255
+"\hat{\mathbf{L}}=\frac{2}{4\text{mm}}\mathbf{L}-\mathbf{I}_{\mathbf{N}},\hat {\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{ \mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{     \mathbf{   }}}}}}}}}}}}}}",,20517,20782
+\mathbf{L},,20817,20831
+\hat{\mathbf{L}},,20865,20885
+\mathbf{w}\in\mathbb{R}^{K},,20898,20929
+\mathbf{T}_{k}(\mathbf{x})=2\mathbf{x}\mathbf{T}_{k-1}(\mathbf{x})-\mathbf{T} _{k-2}(\mathbf{x}),,21014,21114
+\mathbf{T}_{0}(\mathbf{x})=1,,21121,21153
+\mathbf{T}_{1}(\mathbf{x})=\mathbf{x},,21158,21199
+K,,21242,21247
+\mathbb{K}^{\text{th}},,21272,21298
+K,,21367,21372
+K=1,,21593,21600
+z_{\text{max}}\approx 2,,21662,21689
+w_{0},,21966,21975
+w_{1},,21980,21989
+w=w_{0}=-w_{1},,22017,22035
+\mathbf{I}_{\mathbf{N}}+\mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{ 1}{2}}\rightarrow\mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}},,22359,22519
+\hat{\mathbf{A}}=\mathbf{A}+\mathbf{I}_{\mathbf{w}},,22576,22631
+\tilde{\mathbf{D}}_{\mathbf{z}}=\sum\limits_{j}\hat{\mathbf{A}}_{y},,22636,22707
+"\mathbf{X}\in\mathbb{R}^{R,r}",,22883,22916
+"\mathbf{W}\in\mathbb{R}^{R,r^{\prime}}",,22938,22980
+"\mathbf{H}\in\mathbb{R}^{R,r^{\prime}}",,23002,23044
+F,,23070,23075
+F^{\prime},,23080,23094
+\mathbf{A}_{\rho},,24273,24294
+\mathbf{D}_{\rho},,24318,24339
+\mathbf{A}_{\rho},,24373,24394
+\mathbf{W}_{i^{\prime}i^{\prime}}^{+1},,25990,26032
+\lfloor r^{\prime}\cdot\rfloor,,26076,26110
+t+1,,26120,26127
+"\mathbf{X}\in\mathbb{R}^{R,r}",,26598,26631
+F,,26665,26670
+\mathbf{P}^{*},,26690,26708
+N\times K\times N,,26715,26736
+"\{\mathbf{P},\mathbf{P}^{2},\...,\ \mathbf{P}^{k}\}",,26776,26831
+\mathbf{P},,26842,26856
+\mathbf{P},,26862,26876
+\mathbf{A},,26953,26967
+K\times F,,27051,27064
+K,,27083,27088
+F,,27118,27123
+K\times F,,27167,27180
+f,,27232,27237
+k,,27348,27353
+\alpha\mathbf{G}_{i+1},,28181,28207
+v,,29375,29380
+\mathbf{W},,29729,29743
+\mathbf{a},,29842,29856
+K,,30028,30033
+\mathbf{h}_{v}\in\mathbb{R}^{d},,32234,32269
+\mathbf{h}_{v},,32367,32385
+s,,32392,32397
+v,,32423,32428
+\mathbf{o}_{v},,32466,32484
+\mathbf{h}_{v},,32569,32587
+\mathbf{o}_{v},,32592,32610
+"\mathbf{o}_{v}=g(\mathbf{h}_{v},\mathbf{x}_{v})",,32762,32813
+"\mathbf{x}_{v},\mathbf{x}_{v|i},\mathbf{h}_{v^{\prime}_{v}},\mathbf{x}_{v^{ \prime}_{v}}",,32822,32914
+\mathbf{v},,32935,32949
+\mathbf{v},,33042,33056
+f,,33072,33077
+g,,33241,33246
+f,,33336,33341
+g,,33346,33351
+\mathbf{H},,33412,33426
+\mathbf{0},,33428,33442
+\mathbf{X},,33444,33458
+\mathbf{X}_{N},,33464,33482
+F,,33750,33755
+G,,33795,33800
+f,,33855,33860
+g,,33865,33870
+\mathbf{H},,33924,33938
+F,,34019,34024
+\mathbf{H}^{\prime},,34267,34290
+t,,34303,34308
+\mathbf{H},,34325,34339
+f,,34598,34603
+f,,36578,36583
+\nu,,36809,36816
+\mathbf{h}_{v^{\prime}_{v}},,37010,37041
+v,,37088,37093
+\mathbf{z},,37101,37115
+\mathbf{r},,37120,37134
+\mathbf{h}^{\prime}_{v^{\prime}_{v^{\prime}_{v}}}-\sum\limits_{k\in\mathcal{V }_{v^{\prime}_{v}}}\mathbf{h}^{-1}_{v^{\prime}_{v}}+\mathbf{b},,37493,37637
+\mathbf{\zeta}_{v}=\sigma(\mathbf{W}\mathbf{h}^{\prime}_{v^{\prime}_{v^{\prime} _{v}}}+\mathbf{U}\mathbf{h}^{-1}_{v^{\prime}_{v}}),,37640,37774
+\mathbf{\zeta}_{v}=\sigma(\mathbf{W}\mathbf{h}^{\prime}_{v^{\prime}_{v^{\prime} _{v}}}+\mathbf{U}\mathbf{h}^{\prime}_{v^{\prime}_{v}}),,37781,37919
+\mathbf{h}^{\prime}_{v}=\tanh(\mathbf{W}\mathbf{h}^{\prime}_{v^{\prime}_{v}}+ \mathbf{U}\mathbf{h}^{\prime}_{v^{\prime}_{v}}),,37928,38057
+\mathbf{h}^{\prime}_{v}=(1-\mathbf{z})\odot\mathbf{h}^{\prime}_{v^{\prime}_{v}}+ \zeta\odot\mathbf{h}^{\prime}_{v^{\prime}_{v}},,38066,38197
+\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}},,38232,38352
+\mathbf{\zeta}_{v}=\sigma(\mathbf{W}^{\prime}_{v^{\prime}_{v}}+\mathbf{b}^{ \prime}_{v^{\prime}_{v}}+\mathbf{b}^{\prime}_{v^{\prime}_{v}}),,38355,38497
+\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}},,38506,38626
+\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}},,38635,38755
+\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}},,38764,38884
+\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}},,38893,39013
+\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}},,39022,39142
+\mathbf{h}^{\prime}_{v^{\prime}_{v}}=\frac{\mathbf{x}}{\sum\limits_{k\in\mathcal{V}_{v^{ \prime}_{v}}}}\mathbf{h}^{-1}_{v^{\prime}_{v}},,39173,39312
+\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}},,39321,39441
+\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}},,39450,39570
+\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v^{\prime}_{v}}},,39607,39740
+"\mathbf{h}^{\prime}_{v^{\prime}_{v^the _N-ary Tree-LSTM_. They are also extensions to the recursive neural network based models as we mentioned before. Tree is a special case of graph and each node in Tree-LSTM aggregates information from its children. Instead of a single forget gate in traditional LSTM, the Tree-LSTM unit for node \(v",,39749,40090
+\mathbf{f}_{v},,40116,40134
+k,,40150,40155
+\mathbf{f}_{v}^{t},,40230,40252
+\mathbf{o}_{v}^{t},,40254,40276
+\mathbf{c}_{v}^{t},,40282,40304
+\mathbf{x}_{v}^{t},,40367,40389
+t,,40418,40423
+K,,40522,40527
+"\mathbf{h}_{v,v}^{t}",,40595,40619
+"\mathbf{h}_{v,v}^{t}",,40621,40645
+"\mathbf{h}_{v,v}^{t}",,40647,40671
+k,,40729,40734
+"m(v,k)",,41492,41502
+v,,41539,41544
+k,,41549,41554
+k,,42436,42441
+"T=\{(\mathbf{h}_{i}^{T},\mathbf{x}_{i})\}",,48890,48935
+\mathbf{S}^{t},,50431,50449
+\mathbf{H}^{t},,50676,50694
+\mathbf{A}^{t},,50726,50744
+t,,50784,50789
+\mathbf{S}^{t},,50791,50809
+t,,50857,50862
+t+1,,50906,50913
+\mathbf{W}_{p},,52608,52626
+\mathbf{W}_{c},,52631,52649
+"\{V,E,\varphi,\psi\}",,52888,52912
+\nu_{i},,52924,52935
+\varphi(\nu_{i}),,52962,52982
+e_{i},,52997,53006
+\psi(e_{i}),,53019,53034
+\varphi_{1},,53243,53258
+\varphi_{2},,53259,53274
+\varphi_{3},,53275,53290
+\varphi_{4},,53291,53306
+\varphi_{5},,53307,53322
+\varphi_{6},,53323,53338
+\varphi_{7},,53339,53354
+L,,53362,53367
+"(\varphi(\nu),\psi(e_{i}),\varphi(\nu))",,55288,55331
+\mathbf{W}_{r},,56840,56858
+\mathbf{W}_{r},,56957,56975
+\mathbf{V}_{b}\in\mathbb{R}^{d_{k}\cdots d_{m}},,57025,57076
+a_{b},,57095,57104
+\mathbf{W}_{r},,57162,57180
+"G=(V,E,W_{e})",,60075,60092
+e\in E,,60108,60118
+w\in W_{e},,60174,60188
+|V|\times|E|,,60251,60267
+L,,60275,60280
+\mathbf{D}_{r},,60673,60691
+\mathbf{W}_{e},,60693,60711
+\mathbf{D}_{e},,60713,60731
+\mathbf{X},,60733,60747
+\mathbf{W},,60853,60867
+I-\frac{1}{2}L,,68878,68896
+I-\frac{1}{\alpha\alpha}L,,69004,69033
+\lambda_{\text{max}},,69066,69090
+FOC_{2},,74487,74498
+\textbf{e}_{uv}^{t},,85713,85736
+\textbf{h}_{\ell^{\prime}_{v}}^{t}=\sum\limits_{\textbf{u}\in\mathcal{T}(v)} \textbf{e}_{uv}^{t},,85775,85875
+N,,99154,99159
+N,,99243,99248
+N,,99357,99362
+N,,99399,99404
+n,,109011,109016
+n,,109119,109124

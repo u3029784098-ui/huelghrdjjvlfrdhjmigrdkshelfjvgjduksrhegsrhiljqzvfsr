@@ -1,0 +1,77 @@
+parameter. However, this operation is computationally inefficient and the filter is non-spatially localized. Henaff et al. (2015) attempt to make the spectral filters spatially localized by introducing a parameterization with smooth coefficients.
+
+_ChebNet._ Hammond et al. (2011) suggest that \(\mathbf{g}_{\mathbf{w}}\) can be approximated by a truncated expansion in terms of Chebyshev polynomials \(\mathbf{T}_{k}(x)\) up to \(\mathbb{K}^{\text{th}}\) order. Deferhard et al. (2016) propose the ChebNet based on this theory. Thus the operation can be written as:
+
+\[\mathbf{g}_{\mathbf{w}}\star\mathbf{x}\approx\sum_{k=0}^{\mathbf{c}}w_{k} \mathbf{T}_{k}\big{(}\hat{\mathbf{L}}\big{)}\mathbf{x}, \tag{4}\]
+
+where \(\hat{\mathbf{L}}=\frac{2}{4\text{mm}}\mathbf{L}-\mathbf{I}_{\mathbf{N}},\hat {\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{ \mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{\mathbf{     \mathbf{   }}}}}}}}}}}}}}\) denotes the largest eigenvalue of \(\mathbf{L}\). The range of the eigenvalues in \(\hat{\mathbf{L}}\) is [-1, 1]. \(\mathbf{w}\in\mathbb{R}^{K}\) is now a vector of Chebyshev coefficients. The Chebyshev polynomials are defined as \(\mathbf{T}_{k}(\mathbf{x})=2\mathbf{x}\mathbf{T}_{k-1}(\mathbf{x})-\mathbf{T} _{k-2}(\mathbf{x})\), with \(\mathbf{T}_{0}(\mathbf{x})=1\) and \(\mathbf{T}_{1}(\mathbf{x})=\mathbf{x}\). It can be observed that the operation is \(K\)-localized since it is a \(\mathbb{K}^{\text{th}}\)-order polynomial in the Laplacian. Deferhard et al. (2016) use this \(K\)-localized convolution to define a convolutional neural network which could remove the need to compute the eigenvectors of the Laplacian.
+
+_GCN._ Kipf and Welling (2017) simplify the convolution operation in Eq. (4) with \(K=1\) to alleviate the problem of overfitting. They further assume \(z_{\text{max}}\approx 2\) and simplify the equation to
+
+\[\mathbf{g}_{\mathbf{w}}\star\mathbf{x}\approx w_{0}\mathbf{x}+w_{1}(\mathbf{L }-\mathbf{I}_{\mathbf{w}})\mathbf{x}=w_{0}\mathbf{x}-w_{1}\mathbf{D}^{- \frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}}\mathbf{x} \tag{5}\]
+
+with two free parameters \(w_{0}\) and \(w_{1}\). With parameter constraint \(w=w_{0}=-w_{1}\), we can obtain the following expression:
+
+\[\mathbf{g}_{\mathbf{w}}\star\mathbf{x}\approx w\left(\mathbf{I}_{\mathbf{N}}+ \mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}}\right)\mathbf{x}. \tag{6}\]
+
+GCN further introduces a _renormalization trick_ to solve the exploding/vanishing gradient problem in Eq. (6): \(\mathbf{I}_{\mathbf{N}}+\mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{ 1}{2}}\rightarrow\mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}}\), with
+
+Figure 3: An overview of computational modules.
+
+\(\hat{\mathbf{A}}=\mathbf{A}+\mathbf{I}_{\mathbf{w}}\) and \(\tilde{\mathbf{D}}_{\mathbf{z}}=\sum\limits_{j}\hat{\mathbf{A}}_{y}\). Finally, the compact form of GCN is defined as:
+
+\[\mathbf{H}=\mathbf{D}^{-\frac{1}{2}}\hat{\mathbf{A}}\mathbf{D}^{-\frac{1}{2}} \hat{\mathbf{X}}\mathbf{W}, \tag{7}\]
+
+where \(\mathbf{X}\in\mathbb{R}^{R,r}\) is the input matrix, \(\mathbf{W}\in\mathbb{R}^{R,r^{\prime}}\) is the parameter and \(\mathbf{H}\in\mathbb{R}^{R,r^{\prime}}\) is the convolved matrix. \(F\) and \(F^{\prime}\) are the dimensions of the input and the output, respectively. Note that GCN can also be regarded as a spatial method that we will discuss later.
+
+_AGCN._ All of these models use the original graph structure to denote relations between nodes. However, there may have implicit relations between different nodes. The Adaptive Graph Convolution Network (AGCN) is proposed to learn the underlying relations (Li et al., 2018). AGCN learns a "residual" graph Laplacian and add it to the original Laplacian matrix. As a result, it is proven to be effective in several graph-structured datasets.
+
+_DGCN._ The dual graph convolutional network (DGCN) (Zhuang and Ma, 2018) is proposed to jointly consider the local consistency and global consistency on graphs. It uses two convolutional networks to capture the local and global consistency and adopts an unsupervised loss to ensemble them. The first convolutional network is the same as Eq. (7), and the second network replaces the adjacency matrix with positive pointwise mutual information (PPMI) matrix:
+
+\[\mathbf{H}=\rho\left(\mathbf{D}_{\rho}^{-1}\mathbf{A}_{\rho}\mathbf{D}_{ \rho}^{-1}\mathbf{H}\mathbf{W}\right), \tag{8}\]
+
+where \(\mathbf{A}_{\rho}\) is the PPMI matrix and \(\mathbf{D}_{\rho}\) is the diagonal degree matrix of \(\mathbf{A}_{\rho}\).
+
+_GWNN._ Graph wavelet neural network (GWNN) (Xu et al., 2019) uses the graph wavelet transform to replace the graph Fourier transform. It has several advantages: (1) graph wavelets can be fastly obtained without matrix decomposition; (2) graph wavelets are sparse and localized thus the results are better and more explainable. GWNN outperforms several spectral methods on the semi-supervised node classification task.
+
+_AGCN_ and _DGCN_ try to improve spectral methods from the perspective of augmenting graph Laplacian while _GWNN_ replaces the Fourier transform. In conclusion, spectral approaches are well theoretically based and there are also several theoretical analyses proposed recently (see Section 7.1.1). However, in almost all of the spectral approaches mentioned above, the learned filters depend on graph structure. That is to say, the filters cannot be applied to a graph with a different structure and those models can only be applied under the "transductive" setting of graph tasks.
+
+#### 3.1.2 Basic spatial approaches
+
+Spatial approaches define convolutions directly on the graph based on the graph topology. The major challenge of spatial approaches is defining the convolution operation with differently sized neighborhoods and maintaining the local invariance of CNNs.
+
+_Neural FPs._ Neural FPs (Duvenaud et al., 2015) uses different weight matrices for nodes with different degrees:
+
+\[\mathbf{t}=\mathbf{h}_{i}^{+}+\sum\limits_{j\in r_{i}}\mathbf{h}_{i}, \tag{9}\]
+
+\[\mathbf{h}_{i}^{+1+}=\sigma\left(\mathbf{H}\mathbf{W}_{i^{\prime}i^{\prime}}^ {+1}\right),\]
+
+where \(\mathbf{W}_{i^{\prime}i^{\prime}}^{+1}\) is the weight matrix for nodes with degree \(\lfloor r^{\prime}\cdot\rfloor\) at layer \(t+1\). The main drawback of the method is that it cannot be applied to large-scale graphs with more node degrees.
+
+_DCNN._ The diffusion convolutional neural network (DCNN) (Atwood and Towsley, 2016) uses transition matrices to define the neighborhood for nodes. For node classification, the diffusion representations of each node in the graph can be expressed as:
+
+\[\mathbf{H}= f(\mathbf{W}_{c}\odot\mathbf{P}^{*}\mathbf{X})\in\mathbb{R}^{R,r \times F,r}, \tag{10}\]
+
+where \(\mathbf{X}\in\mathbb{R}^{R,r}\) is the matrix of input features (\(F\) is the dimension). \(\mathbf{P}^{*}\) is an \(N\times K\times N\) tensor which contains the power series \(\{\mathbf{P},\mathbf{P}^{2},\...,\ \mathbf{P}^{k}\}\) of matrix \(\mathbf{P}\). And \(\mathbf{P}\) is the degree-normalized transition matrix from the graphs adjacency matrix \(\mathbf{A}\). Each entity is transformed to a diffusion convolutional representation which is a \(K\times F\) matrix defined by \(K\) hops of graph diffusion over \(F\) features. And then it will be defined by a \(K\times F\) weight matrix and a non-linear activation function \(f\).
+
+_PATCHY-SAN._ The PATCHY-SAN model (Niepert et al., 2016) extracts and normalizes a neighborhood of exactly \(k\) nodes for each node. The normalized neighborhood serves as the receptive field in the traditional convolutional operation.
+
+_LGCN._ The learnable graph convolutional network (LGCN) (Gao et al., 2018) also exploits CNNs as aggregators. It performs max pooling on neighborhood matrices of nodes to get top-k feature elements and then applies 1-D CNN to compute hidden representations.
+
+_GraphSAGE._ GraphSAGE (Hamilton et al., 2017) is a general inductive framework which generates embeddings by sampling and aggregating features from a node's local neighborhood:
+
+\[\mathbf{h}_{i}^{+1}=\alpha\mathbf{G}_{i+1}\left(\left(\mathbf{h}_{i}^{+}, \forall i\in\mathcal{I}_{r^{*}}^{-1}\right)\right), \tag{11}\]
+
+Instead of using the full neighbor set, GraphSAGE uniformly samples a fixed-size set of neighbors to aggregate information. \(\alpha\mathbf{G}_{i+1}\) is the aggregation function and GraphSAGE suggests three aggregators: mean aggregator, LSTM aggregator, and pooling aggregator. GraphSAGE with a mean aggregator can be regarded as an inductive version of GCN while the LSTM aggregator is not permutation invariant, which requires a specified order of the nodes.
+
+#### 3.1.3 Attention-based spatial approaches
+
+The attention mechanism has been successfully used in many sequence-based tasks such as machine translation (Bahdanau et al., 2015; Gehring et al., 2017; Vaswani et al., 2017), machine reading (Cheng et al., 2016) and so on. There are also several models which try to generalize the attention operator on graphs (Velickovic et al., 2018; Zhang et al., 2018). Compared with the operators we mentioned before, attention-based operators assign different weights for neighbors, so that they could alleviate noises and achieve better results.
+
+_GAT._ The graph attention network (GAT) (Velickovic et al., 2018) incorporates the attention mechanism into the propagation step. It computes the hidden states of each node by attending to its neighbors, following a _self-attention_ strategy. The hidden state of node \(v\) can be obtained by:
+
+\[\mathbf{h}_{i}^{+1}=\rho\left(\sum\limits_{c,r^{\prime}}\alpha_{v}\mathbf{W}_{c }^{*}\right),\]
+
+\[\alpha_{v}=\frac{\exp(\text{LeakyReLU}(\mathbf{a}^{T}[\mathbf{W}_{h},\parallel \mathbf{W}_{h}]))}{\sum\limits_{c\in\mathcal{I}_{r^{*}}}\exp(\text{LeakyReLU}( \mathbf{a}^{T}[\mathbf{W}_{h},\parallel\mathbf{W}_{h}]))}.\]
+
+where \(\mathbf{W}\) is the weight matrix associated with the linear transfor

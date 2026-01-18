@@ -1,0 +1,751 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="urn:absolute:OntoSMP/"
+     xml:base="urn:absolute:OntoSMP/"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="urn:absolute:OntoSMP">
+        <rdfs:comment>The Standard Model Ontology is designed to formally describe the fundamental particles and interactions governing matter and energy in the universe, as outlined by the Standard Model of particle physics. This ontology serves as a semantic framework to support reasoning, data integration, education, and research in high-energy physics.</rdfs:comment>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- urn:absolute:OntoSMP#constitutesOf -->
+
+    <owl:ObjectProperty rdf:about="urn:absolute:OntoSMP#constitutesOf">
+        <rdfs:comment>Relates a composite particle to the constituent particles it is made of (e.g. a proton is constituted of three quarks).</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#exampleOf -->
+
+    <owl:ObjectProperty rdf:about="urn:absolute:OntoSMP#exampleOf">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ReflexiveProperty"/>
+        <rdfs:comment>Relates a specific chemical reaction to a general reaction type or class it exemplifies. For example, water electrolysis is an example of a decomposition reaction.</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#hasAntiParticle -->
+
+    <owl:ObjectProperty rdf:about="urn:absolute:OntoSMP#hasAntiParticle">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#SymmetricProperty"/>
+        <rdfs:comment>Relates a particle to its corresponding antiparticle (e.g., electron has antiparticle positron). Each particle-antiparticle pair has opposite quantum numbers such as charge.</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#hasProduct -->
+
+    <owl:ObjectProperty rdf:about="urn:absolute:OntoSMP#hasProduct">
+        <rdfs:comment>Relates a chemical reaction to the particles that are produced as a result of the transformation.</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#hasReactant -->
+
+    <owl:ObjectProperty rdf:about="urn:absolute:OntoSMP#hasReactant">
+        <rdfs:comment>Relates a chemical reaction to the particles that act as inputs or participants before the reaction occurs.</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#includes -->
+
+    <owl:ObjectProperty rdf:about="urn:absolute:OntoSMP#includes">
+        <rdfs:comment>Indicates the list of particles that make up a given reactant or product in a reaction.</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#mediatesInteraction -->
+
+    <owl:ObjectProperty rdf:about="urn:absolute:OntoSMP#mediatesInteraction">
+        <rdfs:comment>Relates a gauge boson to the fundamental force it mediates (e.g., photon mediates the electromagnetic force).</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#transformedBy -->
+
+    <owl:ObjectProperty rdf:about="urn:absolute:OntoSMP#transformedBy">
+        <rdfs:comment>Indicates that a chemical or particle-level reaction occurs via or is governed by a specific fundamental interaction.</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- urn:absolute:OntoSMP#antiColorCharge -->
+
+    <owl:DatatypeProperty rdf:about="urn:absolute:OntoSMP#antiColorCharge">
+        <rdfs:domain rdf:resource="urn:absolute:OntoSMP#AntiQuark"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                        <rdf:first>anti-blue</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                <rdf:first>anti-green</rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                        <rdf:first>anti-red</rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                <rdf:first>neutral</rdf:first>
+                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </rdfs:range>
+        <rdfs:comment>The anticolor counterpart to a color charge, relevant for anti-quarks and some gluons; values include anti-red, anti-green, anti-blue.</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#charge -->
+
+    <owl:DatatypeProperty rdf:about="urn:absolute:OntoSMP#charge">
+        <rdfs:domain rdf:resource="urn:absolute:OntoSMP#Particle"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2002/07/owl#real"/>
+        <rdfs:comment>The electric charge of a particle, determining how it interacts electromagnetically. Expressed as multiples of the elementary charge e.</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#colorCharge -->
+
+    <owl:DatatypeProperty rdf:about="urn:absolute:OntoSMP#colorCharge">
+        <rdfs:domain rdf:resource="urn:absolute:OntoSMP#Quark"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                        <rdf:first>blue</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                <rdf:first>green</rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                        <rdf:first>neutral</rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                <rdf:first>red</rdf:first>
+                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </rdfs:range>
+        <rdfs:comment>The type of color charge carried by a quark or gluon under the SU(3) strong interaction; values include red, green, blue.</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#generation -->
+
+    <owl:DatatypeProperty rdf:about="urn:absolute:OntoSMP#generation">
+        <rdfs:domain rdf:resource="urn:absolute:OntoSMP#Fermion"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                        <rdf:first>I</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                <rdf:first>II</rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                        <rdf:first>III</rdf:first>
+                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </rdfs:range>
+        <rdfs:comment>The classification of fermions into one of three families based on mass and interaction properties (1st, 2nd, or 3rd generation).</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#lifetime -->
+
+    <owl:DatatypeProperty rdf:about="urn:absolute:OntoSMP#lifetime">
+        <rdfs:domain rdf:resource="urn:absolute:OntoSMP#Particle"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+        <rdfs:comment>The average time a particle exists before decaying, typically expressed in seconds.</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#mass -->
+
+    <owl:DatatypeProperty rdf:about="urn:absolute:OntoSMP#mass">
+        <rdfs:domain rdf:resource="urn:absolute:OntoSMP#Particle"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2002/07/owl#real"/>
+        <rdfs:comment>The rest mass of a particle, representing its intrinsic resistance to acceleration. Typically expressed in MeV/c² or GeV/c².</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#numberOfParticles -->
+
+    <owl:DatatypeProperty rdf:about="urn:absolute:OntoSMP#numberOfParticles">
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#unsignedInt"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#reactionType -->
+
+    <owl:DatatypeProperty rdf:about="urn:absolute:OntoSMP#reactionType">
+        <rdfs:domain rdf:resource="urn:absolute:OntoSMP#ChemicalReaction"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#spin -->
+
+    <owl:DatatypeProperty rdf:about="urn:absolute:OntoSMP#spin">
+        <rdfs:domain rdf:resource="urn:absolute:OntoSMP#Particle"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:comment>An intrinsic form of angular momentum possessed by particles; values can be integers or half-integers (e.g., 0, 1/2, 1, 3/2).</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- urn:absolute:OntoSMP#unit -->
+
+    <owl:DatatypeProperty rdf:about="urn:absolute:OntoSMP#unit">
+        <rdfs:subPropertyOf rdf:resource="urn:absolute:OntoSMP#charge"/>
+        <rdfs:subPropertyOf rdf:resource="urn:absolute:OntoSMP#lifetime"/>
+        <rdfs:subPropertyOf rdf:resource="urn:absolute:OntoSMP#mass"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>A standard quantity used to express and measure physical properties such as mass, charge, time, or energy.</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- urn:absolute:OntoSMP#AntiBaryon -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#AntiBaryon">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#AntiHadron"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#constitutesOf"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">3</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#AntiQuark"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>A hadron made of three anti-quarks; the antiparticle of a baryon (e.g., antiproton).</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#AntiFermion -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#AntiFermion">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#ElementaryParticle"/>
+        <rdfs:comment>The antimatter counterpart of a fermion; has the same mass but opposite quantum numbers such as charge or baryon number.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#AntiHadron -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#AntiHadron">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#CompositeParticle"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#constitutesOf"/>
+                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#AntiQuark"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#constitutesOf"/>
+                <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#Quark"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#constitutesOf"/>
+                <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">3</owl:maxQualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#AntiQuark"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>A hadron composed of anti-quarks; the antiparticle counterpart to hadrons (e.g., antiproton, anti-neutron).</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#AntiHyperon -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#AntiHyperon">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#AntiBaryon"/>
+        <rdfs:comment>The antiparticle of a hyperon; a baryon containing at least one strange anti-quark.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#AntiLepton -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#AntiLepton">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#AntiFermion"/>
+        <rdfs:comment>An antiparticle of a lepton (e.g., positron is the anti-electron); carries opposite lepton number.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#AntiMeson -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#AntiMeson">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#AntiHadron"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#constitutesOf"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#AntiQuark"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#constitutesOf"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#Quark"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>A meson composed of a quark and an anti-quark where one is an anti-quark; includes meson antiparticles like π⁻.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#AntiNucleon -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#AntiNucleon">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#AntiBaryon"/>
+        <rdfs:comment>The antiparticle of a nucleon (proton or neutron); includes the antiproton and antineutron.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#AntiQuark -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#AntiQuark">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#AntiFermion"/>
+        <rdfs:comment>The antiparticle of a quark; participates in strong interactions and forms anti-hadrons when bound.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Atom -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Atom">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#CompositeParticle"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#constitutesOf"/>
+                <owl:someValuesFrom rdf:resource="urn:absolute:OntoSMP#Lepton"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#constitutesOf"/>
+                <owl:someValuesFrom rdf:resource="urn:absolute:OntoSMP#Nucleon"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>Atoms are the smallest units of chemical elements. Each atom consists of a central nucleus, containing protons and neutrons, surrounded by a cloud of electrons. The number of protons determines the element, and the electron arrangement defines the atom&apos;s chemical behavior. Atoms are electrically neutral if they have an equal number of protons and electrons.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Baryon -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Baryon">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#Hadron"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#constitutesOf"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">3</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#Quark"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#hasAntiParticle"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#AntiBaryon"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>Baryons are hadrons composed of three quarks. They are fermions because they have half-integer spin. The most familiar baryons are the proton and the neutron, which make up the atomic nucleus. Baryons participate in the strong nuclear interaction and are stable or metastable depending on their internal quark structure.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Boson -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Boson">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#ElementaryParticle"/>
+        <rdfs:comment>Bosons are particles with integer spin, such as 0, 1, or 2, and unlike fermions, they do not follow the Pauli exclusion principle. This means multiple bosons can occupy the same quantum state, which is why they serve as force carriers in quantum field theories. Bosons are not building blocks of matter, but they are responsible for mediating interactions between matter particles.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#ChemicalReaction -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#ChemicalReaction">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#hasProduct"/>
+                <owl:someValuesFrom rdf:resource="urn:absolute:OntoSMP#Product"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#hasReactant"/>
+                <owl:someValuesFrom rdf:resource="urn:absolute:OntoSMP#Reactant"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#exampleOf"/>
+                <owl:allValuesFrom rdf:resource="urn:absolute:OntoSMP#ChemicalReaction"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#transformedBy"/>
+                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">0</owl:minQualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#FundamentalInteraction"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#transformedBy"/>
+                <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">4</owl:maxQualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#FundamentalInteraction"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>A process in which one or more chemical substances (reactants) are converted into one or more different substances (products) through bond rearrangement.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#CompositeParticle -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#CompositeParticle">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#Particle"/>
+        <rdfs:comment>A particle made of two or more elementary particles bound together by fundamental forces (e.g., hadrons, atomic nuclei).</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#ElementaryParticle -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#ElementaryParticle">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#Particle"/>
+        <rdfs:comment>A particle with no known internal structure; not composed of smaller constituents (e.g., quarks, leptons, bosons).</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Fermion -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Fermion">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#ElementaryParticle"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#hasAntiParticle"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#AntiFermion"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>Fermions are particles with half-integer spin, such as ½ or 3/2. They obey the Pauli exclusion principle, which means that no two identical fermions can occupy the same quantum state. This property is crucial for the structure of matter. Fermions include quarks and leptons. They are the building blocks of matter, with their behavior determining the structure of atoms and molecules.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#FundamentalInteraction -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#FundamentalInteraction">
+        <rdfs:comment>In the Standard Model of particle physics, all known interactions between elementary particles are governed by four fundamental forces. These forces differ greatly in strength, range, and the particles they act on. Each force is mediated by specific gauge bosons, which are the force carriers in quantum field theory. Together, these interactions shape the behavior of matter and energy at all scales, from the structure of atoms to the evolution of the universe.
+
+- Gravitational Force: A universal attractive force acting between all particles with mass or energy; weakest of the four forces but with infinite range.
+
+- Electromagnetic Force: A force between particles with electric charge; responsible for electric and magnetic fields, with infinite range and mediated by photons.
+
+- Strong Interaction: The force that binds quarks into hadrons and holds protons and neutrons together in atomic nuclei; the strongest force but short-ranged.
+
+- Weak Interaction: A force responsible for processes like beta decay; acts on all fermions, affects flavor, and has a very short range; mediated by W and Z bosons.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Gauge -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Gauge">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#Boson"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#mediatesInteraction"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#FundamentalInteraction"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>Gauge bosons are specific bosons that act as mediators of the fundamental forces. The photon mediates the electromagnetic force, the W⁺, W⁻, and Z⁰ bosons mediate the weak nuclear force, and gluons mediate the strong force between quarks. These bosons emerge from gauge symmetries in the mathematical formulations of particle physics and are vital to the Standard Model.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Hadron -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Hadron">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#CompositeParticle"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#constitutesOf"/>
+                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#Quark"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#hasAntiParticle"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#AntiHadron"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#constitutesOf"/>
+                <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#AntiQuark"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#constitutesOf"/>
+                <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">3</owl:maxQualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#Quark"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>Hadrons are composite particles made up of quarks bound together by the strong force. They are not fundamental, as they are built from two or more quarks. Hadrons are divided into two families: baryons, which consist of three quarks, and mesons, which consist of one quark and one antiquark. These particles are involved in nuclear and high-energy interactions.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Hyperon -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Hyperon">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#Baryon"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#hasAntiParticle"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#AntiHyperon"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>Hyperons are a subclass of baryons that, like protons and neutrons, are made of three quarks. However, unlike nucleons, hyperons contain at least one strange quark, which gives them unusual properties. Because of the presence of the strange quark, hyperons are heavier than protons and neutrons, and they are generally unstable, decaying via the weak interaction into lighter particles. Examples include the Lambda (Λ), Sigma (Σ), Xi (Ξ), and Omega (Ω) particles. Hyperons are commonly produced in high-energy collisions and are studied to understand the behavior of quarks beyond the first generation, as well as the strong force in more exotic systems.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Lepton -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Lepton">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#Fermion"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#hasAntiParticle"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#AntiLepton"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>Leptons are a type of fundamental fermion that do not interact via the strong force. There are six leptons: the electron, muon, and tau, each with its corresponding neutrino (electron neutrino, muon neutrino, and tau neutrino). The charged leptons interact through the electromagnetic and weak forces, while neutrinos interact only via the weak force and gravity. Leptons are essential components of atomic structure and radioactive decay processes.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Meson -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Meson">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#Hadron"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#constitutesOf"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#AntiQuark"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#constitutesOf"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#Quark"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#hasAntiParticle"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#AntiMeson"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>Mesons are hadrons consisting of a quark-antiquark pair. They are bosons with integer spin and typically have short lifetimes, decaying quickly into other particles. Mesons are involved in the residual strong interaction between nucleons in the atomic nucleus and appear in high-energy physics experiments and cosmic rays.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Molecules -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Molecules">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#CompositeParticle"/>
+        <rdfs:comment>Stable, bound systems of two or more atoms held together by electromagnetic interactions; composed of nuclei and electrons.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Nucleon -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Nucleon">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#Baryon"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#hasAntiParticle"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#AntiNucleon"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>Nucleons are the collective term for protons and neutrons, the two baryons that make up the nucleus of an atom. They are bound together by the strong nuclear force and account for almost all the mass in ordinary matter. Nucleons interact with each other via the exchange of mesons and are central to the structure of atomic nuclei.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Particle -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Particle">
+        <rdfs:comment>A physical entity with mass and/or energy, considered as a discrete unit in quantum field theory.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Product -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Product">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#includes"/>
+                <owl:someValuesFrom rdf:resource="urn:absolute:OntoSMP#Particle"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>A substance that is formed as a result of a chemical reaction; present at the end of the reaction.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Quark -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Quark">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#Fermion"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#hasAntiParticle"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="urn:absolute:OntoSMP#AntiQuark"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>Quarks are fundamental particles in the Standard Model. They are never found alone in nature due to a phenomenon called color confinement; instead, they combine to form hadrons such as protons and neutrons. Quarks carry electric charge, color charge, and have spin ½, making them fermions. There are six known flavors of quarks: up, down, charm, strange, top, and bottom. Each has unique properties like mass and electric charge, and they interact via all four fundamental forces, including the strong nuclear force.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Reactant -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Reactant">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="urn:absolute:OntoSMP#includes"/>
+                <owl:someValuesFrom rdf:resource="urn:absolute:OntoSMP#Particle"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>A substance that undergoes change during a chemical reaction; present at the start of the reaction.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- urn:absolute:OntoSMP#Scalar -->
+
+    <owl:Class rdf:about="urn:absolute:OntoSMP#Scalar">
+        <rdfs:subClassOf rdf:resource="urn:absolute:OntoSMP#Boson"/>
+        <rdfs:comment>Scalar bosons are bosons with zero spin. The most notable scalar boson is the Higgs boson, which is responsible for giving mass to other particles through the Higgs mechanism. Unlike gauge bosons, scalar bosons do not carry force but play a role in the fundamental properties of particles, particularly in symmetry breaking.</rdfs:comment>
+    </owl:Class>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi -->
+

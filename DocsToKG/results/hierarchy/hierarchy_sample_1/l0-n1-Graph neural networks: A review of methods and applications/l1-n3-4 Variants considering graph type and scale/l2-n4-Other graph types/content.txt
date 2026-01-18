@@ -1,0 +1,1 @@
+For other variants of graphs, such as hypergraphs and signed graphs, there are also some models proposed to address the challenges.

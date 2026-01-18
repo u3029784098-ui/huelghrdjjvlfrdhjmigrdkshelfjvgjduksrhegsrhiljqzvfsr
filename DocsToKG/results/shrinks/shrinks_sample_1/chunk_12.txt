@@ -1,0 +1,59 @@
+apply a pruning strategy to the input trees.
+
+Cross-sentence N-ary relation extraction detects relations among \(n\) entities across multiple sentences. Peng et al. (2017) explore a general framework for cross-sentence \(n\)-ary relation extraction by applying graph LSTMs on the document graphs. Song et al. (2018) also use a graph-state LSTM model and speed up computation by allowing more parallelization.
+
+**Event Extraction.** Event extraction is an important information extraction task to recognize instances of specified types of events in texts. This is always conducted by recognizing the event triggers and then predicting the arguments for each trigger. Nguyen and Grishman (2018) investigate a convolutional neural network (which is the Syntactic GCN exactly) based on dependency trees to perform event detection. Liu et al. (2018) propose a Jointly Multiple Events Extraction (JMEE) framework to jointly extract multiple event triggers and arguments by introducing syntactic shortcut arcs to enhance information flow to attention-based graph convolution networks to model graph information.
+
+**Fact Verification.** Fact verification is a task requiring models to extract evidence to verify given claims. However, some claims require reasoning on multiple pieces of evidence. GNN-based methods like GEAR (Zhou et al., 2019) and KQAT (Liu et al., 2020) are proposed to conduct evidence aggregating and reasoning based on a fully connected evidence graph. Zhong et al. (2020) build an inner-sentence graph with the information from semantic role labeling and achieve promising results.
+
+**Other Applications on Text.** GNNs can also be applied to many other tasks on text. For example, GNNs are also used in question answering and reading comprehension (Song et al., 2018; De Cao et al., 2019; Qiu et al., 2019; Tu et al., 2019; Ding et al., 2019). Another important direction is relational reasoning, relational networks (Santoro et al., 2017), interaction networks (Battaglia et al., 2016) and recurrent relational networks (Palm et al., 2018) are proposed to solve the relational reasoning task based on text.
+
+## 9 Open problems
+
+Although GNNs have achieved great success in different fields, it is remarkable that GNN models are not good enough to offer satisfying solutions for any graph in any condition. In this section, we list some open problems for further researches.
+
+**Robustness.** As a family of models based on neural networks, GNNs are also vulnerable to adversarial attacks. Compared to adversarial attacks on images or text which only focuses on features, attacks on graphs further consider the structural information. Several works have been proposed to attack existing graph models (Zugner et al., 2018; Dai et al., 2018) and more robust models are proposed to defend (Zhu et al., 2019). We refer to (Sun et al., 2018) for a comprehensive review.
+
+**Interpretability.** Interpretability is also an important research direction for neural models. But GNNs are also black-boxes and lack of explanations. Only a few methods (Ying et al., 2019; Baldassarre and Azizpour, 2019) are proposed to generate example-level explanations for GNN models. It is important to apply GNN models on real-world applications with trusted explanations. Similar to the fields of CV and NLP, interpretability on graphs is also an important direction to investigate.
+
+**Graph Pretraining.** Neural network-based models require abundant labeled data and it is costly to obtain enormous human-labeled data. Self-supervised methods are proposed to guide models to learn from unlabeled data which is easy to obtain from websites or knowledge bases. These methods have achieved great success in the area of CV and NLP with the idea of pretraining (Krizhevsky et al., 2012; Devlin et al., 2019). Recently, there have been works focusing on pretraining on graphs (Qiu et al., 2020; Hu et al., 2020, 2020; Zhang et al., 2020), but they have different problem settings and focus on different aspects. This field still has many open problems requiring research efforts, such as the design of the pretraining tasks, the effectiveness of existing GNN models on learning structural or feature information, etc.
+
+**Complex Graph Structures.** Graph structures are flexible and complex in real life applications. Various works are proposed to deal with complex graph structures such as dynamic graphs or heterogeneous graphs as we have discussed before. With the rapid development of social networks on the Internet, there are certainly more problems, challenges and application scenarios emerging and requiring more powerful models.
+
+## 10 Conclusion
+
+Over the past few years, graph neural networks have become powerful and practical tools for machine learning tasks in graph domain. This progress owes to advances in expressive power, model flexibility, and training algorithms. In this survey, we conduct a comprehensive review of graph neural networks. For GNN models, we introduce its variants categorized by computation modules, graph types, and training types. Moreover, we also summarize several general frameworks and introduce several theoretical analyses. In terms of application taxonomy, we divide the GNN applications into structural scenarios, non-structural scenarios, and other scenarios, then give a detailed review for applications in each scenario. Finally, we suggest four open problems indicating the major challenges and future research directions of graph neural networks, including robustness, interpretability, pretraining and complex structure modeling.
+
+**Declaration of competing interest**
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+## Acknowledgements
+
+This work is supported by the National Key Research and Development Program of China (No. 2018YFB1004503), the National Natural Science Foundation of China (NSFC No.61772302) and the Beijing Academy of Artificial Intelligence (BAAI). This work is also supported by 2019 Tencent Marketing Solution Rhino-Bird Focused Research Program
+
+## Appendix A Datasets
+
+Many tasks related to graphs are released to test the performance of various graph neural networks. Such tasks are based on the following commonly used datasets. We list the datasets in Table 4.
+
+## Appendix B Implementations
+
+We first list several platforms that provide codes for graph computing in Table 6.
+
+\begin{table}
+\begin{tabular}{l l l} \hline \hline Field & Datasets & \\ \hline Citation Networks & Pubmed (Yang et al., 2016) Coren (Yang et al., 2016) Gieseer (Yang et al., 2016) DBLP (Tang et al., 2008) \\ Bio-chemical & MUTA (Obbath et al., 1991) NCI-1 (Wale et al., 2008) PPI (Zitnik and Leskovec, 2017) DBD (Dobson and Digg, 2003) PROTEIN (Borgswardt et al., 2005) PTC \\ Graphs & (Tohonen et al., 2003) \\ Social Networks & Reddit (Hamilton et al., 2017) HogGatalog (Zafrani and Liu, 2009) \\ Knowledge Graphs & FBI3 (Scher et al., 2013) PBI5K (Bordes et al., 2013) PBI5K237 (Toutsono et al., 2015) WIN1 (Scher et al., 2013) WIN18 (Broder et al., 2013) WIN18B \\ \hline \hline \end{tabular}
+\end{table}
+Table 4: Datasets commonly used in tasks related to graph.
+
+\begin{table}
+\begin{tabular}{l l l} \hline \hline Field & Datasets & \\ \hline Citation Networks & Pubmed (Yang et al., 2016) Coren (Yang et al., 2016) Gieseer (Yang et al., 2016) DBLP (Tang et al., 2008) \\ Bio-chemical & MUTA (Obbath et al., 1991) NCI-1 (Wale et al., 2008) PPI (Zitnik and Leskovec, 2017) DBD (Dobson and Digg, 2003) PROTEIN (Borgswardt et al., 2005) PTC \\ Graphs & (Tohonen et al., 2003) \\ Social Networks & Reddit (Hamilton et al., 2017) HogGatalog (Zafrani and Liu, 2009) \\ Knowledge Graphs & FBI3 (Scher et al., 2013) PBI5K (Bordes et al., 2013) PBI5K237 (Toutsono et al., 2015) WIN1 (Scher et al., 2013) WIN18 (Broder et al., 2013) WIN18B \\ \hline \hline \end{tabular}
+\end{table}
+Table 5: Popular graph learning dataset collections.
+
+\begin{table}
+\begin{tabular}{l l l} \hline \hline Platform & Link & Reference \\ \hline PyTorch Geometric & [https://github.com/rustly1s/pytorch_geometric](https://github.com/rustly1s/pytorch_geometric) & Fey and Lensen (2019) \\ Deep Graph Library & [http://github.com/dmlc/dgl](http://github.com/dmlc/dgl) & Wang et al. (2019b) \\ AlGraph & [https://github.com/allabo/aliggraph](https://github.com/allabo/aliggraph) & Zhu et al. (2019a) \\ GraphVite & [https://github.com/DeepGraphLearning/graphvite](https://github.com/DeepGraphLearning/graphvite) & Zhu et al. (2019b) \\ Paddle Graph Learning & [http://github.com/Paddle/PGL](http://github.com/Paddle/PGL) & \\ Euler & [https://github.com/allabo/euler](https://github.com/allabo/euler) & \\ Plato & [https://github.com/tencent/plato](https://github.com/tencent/plato) & \\ CogBlt. & [https://github.com/THUDM/cogBl/](https://github.com/THUDM/cogBl/) & \\ OpenNE & [https://github.com/thunlp/OpenNE/tree/pyTorch](https://github.com/thunlp/OpenNE/tree/pyTorch) & \\ \hline \hline \end{tabular}
+
+* Next we list the hyperlinks of the current open source implementations of some famous GNN models in Table 7: Source code of the models mentioned in the survey.
+
+\begin{table}
+\begin{tabular}{l l l} \hline \hline Model & Link & \\ \hline GCNN (2015) & [https://github.com/yujial/sgnn](https://github.com/yujial/sgnn) \\ Neurals PPs (2015) & [https://github.com/Https://neurals-fingerprint](https://github.com/Https://neurals-fingerprint) \\ CheNet (2016) & [https://github.com/ddell/cnn_graph](https://github.com/ddell/cnn_graph) \\ DNGR (2016) & [https://github.com/shelson/Cos/DNGR](https://github.com/shelson/Cos/DNGR) \\ SDNE (2016) & [https://github.com/uouranorms/SDNE](https://github.com/uouranorms/SDNE) \\ GAE (2016) & [https://github.com/linaosen/Variational-Graph-Auto-Encoders](https://github.com/linaosen/Variational-Graph-Auto-Encoders) \\ DRNR (2016) & [https://github.com/adpole/DRSE](https://github.com/adpole/DRSE) \\ Struc

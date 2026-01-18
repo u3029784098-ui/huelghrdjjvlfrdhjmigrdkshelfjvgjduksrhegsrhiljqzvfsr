@@ -1,0 +1,55 @@
+\mathbf{W}_{h}]))}.\]
+
+where \(\mathbf{W}\) is the weight matrix associated with the linear transformation which is applied to each node, and \(\mathbf{a}\) is the weight vector of a single-layer MLP.
+
+Moreover, GAT utilizes the _multi-head attention_ used by Vaswani et al. (2017) to stabilize the learning process. It applies \(K\) independent attention head matrices to compute the hidden states and then concatenates their features (or computes the average), resulting in the following two output representations:
+
+\[\begin{split}&\mathbf{h}_{v}^{e+1}=\|_{k=1}^{e}\sigma\left(\sum_{v\in \mathcal{V}_{v}}\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\! \!\!recurrent operators share same weights. Early methods based on recursive neural networks focus on dealing with directed acyclic graphs (Sperduti and Starita, 1997; Frasconi et al., 1998; Micheli et al., 2004; Hammer et al., 2004). Later, the concept of graph neural network (GNN) was first proposed in (Scarselli et al., 2009; Gori et al., 2005), which extended existing neural networks to process more graph types. We name the model as GNN in this paper to distinguish it with the general name. We first introduce GNN and its later variants which require convergence of the hidden states and then we talk about methods based on the gate mechanism.
+
+#### 3.2.1 Convergence-based methods
+
+In a graph, each node is naturally defined by its features and the related nodes. The target of GNN is to learn a state embedding \(\mathbf{h}_{v}\in\mathbb{R}^{d}\) which contains the information of the neighborhood and itself for each node. The state embedding \(\mathbf{h}_{v}\) is an \(s\)-dimension vector of node \(v\) and can be used to produce an output \(\mathbf{o}_{v}\) such as the distribution of the predicted node label. Then the computation steps of \(\mathbf{h}_{v}\) and \(\mathbf{o}_{v}\) are defined as:
+
+\[\mathbf{h}_{v}=f\left(\mathbf{x}_{v},\mathbf{x}_{v|i}\right)\mathbf{h}_{v^{ \prime}_{v}},\mathbf{x}_{v^{\prime}_{v}}\,, \tag{19}\]
+
+\(\mathbf{o}_{v}=g(\mathbf{h}_{v},\mathbf{x}_{v})\),
+
+where \(\mathbf{x}_{v},\mathbf{x}_{v|i},\mathbf{h}_{v^{\prime}_{v}},\mathbf{x}_{v^{ \prime}_{v}}\) are the features of \(\mathbf{v}\), the features of its edges, the states and the features of the nodes in the neighborhood of \(\mathbf{v}\), respectively. \(f\) here is a parametric function called the _local transition function_. It is shared among all nodes and updates the node state according to the input neighborhood. \(g\) is the _local output function_ that describes how the output is produced. Note that both \(f\) and \(g\) can be interpreted as the feedforward neural networks.
+
+Let \(\mathbf{H}\), \(\mathbf{0}\), \(\mathbf{X}\), and \(\mathbf{X}_{N}\) be the matrices constructed by stacking all the states, all the outputs, all the features, and all the node features, respectively. Then we have a compact form as:
+
+\[\mathbf{H}=F(\mathbf{H},\mathbf{X}), \tag{20}\] \[\mathbf{O}=G(\mathbf{H},\mathbf{X}_{N}),\]
+
+where \(F\), the _global transition function_, and \(G\), the _global output function_ are stacked versions of \(f\) and \(g\) for all nodes in a graph, respectively. The value of \(\mathbf{H}\) is the fixed point of Eq. (20) and is uniquely defined with the assumption that \(F\) is a contraction map.
+
+With the suggestion of Banach's fixed point theorem (Khamsi and Kirk, 2011), GNN uses the following classic iterative scheme to compute the state:
+
+\[\mathbf{H}^{+1}=F(\mathbf{H}^{\prime},\mathbf{X}), \tag{21}\]
+
+where \(\mathbf{H}^{\prime}\) denotes the \(t\)-th iteration of \(\mathbf{H}\). The dynamical system Eq. (21) converges exponentially fast to the solution for any initial value.
+
+Though experimental results have shown that GNN is a powerful architecture for modeling structural data, there are still several limitations:
+
+* GNN requires \(f\) to be a contraction map which limits the model's ability. And it is inefficient to update the hidden states of nodes iteratively towards the fixed point.
+* It is unsuitable to use the fixed points if we focus on the representation of nodes instead of graphs because the distribution of representation in the fixed point will be much smoother in value and less informative for distinguishing each node.
+
+GraphESNGraph echo state network (GraphESN) (Gallicchio and Micheli, 2010) generalizes the echo state network (ESN) (Jaeger, 2001) on graphs. It uses a fixed contractive encoding function, and only trains a readout function. The convergence is ensured by the contractivity of reservoir dynamics. As a consequence, GraphESN is more efficient than GNN.
+
+SSEStochastic Steady-state Embedding (SSE) (Dai et al., 2018) is also proposed to improve the efficiency of GNN. SSE proposes a learning framework which contains two steps. Embeddings of each node are updated by a parameterized operator in the update step and these embeddings are projected to the steady state constraint space to meet the steady-state conditions.
+
+LP-GNNLagrangian Propagation GNN (LP-GNN) (Tiezzi et al., 2020) formalizes the learning task as a constraint optimization problem in the Lagrangian framework and avoids the iterative computations for the fixed point. The convergence procedure is implicitly expressed by a constraint satisfaction mechanism.
+
+#### 3.2.2 Gate-based methods
+
+There are several works attempting to use the gate mechanism like GRU (Cho et al., 2014) or LSTM (Hochreiter and Schmidhuber, 1997) in the propagation step to diminish the computational limitations in GNN and improve the long-term propagation of information across the graph structure. They run a fixed number of training steps without the guarantee of convergence.
+
+GGNNThe gated graph neural network (GGNN) (Li et al., 2016) is proposed to release the limitations of GNN. It releases the requirement of function \(f\) to be a contraction map and uses the Gate Recurrent Units (GRU) in the propagation step. It also uses back-propagation through time (BPTT) to compute gradients. The computation step of GGNN can be found in Table 2.
+
+The node \(\nu\) first aggregates messages from its neighbors. Then the GRU-like update functions incorporate information from the other nodes and from the previous timestep to update each node's hidden state. \(\mathbf{h}_{v^{\prime}_{v}}\), gathers the neighborhood information of node \(v\), while \(\mathbf{z}\) and \(\mathbf{r}\) are the update and reset gates.
+
+LSTMs are also used in a similar way as GRU through the propagation process based on a tree or a graph.
+
+TreeLSTM.Tai et al. (2015) propose two extensions on the tree structure to the basic LSTM architecture: the _Child-Sum Tree-LSTM_ and
+
+\begin{table}
+\begin{tabular}{l l l} Variant & Aggregator & Updater \\ \hline GGNN & \(\mathbf{h}^{\prime}_{v^{\prime}_{v^{\prime}_{v}}}-\sum\limits_{k\in\mathcal{V }_{v^{\prime}_{v}}}\mathbf{h}^{-1}_{v^{\prime}_{v}}+\mathbf{b}\) & \(\mathbf{\zeta}_{v}=\sigma(\mathbf{W}\mathbf{h}^{\prime}_{v^{\prime}_{v^{\prime} _{v}}}+\mathbf{U}\mathbf{h}^{-1}_{v^{\prime}_{v}})\) \\  & \(\mathbf{\zeta}_{v}=\sigma(\mathbf{W}\mathbf{h}^{\prime}_{v^{\prime}_{v^{\prime} _{v}}}+\mathbf{U}\mathbf{h}^{\prime}_{v^{\prime}_{v}})\) \\  & & \(\mathbf{h}^{\prime}_{v}=\tanh(\mathbf{W}\mathbf{h}^{\prime}_{v^{\prime}_{v}}+ \mathbf{U}\mathbf{h}^{\prime}_{v^{\prime}_{v}})\) \\  & & \(\mathbf{h}^{\prime}_{v}=(1-\mathbf{z})\odot\mathbf{h}^{\prime}_{v^{\prime}_{v}}+ \zeta\odot\mathbf{h}^{\prime}_{v^{\prime}_{v}}\) \\ \hline Tree LSTM (Child sum) & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) & \(\mathbf{\zeta}_{v}=\sigma(\mathbf{W}^{\prime}_{v^{\prime}_{v}}+\mathbf{b}^{ \prime}_{v^{\prime}_{v}}+\mathbf{b}^{\prime}_{v^{\prime}_{v}})\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\ \hline Tree LSTM (N-ary) & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}=\frac{\mathbf{x}}{\sum\limits_{k\in\mathcal{V}_{v^{ \prime}_{v}}}}\mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\  & & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf{h}^{-1}_{v^{\prime}_{v}}\) \\ Graph LSTM (Fung et al., 2017) & \(\mathbf{h}^{\prime}_{v^{\prime}_{v}}-\sum\limits_{k\in\mathcal{V}_{v^{\prime}_{v}}} \mathbf

@@ -1,0 +1,15 @@
+In this step we should design the loss function based on our task type and the training setting.
+
+For graph learning tasks, there are usually three kinds of tasks:
+
+* **Node-level** tasks focus on nodes, which include node classification, node regression, node clustering, etc. Node classification tries to categorize nodes into several classes, and node regression predicts a continuous value for each node. Node clustering aims to partition the nodes into several disjoint groups, where similar nodes should be in the same group.
+* **Edge-level** tasks are edge classification and link prediction, which require the model to classify edge types or predict whether there is an edge existing between two given nodes.
+* **Graph-level** tasks include graph classification, graph regression, and graph matching, all of which need the model to learn graph representations.
+
+From the perspective of supervision, we can also categorize graph learning tasks into three different training settings:
+
+* **Supervised setting** provides labeled data for training.
+* **Semi-supervised setting** gives a small amount of labeled nodes and a large amount of unlabeled nodes for training. In the test phase, the **transductive setting** requires the model to predict the labels of the given unlabeled nodes, while the **inductive setting** provides new unlabeled nodes from the same distribution to infer. Most node and edge classification tasks are semi-supervised. Most recently, a mixed transductive-inductive scheme is undertaken by Wang and Leskovec (2020) and Rossi et al. (2018), carving a new path towards the mixed setting.
+* **Unsupervised setting** only offers unlabeled data for the model to find patterns. Node clustering is a typical unsupervised learning task.
+
+With the task type and the training setting, we can design a specific loss function for the task. For example, for a node-level semi-supervised classification task, the cross-entropy loss can be used for the labeled nodes in the training set.

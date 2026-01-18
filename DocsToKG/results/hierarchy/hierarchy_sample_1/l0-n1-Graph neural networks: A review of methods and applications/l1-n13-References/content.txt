@@ -1,0 +1,122 @@
+* M. Alsamis, M. Brockschmidt, and M. Khademi (2018)Learning to represent programs with graphs. Proc. ICLR. Cited by: SS1.
+* J. Arwood and D. Towsley (2016)Diffusion-convolutional neural networks. In Proceedings of NIPS, pp. 2001-2009. Cited by: SS1.
+* D. Cho, K. Bengio, and Y. Bengio (2015)Neural machine translation by jointly learning to align and translate. In Proceedings of ICML, Cited by: SS1.
+* F. Baldassur, H. Azizpur, and H. Bengio (2019)Eulagability techniques for graph convolutional networks. ICML Workshop on Learning and Reasoning with Graph-Structured Representation. Cited by: SS1.
+* P. Bertolfo, E. V. Korolev, M. Moret, J. R. Ruetter, and J. Silva (2019)The logical expressions of graph neural networks. Proceedings of ICLR. Cited by: SS1.
+* J. Battings, V. Liu, W. M. Marchespiani, and K. Siman (2017)Graph convolutional encoders for syntax-aware neural machine translation. In Proceedings of EMNLP, pp. 1957-1967. Cited by: SS1.
+* P. Battaglia, R. Pascanu, R. Lai, D. R. Reende, and J. L. B.
+
+Dobson, P.D., Doug, A.J., 2003. Distinguishing enzyme structures from non-enzymes without alignments. J. Mol. Biol. 330, 771-783.
+* Drewanad et al. (2015) Drewanad, D.N., Mackintari, D., Agulizarparaprisrisris, J., Gomezhommetili, R., Hirzel, T.D., Asperuguantil, A., Adams, R.P., 2015. Convolutional networks on graphs for learning molecular fingerprints. In: Proceedings of NIPS, pp. 2224-2232.
+* Dwivedi et al. (2020) Dwivedi, V., Joshi, C., Laurent, T., Bengio, Y., Brevano, X., 2020. Benchmarking Graph Neural Networks. arXiv preprint arXiv:2003.00982.
+* Erica et al. (2020) Erica, F., Podda, M., Maccio, D., Micheli, A., 2020. A short comparison of graph neural networks for graph classification. In: Proceedings of ICLR.
+* Pan et al. (2019) Pan, W., Xia, Y., Li, Q., He, Z., Zhao, E., Tang, J., Yin, D., 2019. Graph neural networks for social recommendation. In: Proceedings of WWW, pp. 417-426.
+* Feng et al. (2019) Feng, Y., You, H., Zhang, Z., Ji, R., Gao, Y., 2019. Hypergraph neural networks. In: Proceedings of AAAI, Vol. 33, pp. 3558-3565.
+* Fox and Lissen (2019) Fox, J., Lissen, J., 2019. Fast graph representation learning with PyTorch Geometric. In: ICLR Workshop on Representation Learning on Graphs and Manifolds.
+* Fout et al. (2017) Fout, A., Byrd, J., Shariari, R., Ben-Hur, A., 2017. Protein interface prediction using graph convolutional networks. In: Proceedings of NIPS, pp. 6533-6542.
+* Frasconi and Serberini (1998) Frasconi, P., et al., 2008. A general framework for adaptive processing of data structures. IEEE Trans. 198, 768-769.
+* Fu et al. (2020) Fu, X., Zhang, J., Meng, Z., King, L., Morgan, 2020. MetaGraph aggregation graph neural network for heterogeneous graph embedding. Proceedings of WWW, 2331-2341.
+* Gallicchio and Micheli (2010) Gallicchio, C., Micheli, A., 2010. Graph echo state networks. In: Proceedings of IJCNN. IEEE, pp. 1-8.
+* Gao and Si (2019) Gao, H., Ji, S., 2019. Graph u-nets. In: Proceedings of ICML, pp. 2083-2092.
+* Gao and Si (2018) Gao, H., Wang, Z., Ji, S., 2018. Large-scale learnable graph convolutional networks. In: Proceedings of ISDO., pp. 1416-1414.
+* Gao et al. (2018) Gao, H., Yang, H., Zhou, C., Wu, J., Pan, S., Hu, Y., 2018b. Active discriminative network representation learning. In: Proceedings of IJCAI.
+* Garcia and Berraus (2018) Garcia, V., Bruna, J., 2018. Few-shot learning with graph neural networks. Proceedings of ICLR.
+* Garg et al. (2020) Garg, V.K., Jegelka, S., Jaskidakis, T., 2020. Generalization and representational limits of graph neural networks. Proceedings of ICML, 3419-3430.
+* Gasse et al. (2019) Gasse, M., Chetelat, D., Ferroni, N., Charlin, L., Lodi, A., 2019. Exact combinatorial optimization with graph convolutional neural networks. In: Proceedings of NeurIPS, pp. 15580-15592.
+* Gehring et al. (2017) Gehring, J., Ali, M., Graffner, D., Dampulin, Y.N., 2017. A convolutional encoder model for neural machine translation. In: Proceedings of ACL, 1, pp. 123-135.
+* Gilner et al. (2017) Gilner, J., Schoenholz, S.S., Billey, P.F., Vinyals, O., Dahl, E.G., 2017. Neural message passing for quantum chemistry. Proceedings of ICML, 1263-1272.
+* Gori et al. (2025) Gori, M., Mondaffi, G., Soareski, F., 2025. A new model for learning in graph domain. Proceedings of IJCNN. 2, IEEE, pp. 729-734.
+* Goyal and Ferrara (2018) Goyal, P., Ferrara, E., 2018. Graph embedding techniques, applications, and performance: a survey. Knowl. Base Syst. 151, 78-94.
+* Grover and Leskovec (2016) Grover, L., Leskovec, J., 2016. nodevec: scalable feature learning for networks. In: Proceedings of ICDM. ACM, pp. 855-864.
+* Grover and Zweis (2019) Grover, Zweis, A., Zweis, A., 2019. Graph: iterative generative modeling of graphs. In: Proceedings of ICML, pp. 2442-2444.
+* Gu et al. (2018) Gu, J., Hu, H., Wang, L., Wei, Y., Dai, J., 2018. Learning region features for object detection. In: Proceedings of ICCV, pp. 381-395.
+* Guo et al. (2019) Guo, S., Lin, Y., Feng, N., Song, C., Wan, H., 2019. Attention based spatial-temporal graph discovery in traffic flow forecasting. Proceedings of AAAI 33, 922-929.
+* Hamaguchi et al. (2017) Hamaguchi, T., Owa, H., Shimbo, M., Matsumoto, Y., 2017. Knowledge transfer for out-of-knowledge entities: a graph neural network approach. In: Proceedings of IJCAI, pp. 1802-1806.
+* Hamilton and Ying (2019) Hamilton, W.L., Ying, Z., Leskovec, J., 2019. Lattice representation learning on large graphs. In: Proceedings of NIPS, pp. 1024-1034.
+* Hamilton et al. (2017) Hamilton, W.L., Ying, R., Leskovec, J., 2017. Representation learning on graphs: methods and applications. IEEE DataTables Engineering Bulletin, 50, 52-74.
+* Hamilton et al. (2017) Hamilton, W.L., Zhang, J., Danescu-Mizil, C., Jurdsky, D., Leskovec, J., 2017c. Loyalty in online communities. In: Proceedings of ICWSM, pp. 540-543.
+* Hammer et al. (2004) Hammer, H., Micheli, A., Serberini, A., Strickler, M., 2004. Recursive self-organizing networks. In: Neural Network. 170, 1601-1605.
+* Hammond et al. (2011) Hammond, D.K., Vandergheynst, P., Golomani, R., 2011. Wavelets on graphs via spectral graph theory. Appl. Comput. Harmon. Anal. 30, 129-150.
+* Hassani et al. (2020) Hassani, K., Khashamham, A.H., 2020. Contrastive multi-view representation learning on graphs. In: Proceedings of ICML, pp. 4116-4126.
+* He et al. (2016) He, X., Zhang, X., Ren, S., Sun, J., 2016a. Deep residual learning for image recognition. In: Proceedings of CVPR, pp. 770-778.
+* He et al. (2016) He, K., Zhang, X., Ren, S., Sun, J., 2016a. Identity mappings in deep residual networks. In: Proceedings of ECCV, Springer, pp. 630-645.
+* Heaff et al. (2015) Heaff, H., Burns, J., LeC., 2015. Deep Convolutional Networks on Graph-Structured Data. arXiv preprint arXiv:1506.05163.
+* Hochreiter and Schmidhuber (1997) Hochreiter, S., Schmidhuber, J., 1997. Long short-term memory. Neural comput. 9, 1735-1780.
+* Hohen (2017) Hohen, Y., 2017. Vaint: attentional multi-agent predictive modeling. In: Proceedings of NIPS, pp. 2698-2708.
+* Hu et al. (2018) Hu, H., Gu, J., Zhang, Z., Dai, J., Wei, Y., 2018. Relation networks for object detection. In: Proceedings of CVPR, pp. 3588-3597.
+* Hu et al. (2020a) Hu, H., Dong, Y., Wang, K., Sun, Y., 2020a. Heterogeneous graph transformer. In: Proceedings of WWW, pp. 2704-2710.
+* Hu et al. (2020b) Hu, Z., Dong, Y., Wang, K., Chang, K.W., Sun, Y., 2020b. Gpt-gnn generative pre-training of graph neural networks. In: Proceedings of ICDO, pp. 1857-1867.
+* Hu et al. (2020c) Hu, S., Xiong, Z., Qu, M., Yuan, X., Cote, M.A., Liu, Z., Tang, J., 2020c. Graph policy network for transferable active learning on graphs. In: Proceedings of NeurIPS, 33.
+* Hu et al. (2020d) Hu, W., Fey, M., Zitnik, M., Dong, Y., Ren, H., Liu, R., Cattats, M., Leskovec, J., 2020d. Open graph benchmark: datasets for machine learning on graphs. Proceedings of NeurIPS.
+* Hu et al. (2020e) Hu, W., Liu, B., Gomes, J., Thrill, M., Liang, P., Pande, V., Leskovec, J., 2020e. Strategies for pre-training graph neural networks. Proceedings of ICLR.
+* Huang et al. (2017) Huang, G., Liu, Z., Van Der Maaten, L., Weinberger, K.Q., 2017. Densely connected convolutional networks. In: Proceedings of CVPR, pp. 4700-4708.
+* Huang et al. (2018) Huang, W., Zhang, T., Rong, Y., Huang, J., 2018. Adaptive sampling towards fast graph representation learning. Proceedings of NeurIPS 6558-4867.
+* Huang et al. (2020) Huang, Y., Xu, H., Duan, Z., Ren, A., Feng, J., Wang, X., 2020. Modeling Complex Spatial Patterns with Temporal Features via Heterogeneous Graph Embedding Networks. arXiv preprint arXiv:2008.08617.
+* Jaeger (2001) Jaeger, H., 2001. The "Echo State" Approach to Analysis and Training Recurrent Neural Networks-With an Erratum Note, vol. 148. German National Research Center for Information Technology GMD Technical Report, p. 13.
+* Jain et al. (2016) Jain, A., Zamir, A., Savaree, S., Suenas, A., 2016. Structural-rnn deep learning on spatio-temporal graphs. In: Proceedings of CVPR, pp. 5308-5317.
+* Kampliew et al. (2019) Kampliewiew, M., Chen, Y., Liang, X., Wang, H., Zhang, Y., Xing, P., 2019. Rethinking Knowledge Graph Propagation for Zero-Shot Learning. Proceedings of CVPR, pp. 11487-11496.
+* Kermas et al. (2016) Kermas, S., McCloskey, K., Berndl, M., Pande, V., Riley, P., 2016. Molecular graph convolutions: moving beyond fingerprints. J. Comput. Aided Mol. Des. 30, 595-608.
+* Keriwan and Pey (2019) Keriwan, N., Peyr, G., 2019. Universal invariant and equivariant graph neural networks. In: Proceedings of NeurIPS, pp. 7092-7101.
+* Khalil et al. (2017) Khalil, E., Dai, H * Liu et al. (2019) Liu, J., Kumar, A., Ba, J., Kiros, J., Swersky, K., 2019. Graph normalizing flows. In: Proceedings of NeurIPS, pp. 13578-13588.
+* Liu et al. (2012) Liu, Z., Xiong, C., Sun, M., Liu, Z., 2012. Dimension-grained fact verification with kernel graph attention network. In: Proceedings of ACL, pp. 7342-7351.
+* Looksa (2020) Looksa, A. 2020. What graph neural networks cannot learn: depth vs width. In: Proceedings of ICLR.
+* Ma et al. (2018) Ma, T., Chen, J., Xiao, C., 2018. Constrained generation of semantically valid graphs via regularizing variational autoencoders. Proceedings of NeurIPS 7113-7124.
+* Ma et al. (2019) Ma, Y., Wang, S., Aggarwal, C., Tang, J., 2019. Graph convolutional networks with eigenpooling. In: Proceedings of KDD, pp. 723-731.
+* Ma et al. (2019) Ma, Y., Wang, S., Aggarwal, C., Yin, D., Tang, J., 2019. Multi-dimensional graph convolutional networks. In: Proceedings of SDM, pp. 657-665.
+* Mallat (1999) Mallat, S., 1999. A Wavelet Tour of Signal Processing. Elsevier.
+* Mengnessi et al. (2020) Mengnessi, P., Rozza, A., Mantu, M., 2020. Dynamic graph convolutional networks. Pattern Recogn. 97, 1070000.
+* Marchesiani and Tikov (2017) Marchesiani, D., Tikov, J., 2017. Encoding sentences with graph convolutional networks for semantic role labeling. In: Proceedings of EMNLP, pp. 1506-1515.
+* Marchesiani et al. (2018) Marchesiani, D., Bastings, J., Trov, L., 2018. Exploiting semantics in neural machine translation with graph convolutional networks. Proceedings of NALR, 486-492.
+* Martins et al. (2017) Martins, K., SukthTang, J., Qu, M., Wang, M., Zhang, M., Yan, J., Mei, Q., 2015. Line large-scale information network embedding. In: Proceedings of WWW, pp. 1067-1077.
+* Teney et al. (2017) Teney, D., Liu, L., Den Hengel, A.V., 2017. Graph-structured representations for visual question answering. In: Proceedings of CVPR, pp. 3233-3241.
+* Trezzi et al. (2020) Trezzi, M., Marra, G., Melosci, S., Maggini, M., 2020. Deep Lagrangian Constraint-Based Propagation in Graph Neural Networks. arXiv preprint arXiv:2005.02392.
+* Tovinecn et al. (2003) Tovinecn, H., Srinivasan, A., King, R.D., Kramer, S., Helma, C., 2003. Statistical evaluation of the predictive toxicology challenge 2000-2001. Bioinformatics 19, 1183-1193.
+* Toutanova et al. (2015) Toutanova, K., Chen, D., Pantel, P., Ponn, L., Choudhury, P., Gamon, M., 2015. Representing text for joint embedding of text and knowledge bases. In: Proceedings of EMNLP, pp. 1499-1509.
+* Tsitsulin et al. (2020) Tsitsulin, A., Falovich, J., Perozzi, B., Muller, E., 2020. Graph Clustering with Graph Neural Networks. arXiv preprint arXiv:2006.16904.
+* Tu et al. (2019) Tu, M., Wang, G., Huang, J., Tang, Y., He, X., Zhou, B., 2019. Multi-hop reading compression across multiple documents by reasoning over heterogeneous graphs. In: Proceedings of ACL, pp. 2704-2713.
+* den Berg et al. (2017) den Berg, R., Jeff, Y.N., Welling, M., 2017. Graph convolutional matrix completion. arXiv preprint arXiv:1706.02263.
+* Vanzani et al. (2017) Vanzani, A., Shazeer, N., Parmar, N., Jones, L., Uszkoreit, J., Gomez, A.N., Kaiser, L., 2017. Attention is all you need. In: Proceedings of NIPS, pp. 5998-6008.
+* Velickovic et al. (2018) Velickovic, P., Cucurill, G., Casnova, A., Romero, A., Lio, P., Bengio, Y., 2018. Graph attention networks. In: Proceedings of ICLR.
+* Velickovic et al. (2019) Velickovic, P., Pedus, W., Hamilton, W.L., Li, P., Bengio, Y., Heim, R.D., 2019. Deep graph infomax. In: Proceedings of ICLR.
+* Verma et al. (2019) Verma, S., Zhang, Z., 2019. Stability and generalization of graph convolutional neural networks. In: Proceedings of KDD, pp. 1539-1549.
+* Vinyals and Souliov (2015) Vinyals, O., Bengio, S., Koltun, M., 2015. Order Matters: Sequence to Sequence for Sets arXiv preprint arXiv:1501.06391.
+* Vinyals et al. (2015b) Vinyals, O., Fortunato, M., Jaitly, N., 2015b. Pointer networks. In: Proceedings of NIPS, pp. 2062-2070.
+* Wale et al. (2008) Wale, N., Watson, L., Karypis, G., 2008. Comparison of descriptor spaces for chemical compound retrieval and classification. Knowl. Inf. Ser. 14, 347-347.
+* Wang et al. (2012) Wang, H., Leskovec, J., 2012. Unifying Graph Convolutional Neural Networks and Label Propagation. arXiv preprint arXiv:2002.06755.
+* Wang et al. (2017) Wang, C., Pan, S., Liang, G., Zhu, X., Jiang, J., 2017. Merge marginalized graph autoencoder for graph clustering. In: Proceedings of CIKM, pp. 889-898.
+* Wang et al. (2018a) Wang, X., Girshick, R., Gupta, A., He, K., 2018a. Non-local neural networks. In: Proceedings of CVPR, pp. 7794-7803.
+* Wang et al. (2018b) Wang, Z., Liu, Q., Yan, J., Zhang, Y., 2018b. Cross-lingual knowledge graph alignment via graph convolutional networks. Proceedings of EMNLP 349-357.
+* Wang et al. (2018c) Wang, Z., Chen, T., Ren, J.S.J., Yu, W., Cheng, H., Liu, L., 2018c. Deep reasoning with knowledge graph for social relationship understanding. Proceedings of UCAI 1021-1028.
+* Wang and Gupta (2018d) Wang, X., Ye, Y., Gupta, A., 2018d. Zero-shot recognition via semantic embeddings and knowledge graphs. Proceedings of CVPR 6857-6866.
+* Wang et al. (2018e) Wang, Y., Sun, Y., Lin, J., Sharma, S.E., Hornstein, M.M., Solomon, J.M., 2018e. Dynamic Graph Cm for Learning on Point Clouds. ACM Transactions on Graphics 38.
+* Wang et al. (2019) Wang, X., Ji, H., Shi, C., Wang, B., Ye, Y., Cui, P., Yu, P., 2019. Heterogeneous graph attention network. In: Proceedings of WWW, pp. 2022-2032.
+* Wang et al. (2019) Wang, M., Tu, L., Zheng, D., Gan, Q., Gati, Y., Ye, Z., Li, M., Zhou, J., Huang, Q., Ma, C., Huang, Z., Guo, Q., Zhang, H., Lin, Z., Zhao, J., Li, J., Lyanda, A.J., Zhang, Z., 2019. Depth Graph Library: towards Efficient and Scalable Deep Learning Graphs, ICLR Workshop on Representation Learning on Graphs and Manifolds.
+* Waters et al. (2017) Waters, N., Zoran, D., Weber, T., Hartstiglia, P., Pascanu, R., Tachetti, A., 2017. Visual interaction networks: learning a physics simulator from video. In: Proceedings of NIPS, pp. 6539-5447.
+* Wu et al. (2020) Wu, Y., Liu, D., Yu, W., Lu, L., Chen, E., 2020. Graph convolutional networks with markov random field learning for social spammer detection. In: Proceedings of AAAI, pp. 1054-1061.
+* Wu et al. (2019) Wu, Z., Pan, S., Chen, F., Long, G., Zhang, C., Yu, P.S., 2019a. A Comprehensive Survey on Graph Neural Networks at arXiv preprint arXiv:1901.00596.
+* Wu et al. (2019b) Wu, F., Zhao, J., Han, Z., Zhang, T., Fifty, C., Yu, T., Weinberger, K.O., 2019b. Simplifying graph convolutional networks: In: Volume 97 of Proceedings of Machine Learning Research, PMLR, pp. 6681-6687.
+* Wu et al. (2019c) Wu, Q., Zhang, H., Gao, X., He, P., Wang, P., Gao, H., Chen, G., 2019c. Dual graph attention networks for deep latent representation of multitarget social effects in recommender systems. In: Proceedings of WWW, pp. 2091-2102.
+* Xu et al. (2018) Xu, K., Li, C., Tian, Y., Sonobe, T., Kawanokyoshi, K., Jegelka, S., 2018. Representation learning on graphs with jumping knowledge networks. In: Proceeding of ICMI, pp. 5449-5458.
+* Xu et al. (2019a) Xu, B., Shen, H., Cao, Q., Qiu, Y., Cheng, X., 2019a. Graph wavelet neural network. In: Proceedings of ICML.
+* Xu et al. (2019b) Xu, K., Hu, W., Leskovec, J., Jegelka, S., 2019b. How powerful are graph neural networks? In: Proceedings of ICLR.
+* Xu et al. (2019c) Xu, K., Wang, L. Yu, M., Feng, Y., Song, Y., Wang, Z., Yu, D., 2019c. Cross-lingual knowledge graph alignment via graph matching neural network. In: Proceedings of ACL. Association for Computational Linguistics, pp. 3156-3161.
+* Xu et al. (2018) Xu, N., Wang, P., Chen, L., Jao, J., Zhao, J., Gim, M.K., 2019d. multi-resolution and dual graph neural network for predicting structured entity interactions. In: Proceedings of IJCAI, pp. 3968-3974.
+* Yan et al. (2018) Yan, S., Xiong, Y., Lin, D., 2018. Spatial temporal graph convolutional networks for skeleton-based action recognition. Proceedings of AAAI 32.
+* Yang et al. (2015) Yang, C., Liu, Z., Zhao, D., Sun, M., Chang, F.V., 2015. Network representation learning with rich text information. In: Proceedings of IJCAI, pp. 2111-2117.
+* Yang et al. (2016) Yang, Z., Cohen, W., Salakhutdinov, R., 2016. Revisiting semi-supervised learning with graph embeddings. In: Proceedings of ICML, PMLR, pp. 90-48.
+* Yang et al. (2019) Yang, Y., Wei, Z., Chen, Q., Wu, L., 2019. Using external knowledge for financial event prediction based on graph neural networks. In: Proceedings of EMNLP, pp. 2161-2164.
+* Yang et al. (2020) Yang, C., Xiao, Y., Zhang, Y., Sun, Y., Han, J., 2020. Heterogeneous Network Representation Learning: Survey, Benchmark, Evaluation, and beyond. arXiv preprint arXiv:2004.00216.
+* Yao et al. (2017) Yao, L., Mao, C., Liu, Y., 2017. Graph convolutional networks for text classification. Proceedings of AAAI 333, 7370-7377.
+* Ying et al. (2018a) Ying, R., He, R., Chen, E., Eisenbuchtale, P., Hamilton, W.L., Leskovec, J., 2018a. Graph convolutional neural networks for web-scale recommender systems. In: Proceedings of XDD Update 97-9848.
+* Ying et al. (2018b) Ying, Z., You, J., Morris, C., Ren, X., Hamilton, W., Leskovec, J., 2018b. Hierarchical graph representation learning with differentiable pooling. Proceedings of NeurIPS 4805-4815.
+* Ying et al. (2019) Ying, Z., Bourgeset, D., You, J., Zitnik, M., Leskovec, J., Ganespjaar, D., 2019. Generating explanations for graph neural networks. Proceedings of NeurIPS 9244-9255.
+* You et al. (2018) You, J., Liu, B., Ying, Z., Pande, V., Leskovec, J., 2018a. Graph convolutional policy network for goal-directed molecular graph generation. Proceedings of NeurIPS 6410-6421.
+* You et al. (2018b) You, J., Ying, R., Ren, X., Hamilton, W., Leskovec, J., Graghun, 2018b. Generating realistic graphs with deep auto-arviseable models. Proceedings of ICML 5694-5703.
+* You et al. (2020) You, J., Ying, J., Leskovec, J., 2020. Deep scene for graph neural networks. In: Proceedings of NeurIPS, pp. 33.
+* Yu and Zhu (2018) Yu, B., Yin, H., Zhu, Z., 2018. Spatio-temporal Graph Convolutional Networks: A Deep Learning Framework for Traffic Forecasting. Proceduralin. Of IJCAI, pp. 3634-3640.
+* Yun et al. (2019) Yun, S., Jeong, M., Kim, R., Kang, J., Kim, H.J., 2019. Graph transformer networksZilly, J.G., Srivastava, R.K., Koutnik, J., Schmidhuber, J., 2016. Recurrent highway networks. In: Proceedings of ICML, pp. 4189-4198.
+* Zitnik and Leskovec (2017) Zitnik, M., Leskovec, J., 2017. Predicting multicellular function through multi-layer tissue networks. Bioinformatics 33, 1190-1198.
+* Zitnik et al. (2018) Zitnik, M., Agrawal, M., Leskovec, J., 2018. Modeling polypharmacy side effects with graph convolutional networks. Bioinformatics 34, 1457-1466.
+* Zou et al. (2019) Zou, D., Han, Z., Wang, Y., Jiang, S., Sun, Y., Gu, Q., 2019. Layer-dependent importance sampling for training deep and large graph convolutional networks. In: Proceedings of NeurIPS, pp. 11249-11259.
+* Zigner et al. (2018) Zigner, D., Akbarnejad, A., Gunnemann, S., 2018. Adversarial attacks on neural networks for graph data. In: Proceedings of KDD, pp. 2847-2856.
+* Rossi et al. (2020) E. Rossi, P., Pasca, B. Chamberlain, D., Byward, H. Bronstein, F. Monti, 2020. Sign: scalable inception graph neural networks, arXiv preprint arXiv:2004.11198.

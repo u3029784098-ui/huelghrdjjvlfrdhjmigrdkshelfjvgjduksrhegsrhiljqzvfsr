@@ -1,0 +1,488 @@
+@prefix : <urn:absolute:OntoSMP/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <urn:absolute:OntoSMP/> .
+
+<urn:absolute:OntoSMP> rdf:type owl:Ontology ;
+                        rdfs:comment "The Standard Model Ontology is designed to formally describe the fundamental particles and interactions governing matter and energy in the universe, as outlined by the Standard Model of particle physics. This ontology serves as a semantic framework to support reasoning, data integration, education, and research in high-energy physics." .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  urn:absolute:OntoSMP#constitutesOf
+:constitutesOf rdf:type owl:ObjectProperty ;
+               rdfs:comment "Relates a composite particle to the constituent particles it is made of (e.g. a proton is constituted of three quarks)." .
+
+
+###  urn:absolute:OntoSMP#exampleOf
+:exampleOf rdf:type owl:ObjectProperty ,
+                    owl:ReflexiveProperty ;
+           rdfs:comment "Relates a specific chemical reaction to a general reaction type or class it exemplifies. For example, water electrolysis is an example of a decomposition reaction." .
+
+
+###  urn:absolute:OntoSMP#hasAntiParticle
+:hasAntiParticle rdf:type owl:ObjectProperty ,
+                          owl:SymmetricProperty ;
+                 rdfs:comment "Relates a particle to its corresponding antiparticle (e.g., electron has antiparticle positron). Each particle-antiparticle pair has opposite quantum numbers such as charge." .
+
+
+###  urn:absolute:OntoSMP#hasProduct
+:hasProduct rdf:type owl:ObjectProperty ;
+            rdfs:comment "Relates a chemical reaction to the particles that are produced as a result of the transformation." .
+
+
+###  urn:absolute:OntoSMP#hasReactant
+:hasReactant rdf:type owl:ObjectProperty ;
+             rdfs:comment "Relates a chemical reaction to the particles that act as inputs or participants before the reaction occurs." .
+
+
+###  urn:absolute:OntoSMP#includes
+:includes rdf:type owl:ObjectProperty ;
+          rdfs:comment "Indicates the list of particles that make up a given reactant or product in a reaction." .
+
+
+###  urn:absolute:OntoSMP#mediatesInteraction
+:mediatesInteraction rdf:type owl:ObjectProperty ;
+                     rdfs:comment "Relates a gauge boson to the fundamental force it mediates (e.g., photon mediates the electromagnetic force)." .
+
+
+###  urn:absolute:OntoSMP#transformedBy
+:transformedBy rdf:type owl:ObjectProperty ;
+               rdfs:comment "Indicates that a chemical or particle-level reaction occurs via or is governed by a specific fundamental interaction." .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  urn:absolute:OntoSMP#antiColorCharge
+:antiColorCharge rdf:type owl:DatatypeProperty ;
+                 rdfs:domain :AntiQuark ;
+                 rdfs:range [ rdf:type rdfs:Datatype ;
+                              owl:oneOf [ rdf:type rdf:List ;
+                                          rdf:first "anti-blue" ;
+                                          rdf:rest [ rdf:type rdf:List ;
+                                                     rdf:first "anti-green" ;
+                                                     rdf:rest [ rdf:type rdf:List ;
+                                                                rdf:first "anti-red" ;
+                                                                rdf:rest [ rdf:type rdf:List ;
+                                                                           rdf:first "neutral" ;
+                                                                           rdf:rest rdf:nil
+                                                                         ]
+                                                              ]
+                                                   ]
+                                        ]
+                            ] ;
+                 rdfs:comment "The anticolor counterpart to a color charge, relevant for anti-quarks and some gluons; values include anti-red, anti-green, anti-blue." .
+
+
+###  urn:absolute:OntoSMP#charge
+:charge rdf:type owl:DatatypeProperty ;
+        rdfs:domain :Particle ;
+        rdfs:range owl:real ;
+        rdfs:comment "The electric charge of a particle, determining how it interacts electromagnetically. Expressed as multiples of the elementary charge e." .
+
+
+###  urn:absolute:OntoSMP#colorCharge
+:colorCharge rdf:type owl:DatatypeProperty ;
+             rdfs:domain :Quark ;
+             rdfs:range [ rdf:type rdfs:Datatype ;
+                          owl:oneOf [ rdf:type rdf:List ;
+                                      rdf:first "blue" ;
+                                      rdf:rest [ rdf:type rdf:List ;
+                                                 rdf:first "green" ;
+                                                 rdf:rest [ rdf:type rdf:List ;
+                                                            rdf:first "neutral" ;
+                                                            rdf:rest [ rdf:type rdf:List ;
+                                                                       rdf:first "red" ;
+                                                                       rdf:rest rdf:nil
+                                                                     ]
+                                                          ]
+                                               ]
+                                    ]
+                        ] ;
+             rdfs:comment "The type of color charge carried by a quark or gluon under the SU(3) strong interaction; values include red, green, blue." .
+
+
+###  urn:absolute:OntoSMP#generation
+:generation rdf:type owl:DatatypeProperty ;
+            rdfs:domain :Fermion ;
+            rdfs:range [ rdf:type rdfs:Datatype ;
+                         owl:oneOf [ rdf:type rdf:List ;
+                                     rdf:first "I" ;
+                                     rdf:rest [ rdf:type rdf:List ;
+                                                rdf:first "II" ;
+                                                rdf:rest [ rdf:type rdf:List ;
+                                                           rdf:first "III" ;
+                                                           rdf:rest rdf:nil
+                                                         ]
+                                              ]
+                                   ]
+                       ] ;
+            rdfs:comment "The classification of fermions into one of three families based on mass and interaction properties (1st, 2nd, or 3rd generation)." .
+
+
+###  urn:absolute:OntoSMP#lifetime
+:lifetime rdf:type owl:DatatypeProperty ;
+          rdfs:domain :Particle ;
+          rdfs:range xsd:double ;
+          rdfs:comment "The average time a particle exists before decaying, typically expressed in seconds." .
+
+
+###  urn:absolute:OntoSMP#mass
+:mass rdf:type owl:DatatypeProperty ;
+      rdfs:domain :Particle ;
+      rdfs:range owl:real ;
+      rdfs:comment "The rest mass of a particle, representing its intrinsic resistance to acceleration. Typically expressed in MeV/c² or GeV/c²." .
+
+
+###  urn:absolute:OntoSMP#numberOfParticles
+:numberOfParticles rdf:type owl:DatatypeProperty ;
+                   rdfs:range xsd:unsignedInt .
+
+
+###  urn:absolute:OntoSMP#reactionType
+:reactionType rdf:type owl:DatatypeProperty ;
+              rdfs:domain :ChemicalReaction ;
+              rdfs:range xsd:string .
+
+
+###  urn:absolute:OntoSMP#spin
+:spin rdf:type owl:DatatypeProperty ;
+      rdfs:domain :Particle ;
+      rdfs:range xsd:decimal ;
+      rdfs:comment "An intrinsic form of angular momentum possessed by particles; values can be integers or half-integers (e.g., 0, 1/2, 1, 3/2)." .
+
+
+###  urn:absolute:OntoSMP#unit
+:unit rdf:type owl:DatatypeProperty ;
+      rdfs:subPropertyOf :charge ,
+                         :lifetime ,
+                         :mass ;
+      rdfs:range xsd:string ;
+      rdfs:comment "A standard quantity used to express and measure physical properties such as mass, charge, time, or energy." .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  urn:absolute:OntoSMP#AntiBaryon
+:AntiBaryon rdf:type owl:Class ;
+            rdfs:subClassOf :AntiHadron ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :constitutesOf ;
+                              owl:qualifiedCardinality "3"^^xsd:nonNegativeInteger ;
+                              owl:onClass :AntiQuark
+                            ] ;
+            rdfs:comment "A hadron made of three anti-quarks; the antiparticle of a baryon (e.g., antiproton)." .
+
+
+###  urn:absolute:OntoSMP#AntiFermion
+:AntiFermion rdf:type owl:Class ;
+             rdfs:subClassOf :ElementaryParticle ;
+             rdfs:comment "The antimatter counterpart of a fermion; has the same mass but opposite quantum numbers such as charge or baryon number." .
+
+
+###  urn:absolute:OntoSMP#AntiHadron
+:AntiHadron rdf:type owl:Class ;
+            rdfs:subClassOf :CompositeParticle ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :constitutesOf ;
+                              owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                              owl:onClass :AntiQuark
+                            ] ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :constitutesOf ;
+                              owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                              owl:onClass :Quark
+                            ] ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :constitutesOf ;
+                              owl:maxQualifiedCardinality "3"^^xsd:nonNegativeInteger ;
+                              owl:onClass :AntiQuark
+                            ] ;
+            rdfs:comment "A hadron composed of anti-quarks; the antiparticle counterpart to hadrons (e.g., antiproton, anti-neutron)." .
+
+
+###  urn:absolute:OntoSMP#AntiHyperon
+:AntiHyperon rdf:type owl:Class ;
+             rdfs:subClassOf :AntiBaryon ;
+             rdfs:comment "The antiparticle of a hyperon; a baryon containing at least one strange anti-quark." .
+
+
+###  urn:absolute:OntoSMP#AntiLepton
+:AntiLepton rdf:type owl:Class ;
+            rdfs:subClassOf :AntiFermion ;
+            rdfs:comment "An antiparticle of a lepton (e.g., positron is the anti-electron); carries opposite lepton number." .
+
+
+###  urn:absolute:OntoSMP#AntiMeson
+:AntiMeson rdf:type owl:Class ;
+           rdfs:subClassOf :AntiHadron ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :constitutesOf ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :AntiQuark
+                           ] ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :constitutesOf ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :Quark
+                           ] ;
+           rdfs:comment "A meson composed of a quark and an anti-quark where one is an anti-quark; includes meson antiparticles like π⁻." .
+
+
+###  urn:absolute:OntoSMP#AntiNucleon
+:AntiNucleon rdf:type owl:Class ;
+             rdfs:subClassOf :AntiBaryon ;
+             rdfs:comment "The antiparticle of a nucleon (proton or neutron); includes the antiproton and antineutron." .
+
+
+###  urn:absolute:OntoSMP#AntiQuark
+:AntiQuark rdf:type owl:Class ;
+           rdfs:subClassOf :AntiFermion ;
+           rdfs:comment "The antiparticle of a quark; participates in strong interactions and forms anti-hadrons when bound." .
+
+
+###  urn:absolute:OntoSMP#Atom
+:Atom rdf:type owl:Class ;
+      rdfs:subClassOf :CompositeParticle ,
+                      [ rdf:type owl:Restriction ;
+                        owl:onProperty :constitutesOf ;
+                        owl:someValuesFrom :Lepton
+                      ] ,
+                      [ rdf:type owl:Restriction ;
+                        owl:onProperty :constitutesOf ;
+                        owl:someValuesFrom :Nucleon
+                      ] ;
+      rdfs:comment "Atoms are the smallest units of chemical elements. Each atom consists of a central nucleus, containing protons and neutrons, surrounded by a cloud of electrons. The number of protons determines the element, and the electron arrangement defines the atom's chemical behavior. Atoms are electrically neutral if they have an equal number of protons and electrons." .
+
+
+###  urn:absolute:OntoSMP#Baryon
+:Baryon rdf:type owl:Class ;
+        rdfs:subClassOf :Hadron ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :constitutesOf ;
+                          owl:qualifiedCardinality "3"^^xsd:nonNegativeInteger ;
+                          owl:onClass :Quark
+                        ] ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :hasAntiParticle ;
+                          owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                          owl:onClass :AntiBaryon
+                        ] ;
+        rdfs:comment "Baryons are hadrons composed of three quarks. They are fermions because they have half-integer spin. The most familiar baryons are the proton and the neutron, which make up the atomic nucleus. Baryons participate in the strong nuclear interaction and are stable or metastable depending on their internal quark structure." .
+
+
+###  urn:absolute:OntoSMP#Boson
+:Boson rdf:type owl:Class ;
+       rdfs:subClassOf :ElementaryParticle ;
+       rdfs:comment "Bosons are particles with integer spin, such as 0, 1, or 2, and unlike fermions, they do not follow the Pauli exclusion principle. This means multiple bosons can occupy the same quantum state, which is why they serve as force carriers in quantum field theories. Bosons are not building blocks of matter, but they are responsible for mediating interactions between matter particles." .
+
+
+###  urn:absolute:OntoSMP#ChemicalReaction
+:ChemicalReaction rdf:type owl:Class ;
+                  rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                    owl:onProperty :hasProduct ;
+                                    owl:someValuesFrom :Product
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty :hasReactant ;
+                                    owl:someValuesFrom :Reactant
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty :exampleOf ;
+                                    owl:allValuesFrom :ChemicalReaction
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty :transformedBy ;
+                                    owl:minQualifiedCardinality "0"^^xsd:nonNegativeInteger ;
+                                    owl:onClass :FundamentalInteraction
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty :transformedBy ;
+                                    owl:maxQualifiedCardinality "4"^^xsd:nonNegativeInteger ;
+                                    owl:onClass :FundamentalInteraction
+                                  ] ;
+                  rdfs:comment "A process in which one or more chemical substances (reactants) are converted into one or more different substances (products) through bond rearrangement." .
+
+
+###  urn:absolute:OntoSMP#CompositeParticle
+:CompositeParticle rdf:type owl:Class ;
+                   rdfs:subClassOf :Particle ;
+                   rdfs:comment "A particle made of two or more elementary particles bound together by fundamental forces (e.g., hadrons, atomic nuclei)." .
+
+
+###  urn:absolute:OntoSMP#ElementaryParticle
+:ElementaryParticle rdf:type owl:Class ;
+                    rdfs:subClassOf :Particle ;
+                    rdfs:comment "A particle with no known internal structure; not composed of smaller constituents (e.g., quarks, leptons, bosons)." .
+
+
+###  urn:absolute:OntoSMP#Fermion
+:Fermion rdf:type owl:Class ;
+         rdfs:subClassOf :ElementaryParticle ,
+                         [ rdf:type owl:Restriction ;
+                           owl:onProperty :hasAntiParticle ;
+                           owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                           owl:onClass :AntiFermion
+                         ] ;
+         rdfs:comment "Fermions are particles with half-integer spin, such as ½ or 3/2. They obey the Pauli exclusion principle, which means that no two identical fermions can occupy the same quantum state. This property is crucial for the structure of matter. Fermions include quarks and leptons. They are the building blocks of matter, with their behavior determining the structure of atoms and molecules." .
+
+
+###  urn:absolute:OntoSMP#FundamentalInteraction
+:FundamentalInteraction rdf:type owl:Class ;
+                        rdfs:comment """In the Standard Model of particle physics, all known interactions between elementary particles are governed by four fundamental forces. These forces differ greatly in strength, range, and the particles they act on. Each force is mediated by specific gauge bosons, which are the force carriers in quantum field theory. Together, these interactions shape the behavior of matter and energy at all scales, from the structure of atoms to the evolution of the universe.
+
+- Gravitational Force: A universal attractive force acting between all particles with mass or energy; weakest of the four forces but with infinite range.
+
+- Electromagnetic Force: A force between particles with electric charge; responsible for electric and magnetic fields, with infinite range and mediated by photons.
+
+- Strong Interaction: The force that binds quarks into hadrons and holds protons and neutrons together in atomic nuclei; the strongest force but short-ranged.
+
+- Weak Interaction: A force responsible for processes like beta decay; acts on all fermions, affects flavor, and has a very short range; mediated by W and Z bosons.""" .
+
+
+###  urn:absolute:OntoSMP#Gauge
+:Gauge rdf:type owl:Class ;
+       rdfs:subClassOf :Boson ,
+                       [ rdf:type owl:Restriction ;
+                         owl:onProperty :mediatesInteraction ;
+                         owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                         owl:onClass :FundamentalInteraction
+                       ] ;
+       rdfs:comment "Gauge bosons are specific bosons that act as mediators of the fundamental forces. The photon mediates the electromagnetic force, the W⁺, W⁻, and Z⁰ bosons mediate the weak nuclear force, and gluons mediate the strong force between quarks. These bosons emerge from gauge symmetries in the mathematical formulations of particle physics and are vital to the Standard Model." .
+
+
+###  urn:absolute:OntoSMP#Hadron
+:Hadron rdf:type owl:Class ;
+        rdfs:subClassOf :CompositeParticle ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :constitutesOf ;
+                          owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                          owl:onClass :Quark
+                        ] ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :hasAntiParticle ;
+                          owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                          owl:onClass :AntiHadron
+                        ] ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :constitutesOf ;
+                          owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                          owl:onClass :AntiQuark
+                        ] ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :constitutesOf ;
+                          owl:maxQualifiedCardinality "3"^^xsd:nonNegativeInteger ;
+                          owl:onClass :Quark
+                        ] ;
+        rdfs:comment "Hadrons are composite particles made up of quarks bound together by the strong force. They are not fundamental, as they are built from two or more quarks. Hadrons are divided into two families: baryons, which consist of three quarks, and mesons, which consist of one quark and one antiquark. These particles are involved in nuclear and high-energy interactions." .
+
+
+###  urn:absolute:OntoSMP#Hyperon
+:Hyperon rdf:type owl:Class ;
+         rdfs:subClassOf :Baryon ,
+                         [ rdf:type owl:Restriction ;
+                           owl:onProperty :hasAntiParticle ;
+                           owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                           owl:onClass :AntiHyperon
+                         ] ;
+         rdfs:comment "Hyperons are a subclass of baryons that, like protons and neutrons, are made of three quarks. However, unlike nucleons, hyperons contain at least one strange quark, which gives them unusual properties. Because of the presence of the strange quark, hyperons are heavier than protons and neutrons, and they are generally unstable, decaying via the weak interaction into lighter particles. Examples include the Lambda (Λ), Sigma (Σ), Xi (Ξ), and Omega (Ω) particles. Hyperons are commonly produced in high-energy collisions and are studied to understand the behavior of quarks beyond the first generation, as well as the strong force in more exotic systems." .
+
+
+###  urn:absolute:OntoSMP#Lepton
+:Lepton rdf:type owl:Class ;
+        rdfs:subClassOf :Fermion ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :hasAntiParticle ;
+                          owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                          owl:onClass :AntiLepton
+                        ] ;
+        rdfs:comment "Leptons are a type of fundamental fermion that do not interact via the strong force. There are six leptons: the electron, muon, and tau, each with its corresponding neutrino (electron neutrino, muon neutrino, and tau neutrino). The charged leptons interact through the electromagnetic and weak forces, while neutrinos interact only via the weak force and gravity. Leptons are essential components of atomic structure and radioactive decay processes." .
+
+
+###  urn:absolute:OntoSMP#Meson
+:Meson rdf:type owl:Class ;
+       rdfs:subClassOf :Hadron ,
+                       [ rdf:type owl:Restriction ;
+                         owl:onProperty :constitutesOf ;
+                         owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                         owl:onClass :AntiQuark
+                       ] ,
+                       [ rdf:type owl:Restriction ;
+                         owl:onProperty :constitutesOf ;
+                         owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                         owl:onClass :Quark
+                       ] ,
+                       [ rdf:type owl:Restriction ;
+                         owl:onProperty :hasAntiParticle ;
+                         owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                         owl:onClass :AntiMeson
+                       ] ;
+       rdfs:comment "Mesons are hadrons consisting of a quark-antiquark pair. They are bosons with integer spin and typically have short lifetimes, decaying quickly into other particles. Mesons are involved in the residual strong interaction between nucleons in the atomic nucleus and appear in high-energy physics experiments and cosmic rays." .
+
+
+###  urn:absolute:OntoSMP#Molecules
+:Molecules rdf:type owl:Class ;
+           rdfs:subClassOf :CompositeParticle ;
+           rdfs:comment "Stable, bound systems of two or more atoms held together by electromagnetic interactions; composed of nuclei and electrons." .
+
+
+###  urn:absolute:OntoSMP#Nucleon
+:Nucleon rdf:type owl:Class ;
+         rdfs:subClassOf :Baryon ,
+                         [ rdf:type owl:Restriction ;
+                           owl:onProperty :hasAntiParticle ;
+                           owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                           owl:onClass :AntiNucleon
+                         ] ;
+         rdfs:comment "Nucleons are the collective term for protons and neutrons, the two baryons that make up the nucleus of an atom. They are bound together by the strong nuclear force and account for almost all the mass in ordinary matter. Nucleons interact with each other via the exchange of mesons and are central to the structure of atomic nuclei." .
+
+
+###  urn:absolute:OntoSMP#Particle
+:Particle rdf:type owl:Class ;
+          rdfs:comment "A physical entity with mass and/or energy, considered as a discrete unit in quantum field theory." .
+
+
+###  urn:absolute:OntoSMP#Product
+:Product rdf:type owl:Class ;
+         rdfs:subClassOf [ rdf:type owl:Restriction ;
+                           owl:onProperty :includes ;
+                           owl:someValuesFrom :Particle
+                         ] ;
+         rdfs:comment "A substance that is formed as a result of a chemical reaction; present at the end of the reaction." .
+
+
+###  urn:absolute:OntoSMP#Quark
+:Quark rdf:type owl:Class ;
+       rdfs:subClassOf :Fermion ,
+                       [ rdf:type owl:Restriction ;
+                         owl:onProperty :hasAntiParticle ;
+                         owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                         owl:onClass :AntiQuark
+                       ] ;
+       rdfs:comment "Quarks are fundamental particles in the Standard Model. They are never found alone in nature due to a phenomenon called color confinement; instead, they combine to form hadrons such as protons and neutrons. Quarks carry electric charge, color charge, and have spin ½, making them fermions. There are six known flavors of quarks: up, down, charm, strange, top, and bottom. Each has unique properties like mass and electric charge, and they interact via all four fundamental forces, including the strong nuclear force." .
+
+
+###  urn:absolute:OntoSMP#Reactant
+:Reactant rdf:type owl:Class ;
+          rdfs:subClassOf [ rdf:type owl:Restriction ;
+                            owl:onProperty :includes ;
+                            owl:someValuesFrom :Particle
+                          ] ;
+          rdfs:comment "A substance that undergoes change during a chemical reaction; present at the start of the reaction." .
+
+
+###  urn:absolute:OntoSMP#Scalar
+:Scalar rdf:type owl:Class ;
+        rdfs:subClassOf :Boson ;
+        rdfs:comment "Scalar bosons are bosons with zero spin. The most notable scalar boson is the Higgs boson, which is responsible for giving mass to other particles through the Higgs mechanism. Unlike gauge bosons, scalar bosons do not carry force but play a role in the fundamental properties of particles, particularly in symmetry breaking." .
+
+
+###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi

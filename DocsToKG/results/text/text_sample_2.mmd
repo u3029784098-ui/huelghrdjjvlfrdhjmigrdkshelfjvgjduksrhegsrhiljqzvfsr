@@ -1,0 +1,29 @@
+while the kernel weights are structured as (\(N_{\rm slice},N_{\rm time}\)). This precomputation significantly accelerates our calculations, which is essential since the longitudinal slices are at least partially degenerate with one another. Consequently, the fits require more steps and walkers to ensure proper convergence.
+
+To address this, we follow a similar approach to our sinusoidal fits using emcee, but we increase the total number of steps to 100,000 and use 100 walkers. Naively, the fit would include \(2N_{\rm slice}+1\) parameters: \(N_{\rm slice}\) for the albedo values, \(N_{\rm slice}\) for the emission parameters, and one additional scatter parameter, \(\sigma\). However, since night-side slices do not contribute to the reflected light component, we exclude these albedo values from the fit. In any case, our choice of 100 walkers ensures a sufficient number of walkers per free parameter. Following Coulombe et al. (2025) we set an upper prior limit of 3/2 on all albedo slices as a fully Lambertian sphere (\(A_{i}=1\)) corresponds to a geometric albedo of \(A_{\rm g}=2/3\). For thermal emission we impose a uniform prior between 0 and 500 ppm for each slice.
+
+We choose to fit our detrended lightcurves considering 4, 6 and 8 longitudinal slices (\(N_{\rm slice}=4,6,8\)). However, we show the results of the simplest 4 slice model. As in our previous fits, we conduct an initial run with 25,000 steps (25% of the total run) and use the maximum-probability parameters from this preliminary fit as the starting positions for the final 75,000-step run. We then discard the first 60% of the final run as burn-in.
+
+### Planetary Effective Temperature
+
+Phase curves are the only way to probe thermal emission from the day and nightside of an exoplanet and hence determine its global energy budget (Parmentier and Crossfield, 2018). The wavelength range of NIRISS/SOSS covers a large portion of the emitted flux of WASP-121 b (\(\sim\) 50-83%; see Figure 2), enabling a precise and robust constraint of the planet's energy budget.
+
+We convert the fitted \(F_{p}/F_{*}\) emission spectra to brightness temperature by wavelength,
+
+\[T_{\rm bright}=\frac{hc}{k\lambda}\cdot\left[\ln\left(\frac{2hc^{2}}{\lambda ^{5}B_{\lambda,{\rm planet}}}+1\right)\right]^{-1}, \tag{16}\]
+
+where the planet's thermal emission is
+
+\[B_{\lambda,\,{\rm planet}}=\frac{F_{p}/F_{*}}{(R_{p}/R_{*})^{2}}\cdot B_{ \lambda,\,{\rm star}}\,. \tag{17}\]
+
+There are many ways of converting brightness temperatures to effective temperature, including the Error-Weighted Mean (EWM), Power-Weighted mean (PWM) and with a Gaussian Process (Schwartz and Cowan, 2015; Pass et al., 2019). In this work, we elect to compute our effective temperature estimates with a novel method that is essentially a combination of the PWM and EWM. We create the effective temperature by using a simple Monte Carlo process. First, we perturb our \(F_{p}/F_{*}\) emission spectra at each point in the orbit by a Gaussian based on the measurement uncertainty. Our new emission spectrum is then used to create an estimate of the brightness temperature spectrum. This process is repeated at each orbital phase. We then estimate the effective temperature, \(T_{\rm eff}\) for a given orbital phase as
+
+\[T_{\rm eff}=\frac{\sum_{i=1}^{N}w_{i}\,T_{\rm bright,\,\,i}}{\sum_{i=1}^{N}w_ {i}}, \tag{18}\]
+
+where \(w_{i}\) is the weight for the \(i\)-th wavelength given by the fraction of the planet's bolometric flux that falls within that wavelength bin scaled by the inverse variance of the measurement,
+
+\[w_{i}=\frac{\int_{\lambda_{i}}^{\lambda_{i+1}}B(\lambda_{i},\,T_{\rm est})\, d\lambda}{\int_{0}^{\infty}B(\lambda_{i},\,T_{\rm est})\,d\lambda}\cdot\frac{1}{ \sigma_{i}^{2}}, \tag{19}\]
+
+with \(T_{\rm est}\) representing an estimated effective temperature at the orbital phase of interest. When computing
+
+Figure 2: Estimated captured flux of the planet assuming the planet radiates as a blackbody. The captured flux is calculated as the ratio of the integrated blackbody emission within the instrument’s band pass to the total emission over all wavelengths, i.e., \(\gamma=\int_{\lambda_{\rm min}}^{\lambda_{\rm max}}B(\lambda,T)\,d\lambda/ \int_{0}^{\infty}B(\lambda,T)\,d\lambda\). The captured flux fraction is shown for NIRISS SOSS [0.6–2.85 \(\mu\)m] (red line); Hubble WFC3 [1.12–1.64 \(\mu\)m] (dashed green line); NIRSpec G395H [2.7–5.15 \(\mu\)m] (dash dotted blue line). The red-shaded region shows the temperature range on WASP-121 b based on our \(T_{\rm eff}\) estimates. Red dashed lines indicate the boundaries of the planet’s temperature range within the NIRISS SOSS captured flux fraction. From this we estimate that these observations capture between 55% and 82% of the planet’s bolometric flux, depending on orbital phase. Using the minimum temperature from the NAMELESS fit, this estimate decreases to 50%. In either case, the wavelength coverage of NIRISS exceeds that of any other instrument.

@@ -1,0 +1,59 @@
+ical pooling pattern and learn graph representations by layers.
+
+_Graph Coarsening._ Early methods are usually based on graph coarsening algorithms. Spectral clustering algorithms are firstly used but they are inefficient because of the eigendecomposition step. Gracus (Dhillon et al., 2007) provides a faster way to cluster nodes and it is applied as a pooling module. For example, ChebNet and MoNet use Graclus to merge node pairs and further add additional nodes to make sure the pooling procedure forms a balanced binary tree.
+
+_ECC_. Edge-Conditioned Convolution (ECC) (Simonovsky and Komodakis, 2017) designs its pooling module with recursively downsampling operation. The downsampling method is based on splitting the graph into two components by the sign of the largest eigenvector of the Laplacian.
+
+_DiffPool._ DiffPool (Ying et al., 2018) uses a learnable hierarchical clustering module by training an assignment matrix \(\mathbf{S}^{t}\) in each layer:
+
+\[\begin{array}{l}\mathbf{S}^{t}=\operatorname{softmax}(\operatorname{GNN}_{i,\text{real}}(\mathbf{A}^{t},\mathbf{H})),\\ \mathbf{A}^{t+1}=(\mathbf{S})^{T}\mathbf{A}\mathbf{S}^{t},\end{array} \tag{24}\]
+
+where \(\mathbf{H}^{t}\) is the node feature matrix and \(\mathbf{A}^{t}\) is coarsened adjacency matrix of layer \(t\). \(\mathbf{S}^{t}\) denotes the probabilities that a node in layer \(t\) can be assigned to a coarser node in layer \(t+1\).
+
+_gPool._ gPool (Gao and Ji, 2019) uses a project vector to learn projection scores for each node and select nodes with top-k scores. Compared to DiffPool, it uses a vector instead of a matrix at each layer, thus it reduces the storage complexity. But the projection procedure does not consider the graph structure.
+
+_EigenPooling._ EigenPooling (Ma et al., 2019) is designed to use the node features and local structure jointly. It uses the local graph Fourier transform to extract subgraph information and suffers from the inefficiency of graph eigendecomposition.
+
+_SAGPool._ SAGPool (Lee et al., 2019) is also proposed to use features and topology jointly to learn graph representations. It uses a self-attention based method with a reasonable time and space complexity.
+
+Figure 4: An overview of variants considering graph type and scale.
+
+## 4 Variants considering graph type and scale
+
+In the above sections, we assume the graph to be the simplest format. However, many graphs in the real world are complex. In this subsection, we will introduce the approaches which attempt to address the challenges of complex graph types. An overview of these variants is shown in Fig. 4.
+
+### Directed graphs
+
+The first type is the directed graphs. Directed edges usually contain more information than undirected edges. For example, in a knowledge graph where a head entity is the parent class of a tail entity, the edge direction offers information about the partial order. Instead of simply adopting an asymmetric adjacency matrix in the convolution operator, we can model the forward and reverse directions of an edge differently. DGP (Kampffmeyer et al., 2019) uses two kinds of weight matrices \(\mathbf{W}_{p}\) and \(\mathbf{W}_{c}\) for the convolution in forward and reverse directions.
+
+### Heterogeneous graphs
+
+The second variant of graphs is heterogeneous graphs, where the nodes and edges are multi-typed or multi-modal. More specifically, in a heterogeneous graph \(\{V,E,\varphi,\psi\}\), each node \(\nu_{i}\) is associated with a type \(\varphi(\nu_{i})\) and each edge \(e_{i}\) with a type \(\psi(e_{i})\).
+
+#### 4.2.1 Meta-path-based methods
+
+Most approaches toward this graph type utilize the concept of meta-path. Meta-path is a path scheme which determines the type of node in each position of the path, e.g., \(\varphi_{1}\)-\(\varphi_{2}\)-\(\varphi_{3}\)-\(\varphi_{4}\)-\(\varphi_{5}\)-\(\varphi_{6}\)-\(\varphi_{7}\), where \(L\) is the length of the meta-path. In the training process, the meta-paths are instantiated as node sequences. By connecting the two end nodes of a meta-path instances, the meta-path captures the similarity of two nodes which may not be directly connected. Consequently, one heterogeneous graph can be reduced to several homogeneous graphs, on which graph learning algorithms can be applied. In early work, meta-path based similarity search is investigated (Sun et al., 2011). Recently, more GNN models which utilize the meta-path are proposed. HAN (Wang et al., 2019) first performs graph attention on the meta-path-based neighbors under each meta-path and then uses a semantic attention over output embeddings of nodes under all meta-path schemes to generate the final representation of nodes. MAGNN (Fu et al., 2020) proposes to take the intermediate nodes in a meta-path into consideration. It first aggregates the information along the meta-path using a neural module and then performs attention over different meta-path instances associated with a node and finally performs attention over different meta-path schemes. GTN (Yun et al., 2019) proposes a novel graph transformer layer which identifies new connections between unconnected nodes while learning representations of nodes. The learned new connections can connect nodes which are serveral hops away from each other but are closely related, which function as the meta-paths.
+
+#### 4.2.2 Edge-based methods
+
+There are also works which don't utilize meta-paths. These works typically use different functions in terms of sampling, aggregation, etc. for different kinds of neighbors and edges. HetGNN (Zhang et al., 2019) addresses the challenge by directly treating neighbors of different types differently in sampling, feature encoding and aggregation steps. HGT (Hu et al., 2020) defines the meta-relation to be the type of two neighboring nodes and their link \((\varphi(\nu),\psi(e_{i}),\varphi(\nu))\). It assigns different attention weight matrices to different meta-relations, empowering the model to take type information into consideration.
+
+#### 4.2.3 Methods for relational graphs
+
+The edge of some graphs may contain more information than the type, or the quantity of types may be too large, exerting difficulties to applying the meta-path or meta-relation based methods. We refer to this kind of graphs as relational graphs (Schlichtkrull et al., 2018), To handle the relational graphs, G2S (Beck et al., 2018) converts the original graph to a bipartite graph where the original edges also become nodes and one original edge is split into two new edges which means there are two new edges between the edge node and begin/end nodes. After this transformation, it uses a Gated Graph Neural Network followed by a Recurrent Neural Network to convert graphs with edge information into sentences. The aggregation function of GGNN takes both the hidden representations of nodes and the relations as the input. As another approach, R-GCN (Schlichtkrull et al., 2018) doesn't require to convert the original graph format. It assigns different weight matrices for the propagation on different kinds of edges. However, When the number of relations is very large, the number of parameters in the model explodes. Therefore, it introduces two kinds of regularizations to reduce the number of parameters for modeling amounts of relations: basis- and _block-diagonal_-decomposition. With the basis decomposition, each \(\mathbf{W}_{r}\) is defined as follows:
+
+\[\mathbf{W}_{r}=\sum_{k=1}^{B}d_{k}\mathbf{V}_{k}. \tag{25}\]
+
+Here each \(\mathbf{W}_{r}\) is a linear combination of basis transformations \(\mathbf{V}_{b}\in\mathbb{R}^{d_{k}\cdots d_{m}}\) with coefficients \(a_{b}\). In the block-diagonal decomposition, R-GCN defines each \(\mathbf{W}_{r}\) through the direct sum over a set of low-dimensional matrices, which need more parameters than the first one.
+
+#### 4.2.4 Methods for multiplex graphs
+
+In more complex scenarios, a pair of nodes in a graph can be associated with multiple edges of different types. By viewing under different types of edges, the graph can form multiple layers, in which each layer represents one type of relation. Therefore, multiplex graph can also be referred to as multi-view graph (multi-dimensional graph). For example, in YouTube, there can be three different relations between two users: sharing, subscription, comment. Edge types are not assumed independent with each other, therefore simply splitting the graph into subgraphs with one type of edges might not be an optimal solution. mGCN (Ma et al., 2019) introduces general representations and dimension-specific representations for nodes in each layer of GNN. The dimension-specific representations are projected from general representations using
+
+Figure 5: An overview of methods with unsupervised loss.
+
+different projection matrices and then aggregated to form the next layer's general representations.
+
+### Dynamic graphs
+
+Another variant of graphs is dynamic graphs, in which the graph structure, e.g. the existence of edges and nodes, keeps changing over time. To model the graph structured data together with the time series data, DCRNN (Li et al., 2018) and STGCN (Yu et al., 2018) first collect spatial information by GNNs, then feed the outputs into a sequence model like sequence-to-sequence models or RNNs. Differently, Structural-RNN (Jain et al., 2016) and ST-GCN (Yan et al., 2018) collect spatial and temporal messages at the same time. They extend static graph structure with temporal connections so they can apply traditional GNNs on the extended graphs. Similarly, DGNN (Manessi et al., 2020) feeds the output embeddings of each node from the GCN into separate LSTMs. The weights of LSTMs are shared between each node. On the other hand, EvolveGCN (Pareja et al., 2020) argues that directly modeling dynamics of the node representation will hamper the model's performance on graphs where node set keeps changing. Therefore, instead of treating node features as the input to RNN, it feeds the weights of the GCN into the RNN to capture the intrinsic dynamic

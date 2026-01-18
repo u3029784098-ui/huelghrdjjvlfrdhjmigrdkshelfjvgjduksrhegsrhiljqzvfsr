@@ -1,0 +1,15 @@
+Many applications unroll or stack the graph neural network layer aiming to achieve better results as more layers (i.e k layers) make each node aggregate more information from neighbors \(k\) hops away. However, it has been observed in many experiments that deeper models could not improve the performance and deeper models could even perform worse. This is mainly because more layers could also propagate the noisy information from an exponentially increasing number of expanded neighborhood members. It also causes the over smoothing problem because nodes tend to have similar representations after the aggregation operation when models go deeper. So that many methods try to add "skip connections" to make GNN models deeper. In this subsection we introduce three kinds of instantiations of skip connections.
+
+_Highway GCN_. Rahimi et al. (2018) propose a Highway GCN which uses layer-wise gates similar to highway networks (Zilly et al., 2016). The output of a layer is summed with its input with gating weights:
+
+\[\mathbf{T}(\mathbf{h}^{i})=\mathbf{e}(\mathbf{W}_{i}\mathbf{h}^{i}+\mathbf{b} ), \tag{22}\] \[\mathbf{h}^{i+1}=\mathbf{h}^{i+1}\odot\mathbf{T}(\mathbf{h})+ \mathbf{h}^{i}\odot(1-\mathbf{T}(\mathbf{h}^{i})).\]
+
+By adding the highway gates, the performance peaks at 4 layers in a specific problem discussed in (Rahimi et al., 2018). The column network (CLN) (Pham et al., 2017) also utilizes the highway network. But it has different functions to compute the gating weights.
+
+_JKN_. Xu et al. (2018) study properties and limitations of neighborhood aggregation schemes. They propose the jump knowledge network (JKN) which could learn adaptive and structure-aware representations. JKN selects from all of the intermediate representations (which "jump" to the last layer) for each node at the last layer, which makes the model adapt the effective neighborhood size for each node as needed. Xu et al. (2018) use three approaches of concatenation, max-pooling and LSTM-attention in the experiments to aggregate information. The JKN performs well on the experiments in social, bioinformatics and citation networks. It can also be combined with models like GCN, GraphSAGE and GAT to improve their performance.
+
+_DeepGCN_. Li et al. (2019) borrow ideas from ResNet (He et al., 2016, 2016) and DenseNet (Huang et al., 2017). ResGCN and DenseGCN are proposed by incorporating residual connections and dense connections to solve the problems of vanishing gradient and over smoothing. In detail, the hidden state of a node in ResGCN and DenseGCN can be computed as:
+
+\[\mathbf{h}_{\text{ion}}^{i+1}=\mathbf{h}^{i+1}+\mathbf{h}^{i}, \tag{23}\] \[\mathbf{h}_{\text{home}}^{i+1}=\left[\int_{v=1}^{i+1}\mathbf{h}^{i}.\right.\]
+
+The experiments of DeepGCNs are conducted on the point cloud semantic segmentation task and the best results are achieved with a 56-layer model.
