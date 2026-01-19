@@ -124,7 +124,7 @@ def check_latex_string(latex_code: str):
             tmpfile.close()
 
 
-def validate_and_correct_latex(latex_code: str, max_attempts: int = 3, lm):
+def validate_and_correct_latex(lm, latex_code: str, max_attempts: int = 3):
     """
     Validate LaTeX code and attempt to correct it using AI if invalid.
 

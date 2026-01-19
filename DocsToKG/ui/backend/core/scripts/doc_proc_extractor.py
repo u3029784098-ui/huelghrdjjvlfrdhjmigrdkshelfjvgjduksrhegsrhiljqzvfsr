@@ -13,10 +13,76 @@ import cv2
 import fitz  # PyMuPDF
 import layoutparser as lp
 import matplotlib.pyplot as plt
-import sys
+import csv
 import re
 from charset_normalizer import from_path
 import mysql.connector
+import subprocess
+import tempfile
+import dspy
+from dspy import InputField, OutputField, Signature
+import pandas as pd
+from tqdm import tqdm
+
+
+class OllamaLM(dspy.LM):
+    """Custom Ollama language model for DSPy"""
+
+    def __init__(
+        self, model="qwen2.5-coder:latest", base_url="http://localhost:11434", **kwargs
+    ):
+        super().__init__(model=model)
+        self.model = model
+        self.base_url = base_url
+        self.provider = "ollama"
+        self.history = []
+        self.kwargs = {"temperature": 0.7, "max_tokens": 2000, **kwargs}
+
+    def __call__(self, prompt=None, messages=None, **kwargs):
+        import ollama
+
+        if messages is None and prompt:
+            messages = [{"role": "user", "content": prompt}]
+
+        # Merge default kwargs with call-time kwargs
+        request_kwargs = {**self.kwargs, **kwargs}
+
+        # Use ollama library for the API call
+        options = {}
+        if "temperature" in request_kwargs:
+            options["temperature"] = request_kwargs["temperature"]
+
+        response = ollama.chat(
+            model=self.model, messages=messages, options=options if options else None
+        )
+
+        return [response["message"]["content"]]
+
+    def basic_request(self, prompt, **kwargs):
+        return self(prompt=prompt, **kwargs)
+
+
+# DSPy Signature for LaTeX correction
+class CorrectLaTeX(Signature):
+    """Correct invalid LaTeX code based on error messages."""
+
+    latex_code: str = InputField(desc="The invalid LaTeX code")
+    error_message: str = InputField(desc="Error message from LaCheck")
+    corrected_latex: str = OutputField(
+        desc="The corrected LaTeX code, output ONLY the corrected code without explanations"
+    )
+
+
+class LaTeXCorrector(dspy.Module):
+    """DSPy module for correcting LaTeX code"""
+
+    def __init__(self):
+        super().__init__()
+        self.correct = dspy.ChainOfThought(CorrectLaTeX)
+
+    def forward(self, latex_code, error_message):
+        result = self.correct(latex_code=latex_code, error_message=error_message)
+        return result.corrected_latex
 
 
 class DocProcExtractor:
@@ -96,6 +162,156 @@ class DocProcExtractor:
             self.db_connection = None
             import traceback
             traceback.print_exc()
+
+
+    # Extract formulas
+    def _check_latex_string(latex_code: str):
+        """
+        Validate LaTeX code using LaCheck.
+        Returns a tuple (is_valid, output), where is_valid is True/False
+        and output is LaCheck's feedback.
+        """
+        with tempfile.NamedTemporaryFile(mode="w+", suffix=".tex", delete=False) as tmpfile:
+            tmpfile.write(latex_code)
+            tmpfile.flush()
+            try:
+                result = subprocess.run(
+                    ["lacheck", tmpfile.name], capture_output=True, text=True
+                )
+                output = result.stdout.strip()
+                is_valid = len(output) == 0
+                return is_valid, output
+            finally:
+                tmpfile.close()
+
+
+    def _validate_and_correct_latex(self, lm, latex_code: str, max_attempts: int = 3):
+        """
+        Validate LaTeX code and attempt to correct it using AI if invalid.
+
+        Args:
+            latex_code: The LaTeX code to validate
+            max_attempts: Maximum number of correction attempts
+
+        Returns:
+            tuple: (is_valid, final_code, correction_history)
+        """
+        corrector = LaTeXCorrector()
+        correction_history = []
+        current_code = latex_code
+        if lm["provider"] == "ollama":
+            lm = OllamaLM(model=lm["model_name"])
+        
+        dspy.configure(lm = lm)
+
+        for attempt in range(max_attempts):
+            is_valid, error_msg = self._check_latex_string(current_code)
+
+            if is_valid:
+                return True, current_code, correction_history
+
+            print(f"\nAttempt {attempt + 1}: LaTeX validation failed")
+            print(f"Error: {error_msg}")
+
+            # Use AI to correct the code
+            print("Attempting AI correction...")
+            corrected_code = corrector.forward(
+                latex_code=current_code, error_message=error_msg
+            )
+
+            # Clean up the corrected code (remove markdown code blocks if present)
+            corrected_code = corrected_code.strip()
+            if corrected_code.startswith("```"):
+                lines = corrected_code.split("\n")
+                corrected_code = (
+                    "\n".join(lines[1:-1]) if len(lines) > 2 else corrected_code
+                )
+            corrected_code = corrected_code.strip()
+
+            correction_history.append(
+                {
+                    "attempt": attempt + 1,
+                    "original": current_code,
+                    "error": error_msg,
+                    "corrected": corrected_code,
+                }
+            )
+
+            print(f"Corrected code: {corrected_code}")
+            current_code = corrected_code
+
+        # Final validation after all attempts
+        is_valid, error_msg = self._check_latex_string(current_code)
+        return is_valid, current_code, correction_history
+
+    def _extract_formulas(self, mmd_file, output_csv):
+        # Read the content of the mmd file
+        with open(mmd_file, "r", encoding="utf-8") as f:
+            text = f.read()
+
+        # Regex patterns for formulas
+        patterns = [
+            r"\\\[(.*?)\\\]",  # Display math \[ ... \]
+            r"\\\((.*?)\\\)",  # Inline math \( ... \)
+        ]
+
+        formulas = []
+
+        i = 0
+        for pattern in patterns:
+            for match in re.finditer(pattern, text, re.DOTALL):
+                formula_content = match.group(1)
+
+                # Check for \tag{...} inside the formula
+                tag_match = re.search(r"\\tag\{(.*?)\}", formula_content)
+                tag = tag_match.group(1) if tag_match else ""
+
+                # Remove the tag from formula
+                if tag:
+                    formula_content = re.sub(r"\\tag\{.*?\}", "", formula_content)
+                    formula_content = formula_content.strip()
+
+                # Start and end positions in the original file
+                start_pos = match.start()
+                end_pos = match.end()
+
+                formulas.append([i, formula_content, tag, start_pos, end_pos])
+                i += 1
+
+        # Write to CSV
+        with open(output_csv, "w", newline="", encoding="utf-8") as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(["id", "Formula", "Tag", "Location start", "Location end"])
+            writer.writerows(formulas)
+
+        print(f"Extracted {len(formulas)} formulas to {output_csv}")
+
+
+    def _validate_document(self, lm, max_attempts, path_file, save_path):
+        df = pd.read_csv(path_file)
+        validated_df = df.copy()
+        validated_df["history"] = None
+
+        for i in tqdm(range(len(df)), description="Number of formulas"):
+            latex = df.at(i, "Formula")
+            is_valid, final_code, history = self._validate_and_correct_latex(lm, max_attempts)
+
+            if not is_valid:
+                validated_df["Formula"] = final_code
+
+            validated_df["history"] = "history"
+        pd.save_csv(save_path)
+        return validated_df
+    
+    def extract_formulas(self, input_path: str, output_dir: str, lm, max_attempts):
+        # Extract the text if not already extracted
+        text_path = os.path.join(self.output_structure["text"], f"text_{os.path.basename(input_path).split(".")[0]}.txt")
+        if not os.path.exists(text_path):
+            self.extract_text(input_path, self.output_structure["text"])
+        
+        output_csv = os.path.join(output_dir, f"formulas_{os.path.basename(input_path).split(".")[0]}.csv")
+        self._extract_formulas(text_path, output_csv=output_csv)
+        self._validate_document(lm, max_attempts, text_path, output_csv)
 
     def _update_progress(self, task: str, processed: int, total: int):
         """Update progress in database for a specific task."""
@@ -187,6 +403,7 @@ class DocProcExtractor:
             import traceback
             traceback.print_exc()
 
+    
     def _verify_extraction_output(self, filename: str, task: str) -> bool:
         """Verify if extraction actually produced output files for a given task."""
         filename_no_ext = os.path.splitext(filename)[0]
@@ -380,6 +597,7 @@ class DocProcExtractor:
         else:
             print("[WARNING] Expected folder not found. Nougat may have failed.")
 
+    # Extract Hierarchy
     def extract_hierarchy(self, input_path, output_path):
         """
         Reads a markdown-like text file and creates a folder hierarchy 
@@ -392,7 +610,7 @@ class DocProcExtractor:
         """
         output_path = os.path.join(output_path, f"hierarchy_{os.path.basename(input_path).split(".")[0]}")
         if not os.path.exists(os.path.join(self.output_structure["text"], f"text_{os.path.basename(input_path).split(".")[0]}.txt")):
-            self.extract_text(input_path, os.path.join(self.output_structure["text"], f"text_{os.path.basename(input_path).split(".")[0]}.txt"))
+            self.extract_text(input_path, self.output_structure["text"])
 
         # Read the file content
         input_path = os.path.join(self.output_structure["text"], f"text_{os.path.basename(input_path).split(".")[0]}.txt")

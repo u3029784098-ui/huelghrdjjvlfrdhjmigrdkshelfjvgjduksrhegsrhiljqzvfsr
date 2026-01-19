@@ -101,6 +101,8 @@ export async function POST(request: Request) {
       // LLM & GraphRAG
       llm_provider: body.llmProvider || null,
       llm: body.llmName || null,
+      formulas_llm_provider: body.formulasLlmProvider || null,
+      formulas_llm: body.formulasLlm || null,
       embedding_provider: body.embeddingProvider || null,
       embedding_model: body.embeddingModel || null,
       dimensions: body.embeddingDimensions ? parseInt(body.embeddingDimensions) : null,

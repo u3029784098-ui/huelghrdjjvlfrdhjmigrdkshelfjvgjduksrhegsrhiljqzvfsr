@@ -5,12 +5,16 @@ import { useTheme } from "../themes";
 interface LLMGraphRAGProps {
   llmProvider: string;
   llmName: string;
+  formulasLlmProvider: string;
+  formulasLlm: string;
   embeddingProvider: string;
   embeddingModel: string;
   embeddingDimensions: string;
   similarityMetric: string;
   onLlmProviderChange: (value: string) => void;
   onLlmNameChange: (value: string) => void;
+  onFormulasLlmProviderChange: (value: string) => void;
+  onFormulasLlmChange: (value: string) => void;
   onEmbeddingProviderChange: (value: string) => void;
   onEmbeddingModelChange: (value: string) => void;
   onEmbeddingDimensionsChange: (value: string) => void;
@@ -21,12 +25,16 @@ interface LLMGraphRAGProps {
 const LLMGraphRAG: React.FC<LLMGraphRAGProps> = ({
   llmProvider,
   llmName,
+  formulasLlmProvider,
+  formulasLlm,
   embeddingProvider,
   embeddingModel,
   embeddingDimensions,
   similarityMetric,
   onLlmProviderChange,
   onLlmNameChange,
+  onFormulasLlmProviderChange,
+  onFormulasLlmChange,
   onEmbeddingProviderChange,
   onEmbeddingModelChange,
   onEmbeddingDimensionsChange,
@@ -67,6 +75,37 @@ const LLMGraphRAG: React.FC<LLMGraphRAGProps> = ({
                 type="text"
                 value={llmName}
                 onChange={(e) => onLlmNameChange(e.target.value)}
+                className={`w-full px-3 py-2 rounded border outline-none transition-colors ${themeClasses.input}`}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* LLM for formulas */}
+        <div className={`p-4 rounded-lg ${themeClasses.bg.card}`}>
+          <h3 className={`text-sm font-semibold mb-4 ${themeClasses.text.secondary}`}>
+            LLM for formulas
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${themeClasses.text.secondary}`}>
+                Latex llm provider
+              </label>
+              <input
+                type="text"
+                value={formulasLlmProvider}
+                onChange={(e) => onFormulasLlmProviderChange(e.target.value)}
+                className={`w-full px-3 py-2 rounded border outline-none transition-colors ${themeClasses.input}`}
+              />
+            </div>
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${themeClasses.text.secondary}`}>
+                Latex llm
+              </label>
+              <input
+                type="text"
+                value={formulasLlm}
+                onChange={(e) => onFormulasLlmChange(e.target.value)}
                 className={`w-full px-3 py-2 rounded border outline-none transition-colors ${themeClasses.input}`}
               />
             </div>

@@ -151,6 +151,8 @@ export async function ensureSchema(): Promise<void> {
       shrinks_doc_prefix VARCHAR(255),
       llm_provider VARCHAR(255),
       llm VARCHAR(255),
+      formulas_llm_provider VARCHAR(255),
+      formulas_llm VARCHAR(255),
       embedding_provider VARCHAR(255),
       embedding_model VARCHAR(255),
       dimensions INT,
@@ -295,6 +297,24 @@ export async function ensureSchema(): Promise<void> {
   // Ensure llm column exists on Setting table
   try {
     await pool.query(`ALTER TABLE Setting ADD COLUMN llm VARCHAR(255)`);
+  } catch (err: any) {
+    if (err?.code !== "ER_DUP_FIELDNAME" && err?.errno !== 1060) {
+      throw err;
+    }
+  }
+
+  // Ensure formulas_llm_provider column exists on Setting table
+  try {
+    await pool.query(`ALTER TABLE Setting ADD COLUMN formulas_llm_provider VARCHAR(255)`);
+  } catch (err: any) {
+    if (err?.code !== "ER_DUP_FIELDNAME" && err?.errno !== 1060) {
+      throw err;
+    }
+  }
+
+  // Ensure formulas_llm column exists on Setting table
+  try {
+    await pool.query(`ALTER TABLE Setting ADD COLUMN formulas_llm VARCHAR(255)`);
   } catch (err: any) {
     if (err?.code !== "ER_DUP_FIELDNAME" && err?.errno !== 1060) {
       throw err;

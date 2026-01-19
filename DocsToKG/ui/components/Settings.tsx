@@ -34,6 +34,8 @@ const Settings: React.FC = () => {
   // LLM & GraphRAG state
   const [llmProvider, setLlmProvider] = useState("");
   const [llmName, setLlmName] = useState("");
+  const [formulasLlmProvider, setFormulasLlmProvider] = useState("");
+  const [formulasLlm, setFormulasLlm] = useState("");
   const [embeddingProvider, setEmbeddingProvider] = useState("");
   const [embeddingModel, setEmbeddingModel] = useState("");
   const [embeddingDimensions, setEmbeddingDimensions] = useState("");
@@ -103,6 +105,8 @@ const Settings: React.FC = () => {
           // Load LLM & GraphRAG settings
           setLlmProvider(data.settings.llm_provider || "");
           setLlmName(data.settings.llm || "");
+          setFormulasLlmProvider(data.settings.formulas_llm_provider || "");
+          setFormulasLlm(data.settings.formulas_llm || "");
           setEmbeddingProvider(data.settings.embedding_provider || "");
           setEmbeddingModel(data.settings.embedding_model || "");
           setEmbeddingDimensions(data.settings.dimensions?.toString() || "");
@@ -147,6 +151,8 @@ const Settings: React.FC = () => {
           storagePaths,
           llmProvider,
           llmName,
+          formulasLlmProvider,
+          formulasLlm,
           embeddingProvider,
           embeddingModel,
           embeddingDimensions,
@@ -230,12 +236,16 @@ const Settings: React.FC = () => {
           <LLMGraphRAG
             llmProvider={llmProvider}
             llmName={llmName}
+            formulasLlmProvider={formulasLlmProvider}
+            formulasLlm={formulasLlm}
             embeddingProvider={embeddingProvider}
             embeddingModel={embeddingModel}
             embeddingDimensions={embeddingDimensions}
             similarityMetric={similarityMetric}
             onLlmProviderChange={setLlmProvider}
             onLlmNameChange={setLlmName}
+            onFormulasLlmProviderChange={setFormulasLlmProvider}
+            onFormulasLlmChange={setFormulasLlm}
             onEmbeddingProviderChange={setEmbeddingProvider}
             onEmbeddingModelChange={setEmbeddingModel}
             onEmbeddingDimensionsChange={setEmbeddingDimensions}
