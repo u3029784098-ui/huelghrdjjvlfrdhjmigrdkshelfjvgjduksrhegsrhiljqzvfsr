@@ -180,7 +180,7 @@ class DocProcExtractor:
 
 
     # Extract formulas
-    def _check_latex_string(latex_code: str):
+    def _check_latex_string(self, latex_code: str):
         """
         Validate LaTeX code using LaCheck.
         Returns a tuple (is_valid, output), where is_valid is True/False
@@ -307,7 +307,7 @@ class DocProcExtractor:
         validated_df = df.copy()
         validated_df["history"] = None
 
-        for i in tqdm(range(len(df)), description="Number of formulas"):
+        for i in tqdm(range(len(df)), desc="Number of formulas"):
             latex = df.at[i, "Formula"]
             is_valid, final_code, history = self._validate_and_correct_latex(lm, latex, max_attempts)
 
@@ -326,7 +326,7 @@ class DocProcExtractor:
         
         output_csv = os.path.join(output_dir, f"formulas_{os.path.basename(input_path).split(".")[0]}.csv")
         self._extract_formulas(text_path, output_csv=output_csv)
-        self._validate_document(lm, max_attempts, text_path, output_csv)
+        self._validate_document(lm=lm, max_attempts=max_attempts, path_file=output_csv, save_path=output_csv)
 
     def _update_progress(self, task: str, processed: int, total: int):
         """Update progress in database for a specific task."""
@@ -1071,7 +1071,7 @@ class DocProcExtractor:
                 "output": "formulas",
                 "function": self.extract_formulas,
                 "kwargs": {
-                    "lm": self.lm,
+                    "lm": {"provider": "ollama", "model_name": "qwen2.5-coder:latest"},
                     "max_attempts": self.nbr_attempts
                 }
             }
