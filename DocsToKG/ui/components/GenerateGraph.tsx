@@ -36,6 +36,9 @@ const GenerateGraph: React.FC = () => {
   const [newFigureLabel, setNewFigureLabel] = useState("");
   const [acceptedLabels, setAcceptedLabels] = useState<string[]>([]);
   
+  // Formula extraction configuration
+  const [nbrAttempts, setNbrAttempts] = useState(1);
+  
   // Graph generation state
   // Lexical graph
   const [separator, setSeparator] = useState("");
@@ -145,6 +148,7 @@ const GenerateGraph: React.FC = () => {
         extract_figures: extractTasks.figures,
         extract_tables: extractTasks.tables,
         extract_formulas: extractTasks.formulas,
+        nbr_attempts: extractTasks.formulas ? nbrAttempts : null,
         conf_fig_score_threshold: extractTasks.figures ? parseFloat(scoreThreshold.toString()) : null,
         conf_fig_classif_threshold: extractTasks.figures ? parseFloat(classificationThreshold.toString()) : null,
         conf_fig_labels: extractTasks.figures && figureLabels.length > 0 ? figureLabels.join(',') : null,
@@ -497,6 +501,29 @@ const GenerateGraph: React.FC = () => {
                         </div>
                       )}
                     </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Configure formula extraction - only shown if Extract formulas is checked */}
+            {extractTasks.formulas && (
+              <div className={`p-4 rounded-lg ${themeClasses.bg.card}`}>
+                <h3 className={`text-sm font-semibold mb-4 ${themeClasses.text.secondary}`}>
+                  Configure formula extraction
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${themeClasses.text.secondary}`}>
+                      Number of attempts
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={nbrAttempts}
+                      onChange={(e) => setNbrAttempts(parseInt(e.target.value) || 1)}
+                      className={`w-full px-3 py-2 rounded border outline-none transition-colors ${themeClasses.input}`}
+                    />
                   </div>
                 </div>
               </div>

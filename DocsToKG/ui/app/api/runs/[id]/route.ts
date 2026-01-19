@@ -50,6 +50,10 @@ export async function PATCH(
       updates.push('extract_formulas = ?');
       values.push(body.extract_formulas);
     }
+    if (typeof body.nbr_attempts === 'number') {
+      updates.push('nbr_attempts = ?');
+      values.push(body.nbr_attempts);
+    }
 
     // Float configuration
     if (typeof body.conf_fig_score_threshold === 'number') {

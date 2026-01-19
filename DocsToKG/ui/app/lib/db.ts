@@ -96,6 +96,7 @@ export async function ensureSchema(): Promise<void> {
       extract_figures BOOLEAN DEFAULT FALSE,
       extract_tables BOOLEAN DEFAULT FALSE,
       extract_formulas BOOLEAN DEFAULT FALSE,
+      nbr_attempts INT,
       conf_fig_score_threshold FLOAT,
       conf_fig_classif_threshold FLOAT,
       conf_fig_labels TEXT,
@@ -247,6 +248,18 @@ export async function ensureSchema(): Promise<void> {
   // Ensure is_executed exists on Run table (ignore if already present)
   try {
     await pool.query(`ALTER TABLE Run ADD COLUMN is_executed BOOLEAN DEFAULT FALSE`);
+  } catch (err: any) {
+    if (err?.code !== "ER_DUP_FIELDNAME") {
+      // Some MySQL versions return different codes; ignore if column exists
+      if (err?.errno !== 1060) {
+        throw err;
+      }
+    }
+  }
+
+  // Ensure nbr_attempts exists on Run table (ignore if already present)
+  try {
+    await pool.query(`ALTER TABLE Run ADD COLUMN nbr_attempts INT`);
   } catch (err: any) {
     if (err?.code !== "ER_DUP_FIELDNAME") {
       // Some MySQL versions return different codes; ignore if column exists

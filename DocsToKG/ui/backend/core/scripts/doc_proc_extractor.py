@@ -93,6 +93,9 @@ class DocProcExtractor:
         apply_pipeline: bool = True,
         valid_tasks: Optional[list[str]] = None,
         run_id: Optional[int] = None,
+        nbr_attempts: int = 1,
+        llm_provider: Optional[str] = None,
+        llm_model: Optional[str] = None,
     ):
         # --- Handle defaults safely
         if output_structure is None:
@@ -119,6 +122,18 @@ class DocProcExtractor:
         self.apply_pipeline = apply_pipeline
         self.valid_tasks = valid_tasks
         self.run_id = run_id
+        self.nbr_attempts = nbr_attempts
+        self.llm_provider = llm_provider
+        self.llm_model = llm_model
+        
+        # Initialize LLM if provider and model are provided
+        self.lm = None
+        if self.llm_provider and self.llm_model:
+            self.lm = {
+                "provider": self.llm_provider,
+                "model_name": self.llm_model
+            }
+        
         self.db_connection = None
 
         # Initialize database connection if run_id is provided
@@ -293,14 +308,14 @@ class DocProcExtractor:
         validated_df["history"] = None
 
         for i in tqdm(range(len(df)), description="Number of formulas"):
-            latex = df.at(i, "Formula")
-            is_valid, final_code, history = self._validate_and_correct_latex(lm, max_attempts)
+            latex = df.at[i, "Formula"]
+            is_valid, final_code, history = self._validate_and_correct_latex(lm, latex, max_attempts)
 
             if not is_valid:
-                validated_df["Formula"] = final_code
+                validated_df.at[i, "Formula"] = final_code
 
-            validated_df["history"] = "history"
-        pd.save_csv(save_path)
+            validated_df.at[i, "history"] = str(history)
+        validated_df.to_csv(save_path, index=False)
         return validated_df
     
     def extract_formulas(self, input_path: str, output_dir: str, lm, max_attempts):
@@ -1051,6 +1066,14 @@ class DocProcExtractor:
                     "chunk_length": 10_000,
                     "overlap_size": 100
                 }
+            },
+            "formulas": {
+                "output": "formulas",
+                "function": self.extract_formulas,
+                "kwargs": {
+                    "lm": self.lm,
+                    "max_attempts": self.nbr_attempts
+                }
             }
         }
 
@@ -1095,21 +1118,21 @@ class DocProcExtractor:
 
 # # -------------------- Script Entry --------------------
 
-# if __name__ == "__main__":
-#     folder_path = "../results/raw"
-#     output_structure = {
-#         "metadata": "../results/metadata",
-#         "text": "../results/text",
-#         "formulas": "../results/formulas",
-#         "figures": "../results/figures",
-#         "hierarchy": "../results/hierarchy",
-#         "shrinks": "../results/shrinks"
-#     }
-#     valid_tasks = ["shrinks"]
+if __name__ == "__main__":
+    folder_path = "../../../../results/raw"
+    output_structure = {
+        "metadata": "../../../../results/metadata",
+        "text": "../../../../results/text",
+        "formulas": "../../../../results/formulas",
+        "figures": "../../../../results/figures",
+        "hierarchy": "../../../../results/hierarchy",
+        "shrinks": "../../../../results/shrinks"
+    }
+    valid_tasks = ["formulas"]
 
-#     dpex = DocProcExtractor(
-#         folder_path=folder_path,
-#         output_structure=output_structure,
-#         apply_pipeline=True,
-#         valid_tasks=valid_tasks,
-#     )
+    dpex = DocProcExtractor(
+        folder_path=folder_path,
+        output_structure=output_structure,
+        apply_pipeline=True,
+        valid_tasks=valid_tasks,
+    )

@@ -89,6 +89,30 @@ def parse_args():
         help="API base URL for verification (optional)",
     )
 
+    parser.add_argument(
+        "--nbr-attempts",
+        type=int,
+        required=False,
+        default=1,
+        help="Number of attempts for formula extraction (optional)",
+    )
+
+    parser.add_argument(
+        "--llm-provider",
+        type=str,
+        required=False,
+        default=None,
+        help="LLM provider for formula validation (optional)",
+    )
+
+    parser.add_argument(
+        "--llm-model",
+        type=str,
+        required=False,
+        default=None,
+        help="LLM model for formula validation (optional)",
+    )
+
     return parser.parse_args()
 
 
@@ -123,6 +147,9 @@ def main():
         apply_pipeline=not args.no_pipeline,
         valid_tasks=l,
         run_id=args.run_id,
+        nbr_attempts=args.nbr_attempts,
+        llm_provider=args.llm_provider,
+        llm_model=args.llm_model,
     )
 
 

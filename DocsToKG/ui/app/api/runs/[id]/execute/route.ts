@@ -80,7 +80,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // Get Run data for graph generation config
     const [runRows] = await pool.query<RowDataPacket[]>(
       `SELECT graph_gen_conf_separator, graph_gen_conf_chunk_size, graph_gen_conf_chunk_overlap,
-              graph_gen_conf_allowed_nodes, graph_gen_conf_allowed_relationships, graph_gen_conf_additional_instruction
+              graph_gen_conf_allowed_nodes, graph_gen_conf_allowed_relationships, graph_gen_conf_additional_instruction,
+              nbr_attempts
        FROM Run WHERE id = ?`,
       [runId]
     );
@@ -162,6 +163,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     extractArgs.push('--project-name', projectName);
     extractArgs.push('--api-url', process.env.API_URL || 'http://localhost:3000');
     if (noPipelineFlag) extractArgs.push('--no-pipeline');
+    if (run.nbr_attempts) extractArgs.push('--nbr-attempts', String(run.nbr_attempts));
+    if (settings.llm_provider) extractArgs.push('--llm-provider', settings.llm_provider);
+    if (settings.llm) extractArgs.push('--llm-model', settings.llm);
 
     console.log(`[GRAPH] Starting extraction for run ${runId}...`);
     
