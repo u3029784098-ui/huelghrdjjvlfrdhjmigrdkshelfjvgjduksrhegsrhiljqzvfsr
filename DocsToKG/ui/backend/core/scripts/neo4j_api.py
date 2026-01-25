@@ -28,6 +28,10 @@ from langchain_community.graphs.graph_document import Node, Relationship
 from tqdm import tqdm
 import re
 import hashlib
+import pandas as pd
+import xml.etree.ElementTree as ET
+from typing import Dict, List, Optional, Tuple
+import hashlib
 
 def generate_id(text: str) -> str:
     """Generate a unique ID using hash."""
@@ -753,6 +757,340 @@ class Neo4jAPI:
             print(f"  Level {level} ({label}): {len(nodes)} nodes")
 
 
+    def formula_to_graph(self, mml_path: str, meta_label: str = "FormulaGraph") -> Dict:
+        """
+        Parse a MathML file and create a formula graph in Neo4j.
+        
+        Args:
+            mml_path: Path to the MathML (.mml) file
+            meta_label: Secondary label for all formula nodes
+        
+        Returns:
+            Dict with statistics about created nodes and relationships
+        """
+        try:
+            # Parse the MathML file
+            tree = ET.parse(mml_path)
+            root = tree.getroot()
+            
+            # Helper function to generate unique IDs
+            def generate_formula_id(element: ET.Element, context: str = "") -> str:
+                """Generate a unique ID for a formula element."""
+                element_str = ET.tostring(element, encoding='unicode', method='xml')
+                full_str = context + element_str
+                return hashlib.md5(full_str.encode()).hexdigest()
+            
+            # Helper function to extract text content
+            def get_element_text(element: ET.Element) -> str:
+                """Extract text from element and its children."""
+                # Get direct text
+                text_parts = []
+                if element.text and element.text.strip():
+                    text_parts.append(element.text.strip())
+                
+                # Get text from children
+                for child in element:
+                    if isinstance(child, ET.Element):
+                        child_text = get_element_text(child)
+                        if child_text:
+                            text_parts.append(child_text)
+                    
+                    # Get tail text (text after the element)
+                    if hasattr(child, 'tail') and child.tail and child.tail.strip():
+                        text_parts.append(child.tail.strip())
+                
+                return ''.join(text_parts)
+            
+            # Helper function to extract tag name without namespace
+            def get_tag_name(element: ET.Element) -> str:
+                """Extract tag name without namespace prefix."""
+                tag = element.tag
+                # Remove namespace if present (e.g., '{http://www.w3.org/1998/Math/MathML}math' -> 'math')
+                if '}' in tag:
+                    return tag.split('}')[1]
+                return tag
+            
+            # Statistics
+            stats = {
+                'total_nodes': 0,
+                'nodes_by_tag': {},
+                'relationships': 0,
+                'root_node_id': None
+            }
+            
+            # Store mapping of XML elements to node IDs
+            element_to_id = {}
+            
+            def process_element(
+                element: ET.Element, 
+                parent_id: Optional[str] = None, 
+                relationship_type: str = 'HAS_CHILD',
+                order: int = 0
+            ) -> str:
+                """Recursively process MathML elements and create nodes."""
+                
+                # Get tag name
+                tag_name = get_tag_name(element)
+                
+                # Skip processing instructions and comments (they are not ET.Element instances)
+                # ET.ElementTree only returns Element objects, so this check is sufficient
+                
+                # Generate element ID
+                element_id = generate_formula_id(element, mml_path)
+                element_text = get_element_text(element)
+                
+                # Extract attributes
+                attributes = {}
+                for key, value in element.attrib.items():
+                    # Keep all attributes except namespace declarations
+                    if not key.startswith('xmlns'):
+                        attributes[key] = value
+                
+                # Add alttext from root if available and this is the root element
+                if tag_name == 'math' and 'alttext' in root.attrib:
+                    attributes['alttext'] = root.attrib['alttext']
+                
+                # Prepare node properties
+                properties = {
+                    'id': element_id,
+                    'tag': tag_name,
+                    'text': element_text if element_text else '',
+                    'order': order,
+                    **attributes
+                }
+                
+                # Clean empty properties
+                properties = {k: v for k, v in properties.items() if v not in (None, '', [])}
+                
+                # Create node with tag name as primary label and meta_label as secondary label
+                # Escape label name if needed (Neo4j labels can't have certain characters)
+                safe_tag_name = tag_name.replace('-', '_').replace(':', '_')
+                
+                query = f"""
+                MERGE (n:`{safe_tag_name}`:`{meta_label}` {{id: $id}})
+                SET n += $properties
+                RETURN n.id as node_id
+                """
+                
+                with self.driver.session(database=self.database) as session:
+                    result = session.run(query, id=element_id, properties=properties)
+                    node_id = result.single()['node_id']
+                
+                # Update statistics
+                stats['total_nodes'] += 1
+                stats['nodes_by_tag'][tag_name] = stats['nodes_by_tag'].get(tag_name, 0) + 1
+                
+                # Store element to ID mapping
+                element_to_id[element] = node_id
+                
+                # If this is the root math element
+                if tag_name == 'math':
+                    stats['root_node_id'] = node_id
+                
+                # Create relationship to parent if exists
+                if parent_id:
+                    with self.driver.session(database=self.database) as session:
+                        session.run(
+                            f"""
+                            MATCH (parent {{id: $parent_id}}), (child {{id: $child_id}})
+                            MERGE (parent)-[r:{relationship_type}]->(child)
+                            SET r.order = $order
+                            """,
+                            parent_id=parent_id,
+                            child_id=node_id,
+                            order=order
+                        )
+                    stats['relationships'] += 1
+                
+                # Process children recursively with appropriate relationship types
+                child_order = 0
+                
+                # Special handling for specific MathML elements that have specific semantic relationships
+                
+                # Superscript: <msup> has base and superscript
+                if tag_name == 'msup':
+                    children = list(element)
+                    if len(children) >= 1:
+                        base_child = children[0]
+                        process_element(base_child, node_id, 'HAS_BASE', child_order)
+                        child_order += 1
+                    
+                    if len(children) >= 2:
+                        sup_child = children[1]
+                        process_element(sup_child, node_id, 'HAS_SUPERSCRIPT', child_order)
+                
+                # Subscript: <msub> has base and subscript
+                elif tag_name == 'msub':
+                    children = list(element)
+                    if len(children) >= 1:
+                        base_child = children[0]
+                        process_element(base_child, node_id, 'HAS_BASE', child_order)
+                        child_order += 1
+                    
+                    if len(children) >= 2:
+                        sub_child = children[1]
+                        process_element(sub_child, node_id, 'HAS_SUBSCRIPT', child_order)
+                
+                # Subscript and superscript: <msubsup> has base, subscript, superscript
+                elif tag_name == 'msubsup':
+                    children = list(element)
+                    if len(children) >= 1:
+                        base_child = children[0]
+                        process_element(base_child, node_id, 'HAS_BASE', child_order)
+                        child_order += 1
+                    
+                    if len(children) >= 2:
+                        sub_child = children[1]
+                        process_element(sub_child, node_id, 'HAS_SUBSCRIPT', child_order)
+                    
+                    if len(children) >= 3:
+                        sup_child = children[2]
+                        process_element(sup_child, node_id, 'HAS_SUPERSCRIPT', child_order)
+                
+                # Fraction: <mfrac> has numerator and denominator
+                elif tag_name == 'mfrac':
+                    children = list(element)
+                    if len(children) >= 1:
+                        num_child = children[0]
+                        process_element(num_child, node_id, 'HAS_NUMERATOR', child_order)
+                        child_order += 1
+                    
+                    if len(children) >= 2:
+                        denom_child = children[1]
+                        process_element(denom_child, node_id, 'HAS_DENOMINATOR', child_order)
+                
+                # Root: <mroot> has base and index
+                elif tag_name == 'mroot':
+                    children = list(element)
+                    if len(children) >= 1:
+                        base_child = children[0]
+                        process_element(base_child, node_id, 'HAS_BASE', child_order)
+                        child_order += 1
+                    
+                    if len(children) >= 2:
+                        index_child = children[1]
+                        process_element(index_child, node_id, 'HAS_INDEX', child_order)
+                
+                # Default case: process all element children with HAS_CHILD relationship
+                else:
+                    for child in element:
+                        if isinstance(child, ET.Element):
+                            # Determine relationship type based on context
+                            rel_type = 'HAS_CHILD'
+                            
+                            # For <mrow> with specific role attributes
+                            if tag_name == 'mrow' and 'class' in element.attrib:
+                                if element.attrib['class'] == 'MJX-TeXAtom-ORD':
+                                    rel_type = 'HAS_ORD_GROUP'
+                            
+                            process_element(child, node_id, rel_type, child_order)
+                            child_order += 1
+                
+                return node_id
+            
+            # Start processing from the root
+            root_node_id = process_element(root)
+            
+            # Create NEXT relationships for sibling elements at the same level
+            def create_sibling_relationships(element: ET.Element):
+                """Create NEXT relationships between sibling elements."""
+                parent_id = element_to_id.get(element)
+                if parent_id:
+                    # Get direct element children
+                    children = []
+                    for child in element:
+                        if isinstance(child, ET.Element) and child in element_to_id:
+                            children.append((child, element_to_id[child]))
+                    
+                    # Create NEXT relationships between consecutive siblings
+                    for i in range(len(children) - 1):
+                        current_id = children[i][1]
+                        next_id = children[i + 1][1]
+                        
+                        with self.driver.session(database=self.database) as session:
+                            session.run(
+                                """
+                                MATCH (a {id: $current_id}), (b {id: $next_id})
+                                MERGE (a)-[r:NEXT]->(b)
+                                SET r.sibling_order = $order
+                                """,
+                                current_id=current_id,
+                                next_id=next_id,
+                                order=i
+                            )
+                        stats['relationships'] += 1
+                    
+                    # Recursively process children
+                    for child, _ in children:
+                        create_sibling_relationships(child)
+            
+            # Create sibling relationships
+            create_sibling_relationships(root)
+            
+            # Update depth property for all nodes
+            def update_node_depths(element: ET.Element, current_depth: int = 0):
+                """Update depth property for nodes based on their position in the tree."""
+                if element in element_to_id:
+                    node_id = element_to_id[element]
+                    
+                    with self.driver.session(database=self.database) as session:
+                        session.run(
+                            """
+                            MATCH (n {id: $node_id})
+                            SET n.depth = $depth
+                            """,
+                            node_id=node_id,
+                            depth=current_depth
+                        )
+                    
+                    # Process children
+                    for child in element:
+                        if isinstance(child, ET.Element):
+                            update_node_depths(child, current_depth + 1)
+            
+            update_node_depths(root)
+            
+            # Create indexes for better querying
+            with self.driver.session(database=self.database) as session:
+                # Create index on tag name
+                session.run(
+                    f"CREATE INDEX formula_tag_index IF NOT EXISTS FOR (n:`{meta_label}`) ON (n.tag)"
+                )
+                
+                # Create text index for searching text content
+                session.run(
+                    f"CREATE TEXT INDEX formula_text_index IF NOT EXISTS FOR (n:`{meta_label}`) ON (n.text)"
+                )
+                
+                # Create index on depth for hierarchical queries
+                session.run(
+                    f"CREATE INDEX formula_depth_index IF NOT EXISTS FOR (n:`{meta_label}`) ON (n.depth)"
+                )
+            
+            print(f"Successfully loaded MathML formula from {mml_path}")
+            print(f"Total nodes created: {stats['total_nodes']}")
+            print(f"Nodes by MathML tag: {stats['nodes_by_tag']}")
+            print(f"Total relationships created: {stats['relationships']}")
+            print(f"Root node ID: {stats['root_node_id']}")
+            
+            return stats
+            
+        except ET.ParseError as e:
+            print(f"Error parsing MathML file: {e}")
+            return {'error': f'Parse error: {str(e)}'}
+        except FileNotFoundError:
+            print(f"MathML file not found: {mml_path}")
+            return {'error': f'File not found: {mml_path}'}
+        except Exception as e:
+            import traceback
+            print(f"Unexpected error processing formula: {e}")
+            print(f"Traceback: {traceback.format_exc()}")
+            return {'error': f'Processing error: {str(e)}'}
+        
+    def create_formula_graph(self, csv_file_path, meta_label="FormulaGraph"):
+        csv_file = pd.read_csv(csv_file_path)
+        for row in csv_file.itertuples():
+            pass
 
     def close(self):
         self.driver.close()
@@ -760,20 +1098,20 @@ class Neo4jAPI:
 
 
 
-# NEO4J_URI="neo4j+s://bffb5e09.databases.neo4j.io"
-# NEO4J_USERNAME="neo4j"
-# NEO4J_PASSWORD="zyHLoucQ5CPrKbW8NrJ_GWhLD-3OzCliOev1tEdbf08"
-# NEO4J_DATABASE="neo4j"
-# AURA_INSTANCEID="bffb5e09"
-# AURA_INSTANCENAME="Instance01"
-# instance = Neo4jAPI(NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD, NEO4J_DATABASE, aura_ds=True)
+NEO4J_URI="neo4j+s://bffb5e09.databases.neo4j.io"
+NEO4J_USERNAME="neo4j"
+NEO4J_PASSWORD="zyHLoucQ5CPrKbW8NrJ_GWhLD-3OzCliOev1tEdbf08"
+NEO4J_DATABASE="neo4j"
+AURA_INSTANCEID="bffb5e09"
+AURA_INSTANCENAME="Instance01"
+instance = Neo4jAPI(NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD, NEO4J_DATABASE, aura_ds=True)
 
 # instance.create_lexical_graph("/home/billal-mokhtari/.luminah/hierarchy_documents/hierarchy_raw_2601-04312v1-1", 
 #                               embedding_provider={"provider": "ollama", "model_name": "llama3.1:latest"}, 
 #                               llm={"provider": "ollama", "model_name": "llama3.1:latest"}, chunk_size=500, chunk_overlap=100)
 
-
-# instance.close()
+instance.formula_to_graph("/home/billal-mokhtari/Documents/Projects/Luminahv2/DocsToKG/results/formulas/formulas_sample_1/formula_3.mml")
+instance.close()
 
 
 # instance.load_csv(

@@ -1,0 +1,35 @@
+<math xmlns="http://www.w3.org/1998/Math/MathML" alttext="=\mathbf{U}(\mathbf{U}^{\top}\mathbf{g}\odot\mathbf{U}^{\top} \mathbf{x}),">
+  <mo>=</mo>
+  <mrow class="MJX-TeXAtom-ORD">
+    <mi mathvariant="bold">U</mi>
+  </mrow>
+  <mo stretchy="false">(</mo>
+  <msup>
+    <mrow class="MJX-TeXAtom-ORD">
+      <mi mathvariant="bold">U</mi>
+    </mrow>
+    <mrow class="MJX-TeXAtom-ORD">
+      <mi mathvariant="normal">&#x22A4;<!-- ⊤ -->
+    </mi>
+  </mrow>
+</msup>
+<mrow class="MJX-TeXAtom-ORD">
+  <mi mathvariant="bold">g</mi>
+</mrow>
+<mo>&#x2299;<!-- ⊙ -->
+</mo>
+<msup>
+  <mrow class="MJX-TeXAtom-ORD">
+    <mi mathvariant="bold">U</mi>
+  </mrow>
+  <mrow class="MJX-TeXAtom-ORD">
+    <mi mathvariant="normal">&#x22A4;<!-- ⊤ -->
+  </mi>
+</mrow>
+</msup>
+<mrow class="MJX-TeXAtom-ORD">
+  <mi mathvariant="bold">x</mi>
+</mrow>
+<mo stretchy="false">)</mo>
+<mo>,</mo>
+</math>

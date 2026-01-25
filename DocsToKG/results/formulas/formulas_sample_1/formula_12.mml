@@ -1,0 +1,10 @@
+<math xmlns="http://www.w3.org/1998/Math/MathML" alttext="\mathbf{g}^{n}">
+  <msup>
+    <mrow class="MJX-TeXAtom-ORD">
+      <mi mathvariant="bold">g</mi>
+    </mrow>
+    <mrow class="MJX-TeXAtom-ORD">
+      <mi>n</mi>
+    </mrow>
+  </msup>
+</math>

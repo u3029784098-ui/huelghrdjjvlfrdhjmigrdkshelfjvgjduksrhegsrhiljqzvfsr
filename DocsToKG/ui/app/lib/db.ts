@@ -134,21 +134,21 @@ export async function ensureSchema(): Promise<void> {
     `CREATE TABLE IF NOT EXISTS Setting (
       user_id BIGINT NOT NULL,
       project_name VARCHAR(255) NOT NULL,
-      raw_doc_path VARCHAR(1024),
+      raw_doc_path TEXT,
       raw_doc_prefix VARCHAR(255),
-      metadata_doc_path VARCHAR(1024),
+      metadata_doc_path TEXT,
       metadata_doc_prefix VARCHAR(255),
-      text_doc_path VARCHAR(1024),
+      text_doc_path TEXT,
       text_doc_prefix VARCHAR(255),
-      figures_doc_path VARCHAR(1024),
+      figures_doc_path TEXT,
       figures_doc_prefix VARCHAR(255),
-      formulas_doc_path VARCHAR(1024),
+      formulas_doc_path TEXT,
       formulas_doc_prefix VARCHAR(255),
-      tables_doc_path VARCHAR(1024),
+      tables_doc_path TEXT,
       tables_doc_prefix VARCHAR(255),
-      hierarchy_doc_path VARCHAR(1024),
+      hierarchy_doc_path TEXT,
       hierarchy_doc_prefix VARCHAR(255),
-      shrinks_doc_path VARCHAR(1024),
+      shrinks_doc_path TEXT,
       shrinks_doc_prefix VARCHAR(255),
       llm_provider VARCHAR(255),
       llm VARCHAR(255),
@@ -164,8 +164,8 @@ export async function ensureSchema(): Promise<void> {
       tables_graph_meta_label VARCHAR(255),
       figures_graph_meta_label VARCHAR(255),
       hierarchy_level TEXT,
-      llm_graph_builder_url VARCHAR(1024),
-      neo_4j_uri VARCHAR(1024),
+      llm_graph_builder_url TEXT,
+      neo_4j_uri TEXT,
       neo4j_username VARCHAR(255),
       neo4j_password VARCHAR(255),
       neo4j_database VARCHAR(255),
@@ -313,6 +313,22 @@ export async function ensureSchema(): Promise<void> {
   } catch (err: any) {
     if (err?.code !== "ER_DUP_FIELDNAME" && err?.errno !== 1060) {
       throw err;
+    }
+  }
+
+  // Change path columns from VARCHAR(1024) to TEXT to avoid row size limits
+  const pathColumns = [
+    'raw_doc_path', 'metadata_doc_path', 'text_doc_path', 'figures_doc_path',
+    'formulas_doc_path', 'tables_doc_path', 'hierarchy_doc_path', 'shrinks_doc_path',
+    'llm_graph_builder_url', 'neo_4j_uri'
+  ];
+  
+  for (const col of pathColumns) {
+    try {
+      await pool.query(`ALTER TABLE Setting MODIFY COLUMN ${col} TEXT`);
+    } catch (err: any) {
+      // Ignore if column doesn't exist or other benign errors
+      console.warn(`Could not modify column ${col}:`, err?.message);
     }
   }
 

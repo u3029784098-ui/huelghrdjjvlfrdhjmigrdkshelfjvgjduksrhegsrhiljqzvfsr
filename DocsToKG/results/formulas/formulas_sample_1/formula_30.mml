@@ -1,0 +1,13 @@
+<math xmlns="http://www.w3.org/1998/Math/MathML" alttext="\mathbf{h}^{r}_{i}">
+  <msubsup>
+    <mrow class="MJX-TeXAtom-ORD">
+      <mi mathvariant="bold">h</mi>
+    </mrow>
+    <mrow class="MJX-TeXAtom-ORD">
+      <mi>i</mi>
+    </mrow>
+    <mrow class="MJX-TeXAtom-ORD">
+      <mi>r</mi>
+    </mrow>
+  </msubsup>
+</math>

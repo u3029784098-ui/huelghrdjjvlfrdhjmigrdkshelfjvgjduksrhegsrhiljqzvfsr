@@ -324,9 +324,17 @@ class DocProcExtractor:
         if not os.path.exists(text_path):
             self.extract_text(input_path, self.output_structure["text"])
         
+        output_dir = os.path.join(output_dir, f"formulas_{os.path.basename(input_path).split('.')[0]}")
+        os.makedirs(output_dir, exist_ok=True)
+
         output_csv = os.path.join(output_dir, f"formulas_{os.path.basename(input_path).split(".")[0]}.csv")
         self._extract_formulas(text_path, output_csv=output_csv)
         self._validate_document(lm=lm, max_attempts=max_attempts, path_file=output_csv, save_path=output_csv)
+
+        for row in pd.read_csv(output_csv).itertuples():
+            formula = row.Formula
+            xml_output_path = os.path.join(output_dir, f"formula_{row.id}.mml")
+            result = subprocess.run(["node", "latex_to_mathml.mjs", formula, "-o", xml_output_path], capture_output=True, text=True)
 
     def _update_progress(self, task: str, processed: int, total: int):
         """Update progress in database for a specific task."""
@@ -1118,21 +1126,21 @@ class DocProcExtractor:
 
 # # -------------------- Script Entry --------------------
 
-if __name__ == "__main__":
-    folder_path = "../../../../results/raw"
-    output_structure = {
-        "metadata": "../../../../results/metadata",
-        "text": "../../../../results/text",
-        "formulas": "../../../../results/formulas",
-        "figures": "../../../../results/figures",
-        "hierarchy": "../../../../results/hierarchy",
-        "shrinks": "../../../../results/shrinks"
-    }
-    valid_tasks = ["formulas"]
+# if __name__ == "__main__":
+#     folder_path = "../../../../results/raw"
+#     output_structure = {
+#         "metadata": "../../../../results/metadata",
+#         "text": "../../../../results/text",
+#         "formulas": "../../../../results/formulas",
+#         "figures": "../../../../results/figures",
+#         "hierarchy": "../../../../results/hierarchy",
+#         "shrinks": "../../../../results/shrinks"
+#     }
+#     valid_tasks = ["formulas"]
 
-    dpex = DocProcExtractor(
-        folder_path=folder_path,
-        output_structure=output_structure,
-        apply_pipeline=True,
-        valid_tasks=valid_tasks,
-    )
+#     dpex = DocProcExtractor(
+#         folder_path=folder_path,
+#         output_structure=output_structure,
+#         apply_pipeline=True,
+#         valid_tasks=valid_tasks,
+#     )

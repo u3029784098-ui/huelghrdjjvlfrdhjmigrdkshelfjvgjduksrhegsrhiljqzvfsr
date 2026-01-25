@@ -1,0 +1,18 @@
+<math xmlns="http://www.w3.org/1998/Math/MathML" alttext="\mathbf{L}=\mathbf{U}\mathbf{U}^{\top}">
+  <mrow class="MJX-TeXAtom-ORD">
+    <mi mathvariant="bold">L</mi>
+  </mrow>
+  <mo>=</mo>
+  <mrow class="MJX-TeXAtom-ORD">
+    <mi mathvariant="bold">U</mi>
+  </mrow>
+  <msup>
+    <mrow class="MJX-TeXAtom-ORD">
+      <mi mathvariant="bold">U</mi>
+    </mrow>
+    <mrow class="MJX-TeXAtom-ORD">
+      <mi mathvariant="normal">&#x22A4;<!-- ⊤ -->
+    </mi>
+  </mrow>
+</msup>
+</math>

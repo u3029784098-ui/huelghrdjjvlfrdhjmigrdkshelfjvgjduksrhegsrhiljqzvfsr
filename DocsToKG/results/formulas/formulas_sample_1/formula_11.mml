@@ -1,0 +1,11 @@
+<math xmlns="http://www.w3.org/1998/Math/MathML" alttext="O(n^{2})">
+  <mi>O</mi>
+  <mo stretchy="false">(</mo>
+  <msup>
+    <mi>n</mi>
+    <mrow class="MJX-TeXAtom-ORD">
+      <mn>2</mn>
+    </mrow>
+  </msup>
+  <mo stretchy="false">)</mo>
+</math>

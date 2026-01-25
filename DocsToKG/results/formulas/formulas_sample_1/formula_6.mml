@@ -1,0 +1,17 @@
+<math xmlns="http://www.w3.org/1998/Math/MathML" alttext="|E|=N^{*}">
+  <mrow class="MJX-TeXAtom-ORD">
+    <mo stretchy="false">|</mo>
+  </mrow>
+  <mi>E</mi>
+  <mrow class="MJX-TeXAtom-ORD">
+    <mo stretchy="false">|</mo>
+  </mrow>
+  <mo>=</mo>
+  <msup>
+    <mi>N</mi>
+    <mrow class="MJX-TeXAtom-ORD">
+      <mo>&#x2217;<!-- ∗ -->
+    </mo>
+  </mrow>
+</msup>
+</math>
