@@ -1088,9 +1088,12 @@ class Neo4jAPI:
             return {'error': f'Processing error: {str(e)}'}
         
     def create_formula_graph(self, csv_file_path, meta_label="FormulaGraph"):
+        dir_path = os.path.dirname(csv_file_path)
         csv_file = pd.read_csv(csv_file_path)
         for row in csv_file.itertuples():
-            pass
+            id_formula = row.id
+            formula_mml_path = os.path.join(dir_path, f"formula_{id_formula}.mml")
+            self.formula_to_graph(mml_path=formula_mml_path, meta_label=meta_label)
 
     def close(self):
         self.driver.close()
@@ -1110,8 +1113,8 @@ instance = Neo4jAPI(NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD, NEO4J_DATABASE, a
 #                               embedding_provider={"provider": "ollama", "model_name": "llama3.1:latest"}, 
 #                               llm={"provider": "ollama", "model_name": "llama3.1:latest"}, chunk_size=500, chunk_overlap=100)
 
-instance.formula_to_graph("/home/billal-mokhtari/Documents/Projects/Luminahv2/DocsToKG/results/formulas/formulas_sample_1/formula_3.mml")
-instance.close()
+# instance.formula_to_graph("/home/billal-mokhtari/Documents/Projects/Luminahv2/DocsToKG/results/formulas/formulas_sample_1/formula_3.mml")
+# instance.close()
 
 
 # instance.load_csv(
